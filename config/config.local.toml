@@ -1,0 +1,23 @@
+[server]
+host = "127.0.0.1"
+port = ":4000"
+
+[secrets]
+access_secret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+refresh_secret = "JzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikpva"
+token_secret = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+
+[redis]
+host = "localhost"
+port = 6379
+db = 1
+
+[nsq]
+host = "127.0.0.1"
+port = 4150
+
+[database]
+db_url = "postgres://exchanger:qwerty@localhost:5432/exchanger_server_dev?sslmode=disable"
+
+[environment]
+production = false
