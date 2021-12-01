@@ -36,6 +36,7 @@ func (pr *PublicRoutes) userRegistrationHandler(c *gin.Context) {
 		c.JSON(http.StatusCreated, gin.H{
 			"chat_id":    u.ChatID,
 			"username":   u.Username,
+			"hash":       u.Hash,
 			"created_at": u.CreatedAt,
 			"updated_at": u.UpdatedAt,
 		})

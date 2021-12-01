@@ -3,3 +3,4 @@
 /server
 *.json
 /logs
+*.sql
