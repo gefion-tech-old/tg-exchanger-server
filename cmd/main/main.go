@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"fmt"
 	"runtime"
 
 	"github.com/BurntSushi/toml"
+	"github.com/gefion-tech/tg-exchanger-server/internal/app"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 )
@@ -21,6 +24,7 @@ func init() {
 
 func main() {
 	runtime.GOMAXPROCS(proc)
+	ctx := context.Background()
 
 	// Инициализирую конфигурацию
 	config := config.Init()
@@ -41,5 +45,11 @@ func main() {
 		panic(err)
 	}
 	defer redis.Close()
+
+	// Инициализация модуля приложения
+	application := app.Init(postgres, redis, config)
+	if err := application.Start(ctx); err != nil {
+		fmt.Println(err)
+	}
 
 }
