@@ -6,6 +6,7 @@ import (
 
 type AppRedisDictionaries struct {
 	Registration *redis.Client
+	Auth         *redis.Client
 }
 
 // Redis хранилище

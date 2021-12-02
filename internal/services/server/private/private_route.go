@@ -4,6 +4,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/guard"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +16,7 @@ type PrivateRoutes struct {
 }
 
 type PrivateRoutesI interface {
-	ConfigurePrivateRouter(router *gin.RouterGroup)
+	ConfigurePrivateRouter(router *gin.RouterGroup, g guard.GuardI)
 }
 
 // Конструктор модуля приватных маршрутов
@@ -29,5 +30,7 @@ func Init(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, router *gi
 }
 
 // Метод конфигуратор всех публичных маршрутов
-func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup) {
+func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard.GuardI) {
+
+	router.POST("/private", g.AuthTokenValidation(), g.IsAuth(), pr.privateHandler)
 }

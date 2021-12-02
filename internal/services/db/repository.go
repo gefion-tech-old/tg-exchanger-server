@@ -11,21 +11,14 @@ type UserRepository interface {
 	*/
 	Create(req *models.UserFromBotRequest) (*models.User, error)
 
+	/*
+		Метод регистрации человека как менеджера для доступа к админке
+	*/
 	RegisterAsManager(req *models.User) (*models.User, error)
 
 	/*
-		Метод обновления записи о пользователе
-	*/
-	// Update(req *models.UserRequest) (*models.User, error)
-
-	/*
-		Метод удаления записи из таблицы users
-	*/
-	// Delete(chatID int64) (*models.User, error)
-
-	/*
 		Метод поиска записи о пользователе в
-		таблице users по столбцу chat_id
+		таблице users по столбцу username
 	*/
-	// FindByChatID(chatID int64) (*models.User, error)
+	FindByUsername(username string) (*models.User, error)
 }

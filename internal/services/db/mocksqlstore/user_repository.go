@@ -1,6 +1,7 @@
 package mocksqlstore
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
@@ -33,4 +34,14 @@ func (r *UserRepository) RegisterAsManager(req *models.User) (*models.User, erro
 
 	r.users[u.ChatID] = u
 	return u, nil
+}
+
+func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
+	for _, u := range r.users {
+		if u.Username == username {
+			return u, nil
+		}
+	}
+
+	return nil, sql.ErrNoRows
 }

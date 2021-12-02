@@ -28,4 +28,9 @@ func Test_UserRepository(t *testing.T) {
 	m, err := s.User().RegisterAsManager(u)
 	assert.NoError(t, err)
 	assert.NotNil(t, m)
+
+	// Поиск пользователя по его username
+	uUsername, err := s.User().FindByUsername(u.Username)
+	assert.NoError(t, err)
+	assert.NotNil(t, uUsername)
 }

@@ -197,5 +197,53 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 		})
 		return
 	}
+}
+
+func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
+	req := &models.UserFromAdminRequest{}
+
+	if err := c.ShouldBindJSON(req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": errors.ErrInvalidBody.Error(),
+		})
+		return
+	}
+
+	// Ищу пользователя в БД
+	u, err := pr.store.User().FindByUsername(req.Username)
+	switch err {
+	case nil:
+		// Генерирую сборку токенов и сопутствующих деталей
+		td, err := pr.createToken(u.ChatID, u.Username)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		// Аутентифицирую пользователя
+		if err := pr.createAuth(u.ChatID, td); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"access_token":  td.AccessToken,
+			"refresh_token": td.RefreshToken,
+		})
+		return
+	case sql.ErrNoRows:
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": errors.ErrNotRegistered.Error(),
+		})
+		return
+	default:
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 
 }

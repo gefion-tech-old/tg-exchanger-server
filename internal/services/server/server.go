@@ -4,6 +4,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/guard"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/private"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/public"
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ type Server struct {
 	Router *gin.Engine
 	config *config.Config
 
-	// guard          guard.IGuard
+	guard          guard.GuardI
 	public_routes  public.PublicRoutesI
 	private_routes private.PrivateRoutesI
 }
@@ -41,11 +42,15 @@ func (s *Server) configure() {
 	s.public_routes.ConfigurePublicRouter(v1)
 
 	// Подключение приватных полей
-	s.private_routes.ConfigurePrivateRouter(v1)
+	s.private_routes.ConfigurePrivateRouter(v1, s.guard)
 }
+
 func root(s db.SQLStoreI, r *redisstore.AppRedisDictionaries, c *config.Config) *Server {
 	// Инициализация роутера
 	router := gin.New()
+
+	// Инициализация охранников маршрутов
+	guard := guard.Init(r.Auth, &c.Secrets)
 
 	// Инициализация модуля публичных маршрутов
 	pub := public.Init(s, r, router, &c.Secrets, &c.Users)
@@ -54,10 +59,10 @@ func root(s db.SQLStoreI, r *redisstore.AppRedisDictionaries, c *config.Config) 
 	prv := private.Init(s, r, router, &c.Secrets)
 
 	server := &Server{
-		store:  s,
-		Router: router,
-		config: c,
-		// guard:          guard,
+		store:          s,
+		Router:         router,
+		config:         c,
+		guard:          guard,
 		public_routes:  pub,
 		private_routes: prv,
 	}

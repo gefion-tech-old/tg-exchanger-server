@@ -70,3 +70,23 @@ func (r *UserRepository) RegisterAsManager(u *models.User) (*models.User, error)
 
 	return u, nil
 }
+
+func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
+	u := &models.User{}
+
+	if err := r.store.QueryRow(
+		`
+		SELECT chat_id, username, created_at, updated_at FROM users WHERE username=$1
+		`,
+		username,
+	).Scan(
+		&u.ChatID,
+		&u.Username,
+		&u.CreatedAt,
+		&u.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+
+	return u, nil
+}
