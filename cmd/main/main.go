@@ -40,14 +40,14 @@ func main() {
 	defer postgres.Close()
 
 	// Создаю подключение к Redis
-	redis, err := db.InitRedis(&config.Redis)
-	if err != nil {
-		panic(err)
-	}
-	defer redis.Close()
+	// redis, err := db.InitRedis(&config.Redis)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer redis.Close()
 
 	// Инициализация модуля приложения
-	application := app.Init(postgres, redis, config)
+	application := app.Init(postgres, config)
 	if err := application.Start(ctx); err != nil {
 		fmt.Println(err)
 	}

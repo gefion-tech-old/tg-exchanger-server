@@ -3,12 +3,13 @@ package private
 import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/gin-gonic/gin"
 )
 
 type PrivateRoutes struct {
 	store   db.SQLStoreI
-	redis   db.RedisStoreI
+	redis   *redisstore.AppRedisDictionaries
 	router  *gin.Engine
 	secrets *config.SecretsConfig
 }
@@ -18,7 +19,7 @@ type PrivateRoutesI interface {
 }
 
 // Конструктор модуля приватных маршрутов
-func Init(store db.SQLStoreI, redis db.RedisStoreI, router *gin.Engine, secrets *config.SecretsConfig) PrivateRoutesI {
+func Init(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, router *gin.Engine, secrets *config.SecretsConfig) PrivateRoutesI {
 	return &PrivateRoutes{
 		store:   store,
 		redis:   redis,

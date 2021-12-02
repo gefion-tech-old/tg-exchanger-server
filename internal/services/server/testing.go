@@ -15,16 +15,24 @@ import (
 	Функция возвращает сконфигурированный тестовый сервер
 	К тестовому серверу подключается имитация sql хранилища
 */
-func TestServer(t *testing.T) (*Server, *redis.Client) {
+func TestServer(t *testing.T) (*Server, *redisstore.AppRedisDictionaries, func(...*redis.Client)) {
 	t.Helper()
 
 	config := config.InitTestConfig(t)
 	assert.NotNil(t, config)
 
-	// Создаю подключение к Redis БД
-	redis, err := db.InitRedis(&config.Redis)
+	// Создание redis хранилища для хранения данных о регистрации пользователя
+	rr, err := db.InitRedis(&config.Redis, 1)
 	assert.NoError(t, err)
-	redisStore := redisstore.Init(redis)
 
-	return root(mocksqlstore.Init(), redisStore, config), redis
+	AppRedis := &redisstore.AppRedisDictionaries{
+		Registration: rr,
+	}
+
+	return root(mocksqlstore.Init(), AppRedis, config), AppRedis, func(clients ...*redis.Client) {
+		for _, client := range clients {
+			client.FlushAllAsync()
+			client.Close()
+		}
+	}
 }

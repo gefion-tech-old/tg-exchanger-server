@@ -11,16 +11,152 @@ import (
 	"github.com/go-playground/assert/v2"
 )
 
-func Test_Server_UserInBotRegistrationHandler(t *testing.T) {
-	s, redis := server.TestServer(t)
-	defer redis.FlushAllAsync()
-	defer redis.Close()
+func Test_Server_UserInAdminRegistrationHandler(t *testing.T) {
+	s, _, teardown := server.TestServer(t)
+	defer teardown()
 
 	testCases := []struct {
 		name         string
 		payload      interface{}
 		expectedCode int
 	}{
+		{
+			name:         "invalid payload",
+			payload:      "invalid",
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "empty code",
+			payload: map[string]interface{}{
+				"code": "",
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "invalid code (short)",
+			payload: map[string]interface{}{
+				"code": 134,
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "invalid code (long)",
+			payload: map[string]interface{}{
+				"code": 9764115,
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Кодирую тело запроса
+			b := &bytes.Buffer{}
+			json.NewEncoder(b).Encode(tc.payload)
+
+			rec := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/registration", b)
+			s.Router.ServeHTTP(rec, req)
+
+			assert.Equal(t, tc.expectedCode, rec.Code)
+		})
+	}
+
+}
+
+func Test_Server_UserGenerateCodeHandler(t *testing.T) {
+	s, redis, teardown := server.TestServer(t)
+	defer teardown(redis.Registration)
+
+	testCases := []struct {
+		name         string
+		payload      interface{}
+		expectedCode int
+	}{
+		{
+			name:         "invalid payload",
+			payload:      "invalid",
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "empty username",
+			payload: map[string]interface{}{
+				"username": "",
+				"password": "4tfgefhey75uh",
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "outsider username",
+			payload: map[string]interface{}{
+				"username": "outsider",
+				"password": "4tfgefhey75uh",
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "empty password",
+			payload: map[string]interface{}{
+				"username": "I0HuKc",
+				"password": "",
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "short password",
+			payload: map[string]interface{}{
+				"username": "I0HuKc",
+				"password": "1235",
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "to long password",
+			payload: map[string]interface{}{
+				"username": "I0HuKc",
+				"password": "1235678901234567890",
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "valid",
+			payload: map[string]interface{}{
+				"username": "I0HuKc",
+				"password": "4tfgefhey75uh",
+			},
+			expectedCode: http.StatusOK,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Кодирую тело запроса
+			b := &bytes.Buffer{}
+			json.NewEncoder(b).Encode(tc.payload)
+
+			rec := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/registration/code", b)
+			s.Router.ServeHTTP(rec, req)
+
+			assert.Equal(t, tc.expectedCode, rec.Code)
+		})
+	}
+}
+
+func Test_Server_UserInBotRegistrationHandler(t *testing.T) {
+	s, _, teardown := server.TestServer(t)
+	defer teardown()
+
+	testCases := []struct {
+		name         string
+		payload      interface{}
+		expectedCode int
+	}{
+		{
+			name:         "invalid payload",
+			payload:      "invalid",
+			expectedCode: http.StatusUnprocessableEntity,
+		},
 		{
 			name: "empty chat_id",
 			payload: map[string]interface{}{
@@ -68,5 +204,4 @@ func Test_Server_UserInBotRegistrationHandler(t *testing.T) {
 			assert.Equal(t, tc.expectedCode, rec.Code)
 		})
 	}
-
 }

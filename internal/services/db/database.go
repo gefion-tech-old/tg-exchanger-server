@@ -25,10 +25,10 @@ func InitPostgres(config *config.DatabaseConfig) (*sql.DB, error) {
 }
 
 // Функция инициализации Redis БД
-func InitRedis(config *config.RedisConfig) (*redis.Client, error) {
+func InitRedis(config *config.RedisConfig, db int) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d", config.Host, config.Port),
-		DB:   int(config.DB),
+		DB:   db,
 	})
 
 	// Тест соединение

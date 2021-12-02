@@ -23,4 +23,9 @@ func Test_UserRepository(t *testing.T) {
 	u, err := s.User().Create(&mocks.USER_IN_BOT_REGISTRATION_REQUEST)
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
+
+	// Регистрация человека как менеджера
+	m, err := s.User().RegisterAsManager(u)
+	assert.NoError(t, err)
+	assert.NotNil(t, m)
 }

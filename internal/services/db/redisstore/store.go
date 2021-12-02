@@ -1,14 +1,20 @@
 package redisstore
 
-import "github.com/go-redis/redis/v7"
+import (
+	"github.com/go-redis/redis/v7"
+)
+
+type AppRedisDictionaries struct {
+	Registration *redis.Client
+}
 
 // Redis хранилище
 type RedisStore struct {
-	Client *redis.Client
+	client *redis.Client
 }
 
 func Init(client *redis.Client) *RedisStore {
 	return &RedisStore{
-		Client: client,
+		client: client,
 	}
 }

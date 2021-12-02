@@ -9,7 +9,9 @@ type UserRepository interface {
 	/*
 		Метод создания новой записи пользователя в таблице users
 	*/
-	Create(req *models.UserRequest) (*models.User, error)
+	Create(req *models.UserFromBotRequest) (*models.User, error)
+
+	RegisterAsManager(req *models.User) (*models.User, error)
 
 	/*
 		Метод обновления записи о пользователе

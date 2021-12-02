@@ -6,6 +6,7 @@ type Config struct {
 	Redis       RedisConfig       `toml:"redis"`
 	NSQ         NsqConfig         `toml:"nsq"`
 	DB          DatabaseConfig    `toml:"database"`
+	Users       UsersConfig       `toml:"users"`
 	Environment EnvironmentConfig `toml:"environment"`
 }
 
@@ -37,6 +38,11 @@ type EnvironmentConfig struct {
 type NsqConfig struct {
 	Host string `toml:"host"`
 	Port uint16 `toml:"port"`
+}
+
+type UsersConfig struct {
+	Managers   []string `toml:"managers"`
+	Developers []string `toml:"developers"`
 }
 
 func Init() *Config {

@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/private"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/public"
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,7 @@ type ServerI interface {
 	Run() error
 }
 
-func Init(s db.SQLStoreI, r db.RedisStoreI, c *config.Config) ServerI {
+func Init(s db.SQLStoreI, r *redisstore.AppRedisDictionaries, c *config.Config) ServerI {
 	return root(s, r, c)
 }
 
@@ -42,12 +43,12 @@ func (s *Server) configure() {
 	// Подключение приватных полей
 	s.private_routes.ConfigurePrivateRouter(v1)
 }
-func root(s db.SQLStoreI, r db.RedisStoreI, c *config.Config) *Server {
+func root(s db.SQLStoreI, r *redisstore.AppRedisDictionaries, c *config.Config) *Server {
 	// Инициализация роутера
 	router := gin.New()
 
 	// Инициализация модуля публичных маршрутов
-	pub := public.Init(s, r, router, &c.Secrets)
+	pub := public.Init(s, r, router, &c.Secrets, &c.Users)
 
 	// Инициализация модуля приватных маршрутов
 	prv := private.Init(s, r, router, &c.Secrets)
@@ -61,8 +62,8 @@ func root(s db.SQLStoreI, r db.RedisStoreI, c *config.Config) *Server {
 		private_routes: prv,
 	}
 
-	gin.SetMode(gin.DebugMode)
 	gin.ForceConsoleColor()
+	server.Router.Use(gin.Logger())
 
 	server.configure()
 	return server
