@@ -20,15 +20,14 @@ func (r *UserRepository) Create(req *models.UserFromBotRequest) (*models.User, e
 	}
 
 	r.users[u.ChatID] = u
-	return u, nil
+	return r.users[u.ChatID], nil
 }
 
 func (r *UserRepository) RegisterAsManager(req *models.User) (*models.User, error) {
 	u := &models.User{
-		ChatID:    req.ChatID,
+		ChatID:    1,
 		Username:  req.Username,
 		Hash:      req.Hash,
-		CreatedAt: time.Now().Format(time.RFC3339),
 		UpdatedAt: time.Now().Format(time.RFC3339),
 	}
 

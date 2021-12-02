@@ -76,11 +76,12 @@ func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
 
 	if err := r.store.QueryRow(
 		`
-		SELECT chat_id, username, created_at, updated_at FROM users WHERE username=$1
+		SELECT chat_id, hash, username, created_at, updated_at FROM users WHERE username=$1
 		`,
 		username,
 	).Scan(
 		&u.ChatID,
+		&u.Hash,
 		&u.Username,
 		&u.CreatedAt,
 		&u.UpdatedAt,

@@ -84,7 +84,12 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 	}
 
 	// Генерирую код подтверждения
-	code := tools.RandInt(100000, 999999)
+	var code int
+	if req.Testing {
+		code = 100000
+	} else {
+		code = tools.RandInt(100000, 999999)
+	}
 
 	// Валидирую данные
 	if err := req.UserFromAdminRequestValidation(pr.users.Managers, pr.users.Developers); err != nil {
@@ -181,7 +186,6 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 		c.JSON(http.StatusCreated, gin.H{
 			"chat_id":    user.ChatID,
 			"username":   user.Username,
-			"hash":       user.Hash,
 			"created_at": user.CreatedAt,
 			"updated_at": user.UpdatedAt,
 		})
@@ -199,7 +203,20 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 	}
 }
 
+/*
+	@Method POST
+	@Path /admin/auth
+	@Type PUBLIC
+	@Documentation
+
+	В методе проверяется, есть ли в бд пользователь с переданным username.
+	Если пользователь найден, смотрим есть ли у него hash пароль (если нет, значит он не зареган как менеджер)
+	Если хеш найден и совпадает с переданным паролем, создаю пользовательскую сессию.
+
+	# TESTED
+*/
 func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
+
 	req := &models.UserFromAdminRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -213,30 +230,38 @@ func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
 	u, err := pr.store.User().FindByUsername(req.Username)
 	switch err {
 	case nil:
-		// Генерирую сборку токенов и сопутствующих деталей
-		td, err := pr.createToken(u.ChatID, u.Username)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
+		if u.Hash != nil && tools.ComparePassword(*u.Hash, req.Password) {
+			// Генерирую сборку токенов и сопутствующих деталей
+			td, err := pr.createToken(u.ChatID, u.Username)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+
+			// Аутентифицирую пользователя
+			if err := pr.createAuth(u.ChatID, td); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": err.Error(),
+				})
+			}
+
+			c.JSON(http.StatusOK, gin.H{
+				"access_token":  td.AccessToken,
+				"refresh_token": td.RefreshToken,
 			})
 			return
 		}
 
-		// Аутентифицирую пользователя
-		if err := pr.createAuth(u.ChatID, td); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
-		}
-
-		c.JSON(http.StatusOK, gin.H{
-			"access_token":  td.AccessToken,
-			"refresh_token": td.RefreshToken,
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": _errors.New("user with this username or parrword is not registered as manager").Error(),
 		})
 		return
+
 	case sql.ErrNoRows:
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrNotRegistered.Error(),
+			"error": _errors.New("user with this username or parrword is not registered as manager").Error(),
 		})
 		return
 	default:

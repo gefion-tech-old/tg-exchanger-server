@@ -1,6 +1,8 @@
 package server
 
 import (
+	"bytes"
+	"encoding/json"
 	"testing"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
@@ -22,11 +24,16 @@ func TestServer(t *testing.T) (*Server, *redisstore.AppRedisDictionaries, func(.
 	assert.NotNil(t, config)
 
 	// Создание redis хранилища для хранения данных о регистрации пользователя
-	rr, err := db.InitRedis(&config.Redis, 1)
+	rRegistration, err := db.InitRedis(&config.Redis, 1)
+	assert.NoError(t, err)
+
+	// Создание redis хранилища для хранения пользовательских сессий
+	rAuth, err := db.InitRedis(&config.Redis, 2)
 	assert.NoError(t, err)
 
 	AppRedis := &redisstore.AppRedisDictionaries{
-		Registration: rr,
+		Registration: rRegistration,
+		Auth:         rAuth,
 	}
 
 	return root(mocksqlstore.Init(), AppRedis, config), AppRedis, func(clients ...*redis.Client) {
@@ -35,4 +42,19 @@ func TestServer(t *testing.T) (*Server, *redisstore.AppRedisDictionaries, func(.
 			client.Close()
 		}
 	}
+}
+
+/*
+	Метод для быстрой проверки текста ошибки
+*/
+func TestGetErrorText(t *testing.T, recBody *bytes.Buffer) (string, error) {
+	t.Helper()
+
+	var body map[string]interface{}
+
+	if err := json.NewDecoder(recBody).Decode(&body); err != nil {
+		return "", err
+	}
+
+	return body["error"].(string), nil
 }

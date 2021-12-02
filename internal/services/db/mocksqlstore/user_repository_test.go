@@ -14,4 +14,10 @@ func Test_UserRepository(t *testing.T) {
 	u, err := s.User().Create(&mocks.USER_IN_BOT_REGISTRATION_REQUEST)
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
+	assert.Equal(t, mocks.USER_IN_BOT_REGISTRATION_REQUEST.Username, u.Username)
+
+	uf, err := s.User().FindByUsername(mocks.USER_IN_BOT_REGISTRATION_REQUEST.Username)
+	assert.NoError(t, err)
+	assert.NotNil(t, uf)
+	assert.Equal(t, mocks.USER_IN_BOT_REGISTRATION_REQUEST.Username, uf.Username)
 }
