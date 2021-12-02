@@ -4,7 +4,8 @@
 - [REST API](#rest-api)
     - [Public](#public)
         - [Registration in Bot](#registration-in-bot)
-        - [Auth](#auth)
+        - [Registration in Admin Panel](#registration-in-admin-panel)
+        - [Auth in Admin Panel](#auth-in-admin-panel)       
     - [Private](#private)
 - [Database](#database)
     - [Postgres](#postgres)
@@ -19,7 +20,7 @@
 
 #### Registration in Bot
 
-- [POST] `/api/v1/bot/registration` — Регистрация пользователя через интерфейс Telegram
+- **[POST]** `/api/v1/bot/registration` — Регистрация пользователя через интерфейс Telegram
 
 **Request**
 
@@ -39,7 +40,7 @@
 
 Код подтверждения актуален только в течении **30 минут**.
 
-- [POST] `/api/v1/admin/registration/code` — В ЛС пользователю отправиться код подтверждения. 
+- **[POST]** `/api/v1/admin/registration/code` — В ЛС пользователю отправиться код подтверждения. 
 
 ***Request***
 
@@ -58,7 +59,7 @@
 
 ##### Step 2
 
-- [POST] `/api/v1/admin/registration` — Завершение регистрации пользователя
+- **[POST]** `/api/v1/admin/registration` — Завершение регистрации пользователя
 
 ***Request***
 
@@ -71,7 +72,7 @@
 #### Auth in Admin Panel
 
 
-- [POST] `/api/v1/admin/auth` — Войти в созданный аккаунт
+- **[POST]** `/api/v1/admin/auth` — Войти в созданный аккаунт
 
 ***Request***
 
