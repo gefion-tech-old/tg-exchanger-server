@@ -4,21 +4,21 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config/errors"
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
 /*
 	@Method POST
-	@Path /registration
+	@Path /bot/registration
 	@Type PUBLIC
 	@Documentation
 
-	Регистрация пользователя. При валидных данных создается
+	Регистрация человека как пользователя бота. При валидных данных создается
 	запись в БД в таблице `users`.
 */
-func (pr *PublicRoutes) userRegistrationHandler(c *gin.Context) {
+func (pr *PublicRoutes) userInBotRegistrationHandler(c *gin.Context) {
 	req := &models.UserRequest{}
 
 	// Парсинг входящего тела запроса

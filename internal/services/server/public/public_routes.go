@@ -29,7 +29,8 @@ func Init(store db.SQLStoreI, redis db.RedisStoreI, router *gin.Engine, secrets 
 
 // Метод конфигуратор всех публичных маршрутов
 func (pr *PublicRoutes) ConfigurePublicRouter(router *gin.RouterGroup) {
-	router.POST("/registration", pr.userRegistrationHandler)
+	bot := router.Group("/bot")
+	bot.POST("/registration", pr.userInBotRegistrationHandler)
 }
 
 func (pr *PublicRoutes) testHandler(c *gin.Context) {}

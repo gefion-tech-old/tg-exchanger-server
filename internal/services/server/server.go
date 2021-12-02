@@ -23,6 +23,26 @@ type ServerI interface {
 }
 
 func Init(s db.SQLStoreI, r db.RedisStoreI, c *config.Config) ServerI {
+	return root(s, r, c)
+}
+
+// Метод запуска сервера
+func (s *Server) Run() error {
+	return s.Router.Run(s.config.Server.Port)
+}
+
+// Метод общей конфигурации сервера
+func (s *Server) configure() {
+	api := s.Router.Group("/api")
+	v1 := api.Group("/v1")
+
+	// Подключение публичных путей
+	s.public_routes.ConfigurePublicRouter(v1)
+
+	// Подключение приватных полей
+	s.private_routes.ConfigurePrivateRouter(v1)
+}
+func root(s db.SQLStoreI, r db.RedisStoreI, c *config.Config) *Server {
 	// Инициализация роутера
 	router := gin.New()
 
@@ -46,21 +66,4 @@ func Init(s db.SQLStoreI, r db.RedisStoreI, c *config.Config) ServerI {
 
 	server.configure()
 	return server
-}
-
-// Метод общей конфигурации сервера
-func (s *Server) configure() {
-	api := s.Router.Group("/api")
-	v1 := api.Group("/v1")
-
-	// Подключение публичных путей
-	s.public_routes.ConfigurePublicRouter(v1)
-
-	// Подключение приватных полей
-	s.private_routes.ConfigurePrivateRouter(v1)
-}
-
-// Метод запуска сервера
-func (s *Server) Run() error {
-	return s.Router.Run(s.config.Server.Port)
 }
