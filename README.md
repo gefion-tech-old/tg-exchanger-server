@@ -22,12 +22,12 @@
 
 - **[POST]** `/api/v1/bot/registration` — Регистрация пользователя через интерфейс Telegram
 
-**Request**
+***Request***
 
 ```json
 {
     "chat_id": 564353,
-    "username": "SomeUsername"
+    "username": "I0HuKc"
 }
 ```
 

@@ -18,7 +18,7 @@ import (
 	@Method POST
 	@Path /bot/registration
 	@Type PUBLIC
-	@Documentation
+	@Documentation https://github.com/gefion-tech/tg-exchanger-server#registration-in-bot
 
 	Регистрация человека как пользователя бота. При валидных данных создается
 	запись в БД в таблице `users`.
@@ -65,7 +65,7 @@ func (pr *PublicRoutes) userInBotRegistrationHandler(c *gin.Context) {
 	@Method POST
 	@Path /admin/registration/code
 	@Type PUBLIC
-	@Documentation
+	@Documentation https://github.com/gefion-tech/tg-exchanger-server#registration-in-admin-panel
 
 	Пользователю с переданным username в ЛС будет отправлен код подтверждения
 	который он должен будет ввести в окне на фронтенде. В ответ на запрос отдается
@@ -137,7 +137,7 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 	@Method POST
 	@Path /admin/registration
 	@Type PUBLIC
-	@Documentation
+	@Documentation https://github.com/gefion-tech/tg-exchanger-server#registration-in-admin-panel
 
 	Регистрация человека как пользователя фвьин-панели. При валидных данных
 	обновляется поле has в БД в таблице `users`.
@@ -207,7 +207,7 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 	@Method POST
 	@Path /admin/auth
 	@Type PUBLIC
-	@Documentation
+	@Documentation https://github.com/gefion-tech/tg-exchanger-server#auth-in-admin-panel
 
 	В методе проверяется, есть ли в бд пользователь с переданным username.
 	Если пользователь найден, смотрим есть ли у него hash пароль (если нет, значит он не зареган как менеджер)
