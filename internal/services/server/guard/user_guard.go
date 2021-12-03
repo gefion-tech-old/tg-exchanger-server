@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,11 +26,9 @@ func (g *Guard) IsAuth() gin.HandlerFunc {
 			return
 		}
 
-		errFetch := g.redis.Get(tokenAuth.AccessUuid).Err()
-
-		if errFetch != nil {
+		if errFetch := g.redis.Get(tokenAuth.AccessUuid).Err(); errFetch != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": err.Error(),
+				"error": errors.ErrTokenInvalid,
 			})
 			c.Abort()
 			return

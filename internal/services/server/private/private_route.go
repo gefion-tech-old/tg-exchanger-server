@@ -31,6 +31,7 @@ func Init(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, router *gi
 
 // Метод конфигуратор всех публичных маршрутов
 func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard.GuardI) {
+	admin := router.Group("/admin")
+	admin.POST("/logout", g.AuthTokenValidation(), g.IsAuth(), pr.logout)
 
-	router.POST("/private", g.AuthTokenValidation(), g.IsAuth(), pr.privateHandler)
 }

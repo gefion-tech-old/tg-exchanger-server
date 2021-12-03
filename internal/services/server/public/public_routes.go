@@ -38,6 +38,8 @@ func Init(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, router *gi
 
 // Метод конфигуратор всех публичных маршрутов
 func (pr *PublicRoutes) ConfigurePublicRouter(router *gin.RouterGroup) {
+	router.POST("/token/refresh", pr.refreshToken)
+
 	bot := router.Group("/bot")
 	bot.POST("/registration", pr.userInBotRegistrationHandler)
 
