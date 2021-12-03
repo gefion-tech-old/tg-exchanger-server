@@ -7,6 +7,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
@@ -15,6 +16,7 @@ import (
 
 type PublicRoutes struct {
 	store   db.SQLStoreI
+	nsq     nsqstore.NsqI
 	redis   *redisstore.AppRedisDictionaries
 	router  *gin.Engine
 	secrets *config.SecretsConfig
@@ -26,9 +28,15 @@ type PublicRoutesI interface {
 }
 
 // Конструктор модуля публичных маршрутов
-func Init(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, router *gin.Engine, secrets *config.SecretsConfig, users *config.UsersConfig) PublicRoutesI {
+func Init(
+	store db.SQLStoreI,
+	nsq nsqstore.NsqI,
+	redis *redisstore.AppRedisDictionaries,
+	router *gin.Engine,
+	secrets *config.SecretsConfig, users *config.UsersConfig) PublicRoutesI {
 	return &PublicRoutes{
 		store:   store,
+		nsq:     nsq,
 		redis:   redis,
 		router:  router,
 		secrets: secrets,

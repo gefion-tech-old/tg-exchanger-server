@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/guard"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/private"
@@ -24,8 +25,8 @@ type ServerI interface {
 	Run() error
 }
 
-func Init(s db.SQLStoreI, r *redisstore.AppRedisDictionaries, c *config.Config) ServerI {
-	return root(s, r, c)
+func Init(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, c *config.Config) ServerI {
+	return root(s, nsq, r, c)
 }
 
 // Метод запуска сервера
@@ -45,7 +46,7 @@ func (s *Server) configure() {
 	s.private_routes.ConfigurePrivateRouter(v1, s.guard)
 }
 
-func root(s db.SQLStoreI, r *redisstore.AppRedisDictionaries, c *config.Config) *Server {
+func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, c *config.Config) *Server {
 	// Инициализация роутера
 	router := gin.New()
 
@@ -53,7 +54,7 @@ func root(s db.SQLStoreI, r *redisstore.AppRedisDictionaries, c *config.Config) 
 	guard := guard.Init(r.Auth, &c.Secrets)
 
 	// Инициализация модуля публичных маршрутов
-	pub := public.Init(s, r, router, &c.Secrets, &c.Users)
+	pub := public.Init(s, nsq, r, router, &c.Secrets, &c.Users)
 
 	// Инициализация модуля приватных маршрутов
 	prv := private.Init(s, r, router, &c.Secrets)

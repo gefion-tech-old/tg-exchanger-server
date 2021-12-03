@@ -10,6 +10,7 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 )
@@ -83,12 +84,44 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 		return
 	}
 
+	u, err := pr.store.User().FindByUsername(req.Username)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"error": _errors.New("user with this username registered in bot").Error(),
+			})
+			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+	}
+
 	// Генерирую код подтверждения
-	var code int
-	if req.Testing {
-		code = 100000
-	} else {
-		code = tools.RandInt(100000, 999999)
+	code := tools.VerificationCode(req.Testing)
+
+	// Формирую сообщение и отправляю его в очередь
+	m := map[string]interface{}{
+		"to": map[string]interface{}{
+			"chat_id":  u.ChatID,
+			"username": u.Username,
+		},
+		"message": map[string]interface{}{
+			"type": "verification_code",
+			"text": fmt.Sprintf("%d", code),
+		},
+		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+	}
+
+	payload, err := json.Marshal(m)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
 
 	// Валидирую данные
@@ -102,7 +135,7 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 	// Хеширую пароль
 	hash, err := tools.EncryptString(req.Password)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
@@ -114,7 +147,7 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 		"hash":     hash,
 	})
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
@@ -122,15 +155,21 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 
 	// Записываю в Redis
 	if err := pr.redis.Registration.Set(fmt.Sprintf("%d", code), b, 30*time.Minute).Err(); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"code": code, // УБРАТЬ ЭТУ СТРОКУ В ПРОДЕ
-	})
+	// Отправляю сообщение в NSQ
+	if err := pr.nsq.Publish(nsqstore.VERIFICATION_CODE__TOPIC, payload); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 /*

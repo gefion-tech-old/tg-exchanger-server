@@ -8,6 +8,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/mocksqlstore"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/go-redis/redis/v7"
 	"github.com/stretchr/testify/assert"
@@ -36,7 +37,11 @@ func TestServer(t *testing.T) (*Server, *redisstore.AppRedisDictionaries, func(.
 		Auth:         rAuth,
 	}
 
-	return root(mocksqlstore.Init(), AppRedis, config), AppRedis, func(clients ...*redis.Client) {
+	// Инициализация соединения с NSQ
+	producer, err := db.InitNSQ(&config.NSQ)
+	assert.NoError(t, err)
+
+	return root(mocksqlstore.Init(), nsqstore.Init(producer), AppRedis, config), AppRedis, func(clients ...*redis.Client) {
 		for _, client := range clients {
 			client.FlushAllAsync()
 			client.Close()

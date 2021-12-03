@@ -5,6 +5,11 @@ go 1.17
 require github.com/lib/pq v1.10.4
 
 require (
+	github.com/golang/snappy v0.0.1 // indirect
+	github.com/nsqio/go-nsq v1.1.0 // indirect
+)
+
+require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect

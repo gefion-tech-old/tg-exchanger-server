@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Сгенерировать случайное число
 func RandInt(min int, max int) int {
 	rand.Seed(time.Now().Unix())
 	if min > max {
@@ -16,6 +17,7 @@ func RandInt(min int, max int) int {
 	}
 }
 
+// Создать хеш из пароля
 func EncryptString(s string) (string, error) {
 	b, err := bcrypt.GenerateFromPassword([]byte(s), bcrypt.MinCost)
 	if err != nil {
@@ -25,6 +27,16 @@ func EncryptString(s string) (string, error) {
 	return string(b), nil
 }
 
+// Сравнить хеш и пароль
 func ComparePassword(hash, password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
+}
+
+// Сгенерировать код подтверждения
+func VerificationCode(testing bool) int {
+	if testing {
+		return 100000
+	} else {
+		return RandInt(100000, 999999)
+	}
 }
