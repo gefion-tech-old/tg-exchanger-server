@@ -161,6 +161,9 @@
 
 ***Response***
 
+Время жизни `access_token` — **15 минут**
+Время жизни `refresh_token` — **7 дней**
+
 ```json
 {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6IjRmYzdhNmY5LWUzNzgtNDI0ZS05N2FlLTgxODZiNDI0N2FiOSIsImF1dGhvcml6ZWQiOnRydWUsImNoYXRfaWQiOjM1NDYyMjMsImV4cCI6MTYzODQ1ODAxMywidXNlcm5hbWUiOiJJMEh1S2MifQ.J90F-4a__q3uMkRWAS0K-IxXczT7t1rnPZqc1GAeDWU",
