@@ -84,6 +84,14 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 		return
 	}
 
+	// Валидирую полученные данные
+	if err := req.UserFromAdminRequestValidation(pr.users.Managers, pr.users.Developers); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
 	u, err := pr.store.User().FindByUsername(req.Username)
 	if err != nil {
 		switch err {
@@ -119,14 +127,6 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 	payload, err := json.Marshal(m)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	// Валидирую данные
-	if err := req.UserFromAdminRequestValidation(pr.users.Managers, pr.users.Developers); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
 		return
