@@ -1,0 +1,27 @@
+[server]
+host = "127.0.0.1"
+port = ":4000"
+
+[secrets]
+access_secret = "uhOmoMnMvOyfHizBVB7DlA0TcyHF3ySfg1tfi1Ay"
+refresh_secret = "5rfzJsTCTWkLdxb3iDmb0qKOI56n61aakB4y7KC9"
+token_secret = "mxJ4sOO4JYIyWGvCSlno9KUf3oaF15LOgktDkM2s"
+
+[redis]
+host = "localhost"
+port = 6379
+db = 1
+
+[nsq]
+host = "127.0.0.1"
+port = 4150
+
+[database]
+db_url = "postgres://exchanger:oHEKX73YQsZMSZo05@localhost:5432/exchanger_prod?sslmode=disable"
+
+[users]
+managers = []
+developers = ["I0HuKc", "enthusedfir"]
+
+[environment]
+production = false

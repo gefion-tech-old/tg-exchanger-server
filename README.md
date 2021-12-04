@@ -14,6 +14,8 @@
     - [Redis](#redis)
 - [Tools](#tools)
     - [Migrations](#migrations)
+        - [Create Migration](#create-migration)
+        - [Up/Down Migration](#up/down-migration)
 
 
 ## REST API
@@ -139,8 +141,14 @@
 
 ## Migrations
 
-**Накатить/Откатить миграцию**
+### Create Migration
 
-```bash
+```
+migrate create -ext sql -dir migrations migration_name
+```
+
+### Up/Down Migration
+
+```
 migrate -path migrations -database "postgres://exchanger:qwerty@localhost:5432/exchanger_server_dev?sslmode=disable" up/down
 ```
