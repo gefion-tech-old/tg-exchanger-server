@@ -5,16 +5,17 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/sqlstore"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_SQL_UserRepository(t *testing.T) {
+func Test_SQL_UserBillsRepository(t *testing.T) {
 	config := config.InitTestConfig(t)
 
 	db, teardown := db.TestDB(t, &config.DB)
-	defer teardown("users")
+	defer teardown("users", "bills")
 
 	// Вызываю создание хранилища
 	s := sqlstore.Init(db)
@@ -24,13 +25,23 @@ func Test_SQL_UserRepository(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
-	// Регистрация человека как менеджера
-	m, err := s.User().RegisterAsManager(u)
+	// Создание счета
+	nBill, err := s.User().Bills().Create(&models.Bill{
+		ChatID: int64(mocks.USER_BILL_REQ["chat_id"].(int)),
+		Bill:   mocks.USER_BILL_REQ["bill"].(string),
+	})
 	assert.NoError(t, err)
-	assert.NotNil(t, m)
+	assert.NotNil(t, nBill)
 
-	// Поиск пользователя по его username
-	uUsername, err := s.User().FindByUsername(u.Username)
+	// Получение списка счетов
+	bList, err := s.User().Bills().All(u.ChatID)
 	assert.NoError(t, err)
-	assert.NotNil(t, uUsername)
+	assert.NotNil(t, bList)
+	assert.Len(t, bList, 1)
+
+	// Удаление счета
+	dBill, err := s.User().Bills().Delete(nBill)
+	assert.NoError(t, err)
+	assert.NotNil(t, dBill)
+
 }

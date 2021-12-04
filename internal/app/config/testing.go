@@ -27,6 +27,10 @@ func InitTestConfig(t *testing.T) *Config {
 		DB: DatabaseConfig{
 			DbUrl: "postgres://exchanger:qwerty@localhost:5432/exchanger_server_test?sslmode=disable",
 		},
+		NSQ: NsqConfig{
+			Host: "80.78.253.68",
+			Port: 4150,
+		},
 		Users: UsersConfig{
 			Managers:   []string{},
 			Developers: []string{"I0HuKc"},

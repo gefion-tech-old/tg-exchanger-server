@@ -55,6 +55,8 @@ func (pr *PublicRoutes) getAllBillsHandler(c *gin.Context) {
 
 	В методе проверяется валидность переданых данных, если все ок
 	и желаемый счет существует -> удаляю его из БД.
+
+	# TESTED
 */
 func (pr *PublicRoutes) deleteBillHandler(c *gin.Context) {
 	req := &models.Bill{}
@@ -99,6 +101,8 @@ func (pr *PublicRoutes) deleteBillHandler(c *gin.Context) {
 
 	В методе проверяется валидность переданых данных, если все ок создается
 	банковский счет закрепленный за конкретным пользователем.
+
+	# TESTED
 */
 func (pr *PublicRoutes) newBillHandler(c *gin.Context) {
 	req := &models.Bill{}

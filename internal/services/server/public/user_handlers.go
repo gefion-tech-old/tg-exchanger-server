@@ -97,7 +97,7 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 		switch err {
 		case sql.ErrNoRows:
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"error": _errors.New("user with this username registered in bot").Error(),
+				"error": _errors.New("user with this username is not registered in bot").Error(),
 			})
 			return
 		default:
@@ -269,6 +269,8 @@ func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
 	u, err := pr.store.User().FindByUsername(req.Username)
 	switch err {
 	case nil:
+		fmt.Println(tools.EncryptString(req.Password))
+		// fmt.Println(*u.Hash)
 		if u.Hash != nil && tools.ComparePassword(*u.Hash, req.Password) {
 			// Генерирую сборку токенов и сопутствующих деталей
 			td, err := pr.createToken(u.ChatID, u.Username)
@@ -294,13 +296,13 @@ func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": _errors.New("user with this username or parrword is not registered as manager").Error(),
+			"error": _errors.New("user with this username or password is not registered as manager").Error(),
 		})
 		return
 
 	case sql.ErrNoRows:
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": _errors.New("user with this username or parrword is not registered as manager").Error(),
+			"error": _errors.New("user with this username or password is not registered as manager").Error(),
 		})
 		return
 	default:

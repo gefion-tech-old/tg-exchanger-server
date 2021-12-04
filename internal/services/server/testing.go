@@ -3,9 +3,12 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
+	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/mocksqlstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
@@ -62,4 +65,49 @@ func TestGetErrorText(t *testing.T, recBody *bytes.Buffer) (string, error) {
 	}
 
 	return body["error"].(string), nil
+}
+
+/*
+	==========================================================================================
+	ФУНКЦИИ СОЗДАНИЯ ТЕСТОВЫХ ОБЪЕКТОВ
+	==========================================================================================
+*/
+
+/*
+	Функция для быстрой регистраци пользователя в боте
+*/
+func TestBotUser(t *testing.T, s *Server) error {
+	t.Helper()
+
+	b := &bytes.Buffer{}
+	if err := json.NewEncoder(b).Encode(mocks.USER_IN_BOT_REGISTRATION_REQ); err != nil {
+		return err
+	}
+
+	rec := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/bot/registration", b)
+	if err != nil {
+		return err
+	}
+
+	s.Router.ServeHTTP(rec, req)
+	return nil
+}
+
+func TestUserBill(t *testing.T, s *Server) error {
+	t.Helper()
+
+	b := &bytes.Buffer{}
+	if err := json.NewEncoder(b).Encode(mocks.USER_BILL_REQ); err != nil {
+		return err
+	}
+
+	rec := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/bot/user/bill", b)
+	if err != nil {
+		return err
+	}
+
+	s.Router.ServeHTTP(rec, req)
+	return nil
 }

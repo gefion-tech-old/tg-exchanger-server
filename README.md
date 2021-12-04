@@ -162,6 +162,7 @@
 ***Response***
 
 Время жизни `access_token` — **15 минут**
+
 Время жизни `refresh_token` — **7 дней**
 
 ```json

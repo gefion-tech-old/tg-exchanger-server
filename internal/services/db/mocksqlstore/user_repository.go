@@ -42,24 +42,23 @@ func (r *UserRepository) Create(req *models.UserFromBotRequest) (*models.User, e
 	u := &models.User{
 		ChatID:    req.ChatID,
 		Username:  req.Username,
-		CreatedAt: time.Now().Format(time.RFC3339),
-		UpdatedAt: time.Now().Format(time.RFC3339),
+		CreatedAt: time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		UpdatedAt: time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
 	}
 
 	r.users[u.ChatID] = u
 	return r.users[u.ChatID], nil
 }
 
-func (r *UserRepository) RegisterAsManager(req *models.User) (*models.User, error) {
-	u := &models.User{
-		ChatID:    1,
-		Username:  req.Username,
-		Hash:      req.Hash,
-		UpdatedAt: time.Now().Format(time.RFC3339),
+func (r *UserRepository) RegisterAsManager(u *models.User) (*models.User, error) {
+	for _, user := range r.users {
+		if u.Username == user.Username {
+			r.users[user.ChatID].Hash = u.Hash
+			r.users[user.ChatID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+			return r.users[user.ChatID], nil
+		}
 	}
-
-	r.users[u.ChatID] = u
-	return u, nil
+	return nil, sql.ErrNoRows
 }
 
 func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
@@ -68,6 +67,5 @@ func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
 			return u, nil
 		}
 	}
-
 	return nil, sql.ErrNoRows
 }
