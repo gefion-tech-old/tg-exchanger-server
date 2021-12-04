@@ -21,7 +21,7 @@ services:
       - nsq-lookupd
     links: 
       - nsq-lookupd
-    command: /nsqd -data-path=/data -lookupd-tcp-address=nsq-lookupd:4160 -broadcast-address=127.0.0.1 -max-msg-size=10485760
+    command: /nsqd -data-path=/data -lookupd-tcp-address=nsq-lookupd:4160 -broadcast-address=80.78.253.68 -max-msg-size=10485760
 
   nsq-admin:
     image: nsqio/nsq:v1.2.0
