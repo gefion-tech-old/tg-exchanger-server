@@ -23,6 +23,7 @@ func init() {
 }
 
 func main() {
+	flag.Parse()
 	runtime.GOMAXPROCS(cpu)
 	ctx := context.Background()
 
