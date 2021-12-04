@@ -1,5 +1,5 @@
 [server]
-host = "127.0.0.1"
+host = "80.78.253.68"
 port = ":4000"
 
 [secrets]
@@ -13,7 +13,7 @@ port = 6379
 db = 1
 
 [nsq]
-host = "127.0.0.1"
+host = "80.78.253.68"
 port = 4150
 
 [database]

@@ -13,40 +13,49 @@ import (
 )
 
 var (
-	configPath string
-	proc       int
+	prod bool
+	cpu  int
 )
 
 func init() {
-	flag.StringVar(&configPath, "config-path", "config/config.local.toml", "Path to config file")
-	flag.IntVar(&proc, "proc", 2, "Number of processor threads")
+	flag.BoolVar(&prod, "prod", false, "Strat on production server.")
+	flag.IntVar(&cpu, "cpu", 2, "Number of processor threads")
 }
 
 func main() {
-	runtime.GOMAXPROCS(proc)
+	runtime.GOMAXPROCS(cpu)
 	ctx := context.Background()
 
 	// Инициализирую конфигурацию
-	config := config.Init()
-	if _, err := toml.DecodeFile(configPath, config); err != nil {
-		panic(err)
+	var cnf *config.Config
+	if prod {
+		cnf = config.Init()
+		if _, err := toml.DecodeFile("config/config.prod.toml", cnf); err != nil {
+			panic(err)
+		}
+
+	} else {
+		cnf = config.Init()
+		if _, err := toml.DecodeFile("config/config.local.toml", cnf); err != nil {
+			panic(err)
+		}
 	}
 
 	// Создаю подключение к Postgres
-	postgres, err := db.InitPostgres(&config.DB)
+	postgres, err := db.InitPostgres(&cnf.DB)
 	if err != nil {
 		panic(err)
 	}
 	defer postgres.Close()
 
 	// Инициализация соединения с NSQ
-	nsq, err := db.InitNSQ(&config.NSQ)
+	nsq, err := db.InitNSQ(&cnf.NSQ)
 	if err != nil {
 		panic(err)
 	}
 
 	// Инициализация модуля приложения
-	application := app.Init(postgres, nsq, config)
+	application := app.Init(postgres, nsq, cnf)
 	if err := application.Start(ctx); err != nil {
 		fmt.Println(err)
 	}
