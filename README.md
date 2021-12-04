@@ -4,11 +4,14 @@
 - [REST API](#rest-api)
     - [Public](#public)
         - [Registration in Bot](#registration-in-bot)
+        - [Create User Bill](#create-user-bill)
+        - [Delete User Bill](#delete-user-bill)
+        - [Get All User Bills](#get-all-user-bills)
         - [Registration in Admin Panel](#registration-in-admin-panel)
         - [Auth in Admin Panel](#auth-in-admin-panel)       
-        - [Update Access Token](#update-access-token)
-        - [Logout from Admin Panel](#logout-from-admin-panel)  
+        - [Update Access Token](#update-access-token)        
     - [Private](#private)
+        - [Logout from Admin Panel](#logout-from-admin-panel)  
 - [Database](#database)
     - [Postgres](#postgres)
     - [Redis](#redis)
@@ -32,6 +35,68 @@
 {
     "chat_id": 564353,
     "username": "I0HuKc"
+}
+```
+
+#### Create User Bill 
+
+- **[POST]** `/api/v1/bot/user/bill` **[201]** — Создать новый пользовательский счет
+
+***Request***
+
+```json
+{
+    "chat_id": 524164407,
+    "bill": "535949490410854"
+}
+```
+
+***Response***
+
+```json
+{
+    "bill": "535949490410854",
+    "chat_id": 524164407,
+    "created_at": "2021-12-04T14:10:04.12226Z",
+    "id": 19
+}
+```
+
+#### Delete User Bill
+
+- **[DELETE]** `/api/v1/bot/user/bill` **[200]** — Удалить новый пользовательский счет
+
+***Request***
+
+```json
+{
+    "chat_id": 524164407,
+    "bill": "535949490410854"
+}
+```
+
+***Response***
+
+```json
+{}
+```
+
+#### Get All User Bills
+
+- **[GET]** `/api/v1/bot/user/<chat_id>/bills` **[200]** — Получить список всех пользовательских счетов
+
+***Response***
+
+```json
+{
+    "bills": [
+        {
+            "id": 19,
+            "chat_id": 524164407,
+            "bill": "535949490410854",
+            "created_at": "2021-12-04T14:10:04.12226Z"
+        }
+    ]
 }
 ```
 
@@ -116,6 +181,8 @@
     "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaGF0X2lkIjozNTQ2MjIzLCJleHAiOjE2MzkwNjE5MTMsInJlZnJlc2hfdXVpZCI6IjgxYmY4ZGI1LTY0MGItNDQ0Zi1iMDM0LWYwMWJjNjUwN2RiOCIsInVzZXJuYW1lIjoiSTBIdUtjIn0.YaxLs25XUbgSTDqSxwNoqdrQ9CNl40PoTznVVRe81z4"
 }
 ```
+
+### Private
 
 #### Logout from Admin Panel 
 
