@@ -1,17 +1,19 @@
 # TG Exchanger Server
 
 ## Table of Contents
-- [REST API](#rest-api)
-    - [Public](#public)
-        - [Registration in Bot](#registration-in-bot)
-        - [Create User Bill](#create-user-bill)
-        - [Delete User Bill](#delete-user-bill)
-        - [Get All User Bills](#get-all-user-bills)
-        - [Registration in Admin Panel](#registration-in-admin-panel)
-        - [Auth in Admin Panel](#auth-in-admin-panel)       
-        - [Update Access Token](#update-access-token)        
-    - [Private](#private)
-        - [Logout from Admin Panel](#logout-from-admin-panel)  
+- [REST API](#rest-api)    
+        - [Bot API Routs](#bot-api-routs)
+            - [Registration in Bot](#registration-in-bot)
+            - [Create User Bill](#create-user-bill)
+            - [Delete User Bill](#delete-user-bill)
+            - [Get All User Bills](#get-all-user-bills)
+        - [Admin API Routs](#admin-api-routs)
+            - [Public](#public)
+                - [Registration in Admin Panel](#registration-in-admin-panel)
+                - [Auth in Admin Panel](#auth-in-admin-panel)       
+                - [Update Access Token](#update-access-token)
+            - [Private](#private)
+                - [Logout from Admin Panel](#logout-from-admin-panel)  
 - [Database](#database)
     - [Postgres](#postgres)
     - [Redis](#redis)
@@ -23,7 +25,8 @@
 
 ## REST API
 
-### Public
+
+### Bot API Routs
 
 #### Registration in Bot
 
@@ -99,6 +102,10 @@
     ]
 }
 ```
+
+### Admin API Routs
+
+#### Public
 
 #### Registration in Admin Panel
 
@@ -182,7 +189,7 @@
 }
 ```
 
-### Private
+#### Private
 
 #### Logout from Admin Panel 
 
