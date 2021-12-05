@@ -14,8 +14,8 @@ import (
 )
 
 func Test_Server_GetAllBillsHandler(t *testing.T) {
-	s, _, teardown := server.TestServer(t)
-	defer teardown()
+	s, redis, teardown := server.TestServer(t)
+	defer teardown(redis)
 
 	// Регистрирую пользователя в боте
 	assert.NoError(t, server.TestBotUser(t, s))
@@ -46,8 +46,8 @@ func Test_Server_GetAllBillsHandler(t *testing.T) {
 }
 
 func Test_Server_DeleteBillHandler(t *testing.T) {
-	s, _, teardown := server.TestServer(t)
-	defer teardown()
+	s, redis, teardown := server.TestServer(t)
+	defer teardown(redis)
 
 	// Регистрирую пользователя в боте
 	assert.NoError(t, server.TestBotUser(t, s))
@@ -140,8 +140,8 @@ func Test_Server_DeleteBillHandler(t *testing.T) {
 }
 
 func Test_Server_NewBillHandler(t *testing.T) {
-	s, _, teardown := server.TestServer(t)
-	defer teardown()
+	s, redis, teardown := server.TestServer(t)
+	defer teardown(redis)
 
 	// Регистрирую пользователя в боте
 	assert.NoError(t, server.TestBotUser(t, s))

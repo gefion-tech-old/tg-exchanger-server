@@ -50,11 +50,12 @@ func (a *App) Start(ctx context.Context) error {
 	// Инициализация БД
 	sqlStore := sqlstore.Init(a.db)
 
+	// Инициализация NSQ
 	nsqStore := nsqstore.Init(a.nsq)
 
 	a.redis = &redisstore.AppRedisDictionaries{
-		Registration: rRegistration,
-		Auth:         rAuth,
+		Registration: redisstore.InitRegistrationClient(rRegistration),
+		Auth:         redisstore.InitAuthClient(rAuth),
 	}
 
 	// Инициализация сервера

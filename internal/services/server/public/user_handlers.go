@@ -154,7 +154,7 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 	}
 
 	// Записываю в Redis
-	if err := pr.redis.Registration.Set(fmt.Sprintf("%d", code), b, 30*time.Minute).Err(); err != nil {
+	if err := pr.redis.Registration.SaveVerificationCode(code, b); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -203,7 +203,7 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 	}
 
 	// Ищу данные по этому коду в Redis
-	data, err := pr.redis.Registration.Get(fmt.Sprintf("%d", req.Code)).Result()
+	data, err := pr.redis.Registration.FetchVerificationCode(int(req.Code))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": _errors.New("activation period for this code has expired").Error(),

@@ -51,13 +51,13 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 	router := gin.New()
 
 	// Инициализация охранников маршрутов
-	guard := guard.Init(r.Auth, &c.Secrets)
+	guard := guard.Init(r, &c.Secrets)
 
 	// Инициализация модуля публичных маршрутов
 	pub := public.Init(s, nsq, r, router, &c.Secrets, &c.Users)
 
 	// Инициализация модуля приватных маршрутов
-	prv := private.Init(s, r, router, &c.Secrets)
+	prv := private.Init(s, r, router, &c.Secrets, &c.Users)
 
 	server := &Server{
 		store:          s,

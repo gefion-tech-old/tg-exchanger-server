@@ -13,6 +13,7 @@ type PrivateRoutes struct {
 	redis   *redisstore.AppRedisDictionaries
 	router  *gin.Engine
 	secrets *config.SecretsConfig
+	users   *config.UsersConfig
 }
 
 type PrivateRoutesI interface {
@@ -20,18 +21,26 @@ type PrivateRoutesI interface {
 }
 
 // Конструктор модуля приватных маршрутов
-func Init(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, router *gin.Engine, secrets *config.SecretsConfig) PrivateRoutesI {
+func Init(
+	store db.SQLStoreI,
+	redis *redisstore.AppRedisDictionaries,
+	router *gin.Engine,
+	secrets *config.SecretsConfig,
+	users *config.UsersConfig) PrivateRoutesI {
 	return &PrivateRoutes{
 		store:   store,
 		redis:   redis,
 		router:  router,
 		secrets: secrets,
+		users:   users,
 	}
 }
 
 // Метод конфигуратор всех публичных маршрутов
 func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard.GuardI) {
 	admin := router.Group("/admin")
-	admin.POST("/logout", g.AuthTokenValidation(), g.IsAuth(), pr.logout)
+	admin.POST("/logout", g.AuthTokenValidation(), g.IsAuth(), pr.logoutHandler)
+
+	admin.POST("/messages", g.AuthTokenValidation(), g.IsAuth(), pr.createNewBotMessageHandler)
 
 }

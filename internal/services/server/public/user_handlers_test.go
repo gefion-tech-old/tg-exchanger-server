@@ -12,8 +12,8 @@ import (
 )
 
 func Test_Server_UserInBotRegistrationHandler(t *testing.T) {
-	s, _, teardown := server.TestServer(t)
-	defer teardown()
+	s, redis, teardown := server.TestServer(t)
+	defer teardown(redis)
 
 	testCases := []struct {
 		name         string
@@ -76,7 +76,7 @@ func Test_Server_UserInBotRegistrationHandler(t *testing.T) {
 
 func Test_Server_UserAdminHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
-	defer teardown(redis.Registration, redis.Auth)
+	defer teardown(redis)
 
 	// Регистрирую пользователя в боте
 	assert.NoError(t, server.TestBotUser(t, s))

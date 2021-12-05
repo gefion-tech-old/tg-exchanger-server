@@ -76,7 +76,15 @@ func (pr *PublicRoutes) refreshToken(c *gin.Context) {
 		}
 
 		// Удаляю предыдущий refresh токен
-		deleted, err := pr.redis.Auth.Del(refreshUuid).Result()
+		// deleted, err := pr.redis.Auth.Del(refreshUuid).Result()
+		// if err != nil || deleted == 0 {
+		// 	c.JSON(http.StatusUnauthorized, gin.H{
+		// 		"error": "unauthorized",
+		// 	})
+		// 	return
+		// }
+
+		deleted, err := pr.redis.Auth.DeleteAuth(refreshUuid)
 		if err != nil || deleted == 0 {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "unauthorized",

@@ -17,6 +17,8 @@ import (
 	@Documentation
 
 	Получить список всех имеющихся счетов у пользователя.
+
+	# TESTED
 */
 func (pr *PublicRoutes) getAllBillsHandler(c *gin.Context) {
 
