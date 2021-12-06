@@ -38,11 +38,28 @@ func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
 	}
 }
 
+/*
+	@Method GET
+	@Path admin/message?connector=<connector_name>
+	@Type PRIVATE
+	@Documentation https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__bot_messages.md#get-all
+
+	При валидных данных обновляет запись конкретного сообщения в БД.
+
+	# TESTED
+*/
 func (pr *PrivateRoutes) updateAllBotMessageHandler(c *gin.Context) {
 	req := &models.BotMessage{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": errors.ErrInvalidBody.Error(),
+		})
+		return
+	}
+
+	if err := req.BotMessageValidation(pr.users.Managers, pr.users.Developers); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}
@@ -68,6 +85,16 @@ func (pr *PrivateRoutes) updateAllBotMessageHandler(c *gin.Context) {
 
 }
 
+/*
+	@Method GET
+	@Path admin/message?connector=<connector_name>
+	@Type PUBLIC
+	@Documentation https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__bot_messages.md#get-all
+
+	При валидных данных возвращается запрашиваемое сообщение.
+
+	# TESTED
+*/
 func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 	msgs, err := pr.store.Manager().BotMessages().GetAll()
 	switch err {
@@ -83,6 +110,16 @@ func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 	}
 }
 
+/*
+	@Method GET
+	@Path admin/message?connector=<connector_name>
+	@Type PUBLIC
+	@Documentation https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__bot_messages.md#get
+
+	При валидных данных возвращается запрашиваемое сообщение.
+
+	# TESTED
+*/
 func (pr *PrivateRoutes) getBotMessageHandler(c *gin.Context) {
 	if c.Query("connector") == "" {
 		c.JSON(http.StatusNotFound, gin.H{})
@@ -110,6 +147,17 @@ func (pr *PrivateRoutes) getBotMessageHandler(c *gin.Context) {
 
 }
 
+/*
+	@Method POST
+	@Path admin/message
+	@Type PRIVATE
+	@Documentation https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__bot_messages.md#create
+
+	При валидных данных создаем в БД запись нового сообщения
+	и возвращаю созданное сообщение.
+
+	# TESTED
+*/
 func (pr *PrivateRoutes) createNewBotMessageHandler(c *gin.Context) {
 	req := &models.BotMessage{}
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -119,10 +167,9 @@ func (pr *PrivateRoutes) createNewBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	// Проверяю может ли этот пользователь создавать сообщения
 	if err := req.BotMessageValidation(pr.users.Managers, pr.users.Developers); err != nil {
-		c.JSON(http.StatusMethodNotAllowed, gin.H{
-			"error": "you cannot edit this resource",
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": err.Error(),
 		})
 		return
 	}

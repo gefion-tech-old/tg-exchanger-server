@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -73,6 +74,31 @@ func TestGetErrorText(t *testing.T, recBody *bytes.Buffer) (string, error) {
 	ФУНКЦИИ СОЗДАНИЯ ТЕСТОВЫХ ОБЪЕКТОВ
 	==========================================================================================
 */
+
+func TestBotMessage(t *testing.T, s *Server, tokens map[string]interface{}) error {
+	t.Helper()
+
+	// Кодирую тело запроса
+	b := &bytes.Buffer{}
+	if err := json.NewEncoder(b).Encode(mocks.BOT_MESSAGE_REQ); err != nil {
+		return err
+	}
+
+	rec := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/admin/message", b)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
+	s.Router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		return errors.New("не удалось создать тествое сообщение")
+	}
+
+	return nil
+}
 
 func TestManager(t *testing.T, s *Server) (map[string]interface{}, error) {
 	t.Helper()
