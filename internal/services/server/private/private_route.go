@@ -50,5 +50,5 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 
 	/* Работа с общим списокм конкретного ресурсами */
 
-	admin.GET("/messages", pr.getAllBotMessageHandler)
+	admin.GET("/messages", g.AuthTokenValidation(), g.IsAuth(), pr.getAllBotMessageHandler)
 }

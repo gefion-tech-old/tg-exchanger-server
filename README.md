@@ -13,7 +13,13 @@
             - [Auth in Admin Panel](#auth-in-admin-panel)       
             - [Update Access Token](#update-access-token)
         - [Private](#private)
-            - [Logout from Admin Panel](#logout-from-admin-panel)  
+            - [Bot Messages](bot-messages)
+                - [Create Bot Message](#create-bot-message)
+                - [Update Bot Message](#update-bot-message)
+                - [Get Bot Message](#get-bot-message)
+                - [Get All Bot Message](#get-all-bot-message)
+                - [Delete Bot Message](#delete-bot-message)
+            - [Logout](#logout)  
 - [Database](#database)
     - [Postgres](#postgres)
     - [Redis](#redis)
@@ -195,7 +201,54 @@
 
 #### Private
 
-#### Logout from Admin Panel 
+#### Bot Messages
+
+Сообщения которые использует бот для общения в TG с пользователями.
+
+##### Create Bot Message
+
+- **[POST]** `/api/v1/admin/message` — Создать новое сообщение для бота.
+
+***Header***
+
+```json
+{
+    "Authorization": "Bearer <token>"
+}
+```
+
+***Request***
+
+Поле `created_by` следует брать из `access_token`
+
+```json
+{
+    "connector": "msg_connector",
+    "message_text": "some message text here",
+    "created_by": "I0HuKc"
+}
+```
+
+***Response***
+
+```json
+{
+    "id": 3,
+    "connector": "text_connector",
+    "message_text": "some message text here",
+    "created_by": "I0HuKc",
+    "created_at": "2021-12-06T12:49:35.303698Z",
+    "updated_at": "2021-12-06T12:49:35.303698Z"
+}
+```
+
+##### Get Bot Message
+
+- **[GET]** `/api/v1/admin/message?connector=<connector_name>` — получить конкретное сообщение из БД
+
+
+
+#### Logout
 
 При выходе из хранилища пользовательских сессий удаляется `Access Token`, т.е еще раз авторизовываться с ним нельзя.
 
@@ -205,7 +258,7 @@
 
 ```json
 {
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NfdXVpZCI6ImZiYjIwNDA0LTFlNWQtNGFiOS04MDIzLWY3NjQ2ZTEzYWU3MSIsImF1dGhvcml6ZWQiOnRydWUsImNoYXRfaWQiOjc2NTYyNTYsImV4cCI6MTYzODAyMDA0Mywicm9sZSI6MX0.Lo14QcF_MmGwUFHiSo452aTtsRzV4sZ0a-HdGyWzyds"
+    "Authorization": "Bearer <token>"
 }
 ```
 
