@@ -8,8 +8,9 @@ import (
 
 // SQL хранилище
 type Store struct {
-	db             *sql.DB
-	userRepository *UserRepository
+	db                *sql.DB
+	userRepository    *UserRepository
+	managerRepository *ManagerRepository
 }
 
 func Init(db *sql.DB) db.SQLStoreI {
@@ -28,4 +29,16 @@ func (s *Store) User() db.UserRepository {
 	}
 
 	return s.userRepository
+}
+
+func (s *Store) Manager() db.ManagerRepository {
+	if s.managerRepository != nil {
+		return s.managerRepository
+	}
+
+	s.managerRepository = &ManagerRepository{
+		store: s.db,
+	}
+
+	return s.managerRepository
 }

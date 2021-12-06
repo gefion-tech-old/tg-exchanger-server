@@ -9,8 +9,7 @@ import (
 )
 
 type UserRepository struct {
-	store *sql.DB
-
+	store               *sql.DB
 	userBillsRepository *UserBillsRepository
 }
 

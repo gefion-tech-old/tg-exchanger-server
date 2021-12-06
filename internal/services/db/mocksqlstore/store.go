@@ -7,7 +7,8 @@ import (
 
 // Mock SQL хранилище
 type Store struct {
-	userRepository *UserRepository
+	userRepository    *UserRepository
+	managerRepository *ManagerRepository
 }
 
 func Init() db.SQLStoreI {
@@ -24,4 +25,14 @@ func (s *Store) User() db.UserRepository {
 	}
 
 	return s.userRepository
+}
+
+func (s *Store) Manager() db.ManagerRepository {
+	if s.managerRepository != nil {
+		return s.managerRepository
+	}
+
+	s.managerRepository = &ManagerRepository{}
+
+	return s.managerRepository
 }

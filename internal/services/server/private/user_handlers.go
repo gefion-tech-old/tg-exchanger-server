@@ -22,6 +22,7 @@ func (pr *PrivateRoutes) logoutHandler(c *gin.Context) {
 	// Извлекаю метаданные JWT
 	ctxToken := c.Request.Context().Value(guard.CtxKeyToken).(*models.AccessDetails)
 
+	// Удаляю токен
 	deleted, err := pr.redis.Auth.DeleteAuth(ctxToken.AccessUuid)
 	if err != nil || deleted == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -29,15 +30,6 @@ func (pr *PrivateRoutes) logoutHandler(c *gin.Context) {
 		})
 		return
 	}
-
-	// Удаляю токен
-	// _, err := pr.redis.Auth.Del(ctxToken.AccessUuid).Result()
-	// if err != nil {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{
-	// 		"error": errors.ErrTokenInvalid,
-	// 	})
-	// 	return
-	// }
 
 	c.JSON(http.StatusOK, gin.H{})
 }

@@ -132,28 +132,12 @@ func (pr *PublicRoutes) createAuth(chatID int64, td *models.TokenDetails) error 
 
 	now := time.Now()
 
-	// if errAccess := pr.redis.Auth.Set(
-	// 	td.AccessUuid,
-	// 	strconv.Itoa(int(chatID)),
-	// 	at.Sub(now),
-	// ).Err(); errAccess != nil {
-	// 	return errAccess
-	// }
-
 	// Сохранение access_tokenа
 	if errAccess := pr.redis.Auth.SaveAuth(td.AccessUuid, chatID, at.Sub(now)); errAccess != nil {
 		return errAccess
 	}
 
 	// Сохранение refresh_tokenа
-	// if errRefresh := pr.redis.Auth.Set(
-	// 	td.RefreshUuid,
-	// 	strconv.Itoa(int(chatID)),
-	// 	rt.Sub(now),
-	// ).Err(); errRefresh != nil {
-	// 	return errRefresh
-	// }
-
 	if errRefresh := pr.redis.Auth.SaveAuth(td.RefreshUuid, chatID, rt.Sub(now)); errRefresh != nil {
 		return errRefresh
 	}

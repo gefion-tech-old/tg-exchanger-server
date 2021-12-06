@@ -9,4 +9,6 @@ type SQLStoreI interface {
 		его связанными с ним дочерними репозиториями в БД
 	*/
 	User() UserRepository
+
+	Manager() ManagerRepository
 }

@@ -41,6 +41,14 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 	admin := router.Group("/admin")
 	admin.POST("/logout", g.AuthTokenValidation(), g.IsAuth(), pr.logoutHandler)
 
-	admin.POST("/messages", g.AuthTokenValidation(), g.IsAuth(), pr.createNewBotMessageHandler)
+	/* Работа с конкретными ресурсами */
 
+	admin.POST("/message", g.AuthTokenValidation(), g.IsAuth(), pr.createNewBotMessageHandler)
+	admin.GET("/message", pr.getBotMessageHandler)
+	admin.PUT("/message", g.AuthTokenValidation(), g.IsAuth(), pr.updateAllBotMessageHandler)
+	admin.DELETE("/message", g.AuthTokenValidation(), g.IsAuth(), pr.deleteBotMessageHandler)
+
+	/* Работа с общим списокм конкретного ресурсами */
+
+	admin.GET("/messages", pr.getAllBotMessageHandler)
 }

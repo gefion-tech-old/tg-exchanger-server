@@ -40,3 +40,15 @@ type UserBillsRepository interface {
 	*/
 	All(chatID int64) ([]*models.Bill, error)
 }
+
+type ManagerRepository interface {
+	BotMessages() BotMessagesRepository
+}
+
+type BotMessagesRepository interface {
+	Create(m *models.BotMessage) (*models.BotMessage, error)
+	Get(m *models.BotMessage) (*models.BotMessage, error)
+	GetAll() ([]*models.BotMessage, error)
+	Update(m *models.BotMessage) (*models.BotMessage, error)
+	Delete(m *models.BotMessage) (*models.BotMessage, error)
+}
