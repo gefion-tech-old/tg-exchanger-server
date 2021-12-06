@@ -230,7 +230,7 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 		})
 		return
 	case sql.ErrNoRows:
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"error": errors.ErrNotRegistered.Error(),
 		})
 		return
@@ -295,13 +295,13 @@ func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"error": _errors.New("user with this username or password is not registered as manager").Error(),
 		})
 		return
 
 	case sql.ErrNoRows:
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
+		c.JSON(http.StatusNotFound, gin.H{
 			"error": _errors.New("user with this username or password is not registered as manager").Error(),
 		})
 		return

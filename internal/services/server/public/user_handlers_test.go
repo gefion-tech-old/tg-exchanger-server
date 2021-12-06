@@ -235,7 +235,7 @@ func Test_Server_UserAdminHandler(t *testing.T) {
 				"username": "invalid",
 				"password": "4tfgefhey75uh",
 			},
-			expectedCode: http.StatusUnprocessableEntity,
+			expectedCode: http.StatusNotFound,
 		},
 		{
 			name: "empty password",
@@ -251,7 +251,7 @@ func Test_Server_UserAdminHandler(t *testing.T) {
 				"username": "I0HuKc",
 				"password": "invalid",
 			},
-			expectedCode: http.StatusUnprocessableEntity,
+			expectedCode: http.StatusNotFound,
 		},
 		{
 			name: "valid",
