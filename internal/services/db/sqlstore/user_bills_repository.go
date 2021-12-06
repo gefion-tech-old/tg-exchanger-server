@@ -10,6 +10,9 @@ type UserBillsRepository struct {
 	store *sql.DB
 }
 
+/*
+	Добавить банковский счет пользователю
+*/
 func (r *UserBillsRepository) Create(b *models.Bill) (*models.Bill, error) {
 	if err := r.store.QueryRow(
 		`
@@ -33,6 +36,9 @@ func (r *UserBillsRepository) Create(b *models.Bill) (*models.Bill, error) {
 	return b, nil
 }
 
+/*
+	Удалить банковский счет пользователя
+*/
 func (r *UserBillsRepository) Delete(b *models.Bill) (*models.Bill, error) {
 	if err := r.store.QueryRow(
 		`
@@ -53,6 +59,9 @@ func (r *UserBillsRepository) Delete(b *models.Bill) (*models.Bill, error) {
 	return b, nil
 }
 
+/*
+	Получить все счета пользователя
+*/
 func (r *UserBillsRepository) All(chatID int64) ([]*models.Bill, error) {
 	ub := []*models.Bill{}
 

@@ -37,13 +37,10 @@ func (r *UserRepository) Bills() db.UserBillsRepository {
 	==========================================================================================
 */
 
-func (r *UserRepository) Create(req *models.UserFromBotRequest) (*models.User, error) {
-	// Создаю объект пользователя который будет записан в БД
-	u := &models.User{
-		ChatID:   req.ChatID,
-		Username: req.Username,
-	}
-
+/*
+	Метод создания новой записи пользователя в таблице users
+*/
+func (r *UserRepository) Create(u *models.User) (*models.User, error) {
 	if err := r.store.QueryRow(
 		`
 		INSERT INTO users (chat_id, username) 
@@ -67,6 +64,9 @@ func (r *UserRepository) Create(req *models.UserFromBotRequest) (*models.User, e
 	return u, nil
 }
 
+/*
+	Метод регистрации человека как менеджера для доступа к админке
+*/
 func (r *UserRepository) RegisterAsManager(u *models.User) (*models.User, error) {
 	if err := r.store.QueryRow(
 		`
@@ -91,6 +91,9 @@ func (r *UserRepository) RegisterAsManager(u *models.User) (*models.User, error)
 	return u, nil
 }
 
+/*
+	Метод поиска записи о пользователе в таблице users по столбцу username
+*/
 func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
 	u := &models.User{}
 

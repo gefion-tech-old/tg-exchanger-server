@@ -21,7 +21,10 @@ func Test_SQL_UserBillsRepository(t *testing.T) {
 	s := sqlstore.Init(db)
 
 	// Регистрация человека как пользователя бота
-	u, err := s.User().Create(&mocks.USER_IN_BOT_REGISTRATION_REQUEST)
+	u, err := s.User().Create(&models.User{
+		ChatID:   int64(mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"].(int)),
+		Username: mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string),
+	})
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 

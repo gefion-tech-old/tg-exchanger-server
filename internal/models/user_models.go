@@ -9,16 +9,11 @@ import (
 
 // Структура записи в таблице `users`
 type User struct {
-	ChatID    int64   `json:"chat_id"`
-	Username  string  `json:"username"`
+	ChatID    int64   `json:"chat_id" binding:"required"`
+	Username  string  `json:"username" binding:"required"`
 	Hash      *string `json:"hash"`
 	CreatedAt string  `json:"created_at"`
 	UpdatedAt string  `json:"updated_at"`
-}
-
-type UserFromBotRequest struct {
-	ChatID   int64  `json:"chat_id" binding:"required"`
-	Username string `json:"username" binding:"required"`
 }
 
 type UserFromAdminRequest struct {

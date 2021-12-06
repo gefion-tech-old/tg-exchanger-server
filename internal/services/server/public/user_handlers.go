@@ -27,7 +27,7 @@ import (
 	# TESTED
 */
 func (pr *PublicRoutes) userInBotRegistrationHandler(c *gin.Context) {
-	req := &models.UserFromBotRequest{}
+	req := &models.User{}
 
 	// Парсинг входящего тела запроса
 	if err := c.ShouldBindJSON(req); err != nil {

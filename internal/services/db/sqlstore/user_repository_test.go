@@ -5,6 +5,7 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/sqlstore"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,10 @@ func Test_SQL_UserRepository(t *testing.T) {
 	s := sqlstore.Init(db)
 
 	// Регистрация человека как пользователя бота
-	u, err := s.User().Create(&mocks.USER_IN_BOT_REGISTRATION_REQUEST)
+	u, err := s.User().Create(&models.User{
+		ChatID:   int64(mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"].(int)),
+		Username: mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string),
+	})
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 

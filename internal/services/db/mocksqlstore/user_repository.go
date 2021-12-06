@@ -38,13 +38,9 @@ func (r *UserRepository) Bills() db.UserBillsRepository {
 	==========================================================================================
 */
 
-func (r *UserRepository) Create(req *models.UserFromBotRequest) (*models.User, error) {
-	u := &models.User{
-		ChatID:    req.ChatID,
-		Username:  req.Username,
-		CreatedAt: time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
-		UpdatedAt: time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
-	}
+func (r *UserRepository) Create(u *models.User) (*models.User, error) {
+	u.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+	u.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 
 	r.users[u.ChatID] = u
 	return r.users[u.ChatID], nil
