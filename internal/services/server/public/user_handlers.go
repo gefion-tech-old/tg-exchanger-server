@@ -41,13 +41,7 @@ func (pr *PublicRoutes) userInBotRegistrationHandler(c *gin.Context) {
 	u, err := pr.store.User().Create(req)
 	switch err {
 	case nil:
-		c.JSON(http.StatusCreated, gin.H{
-			"chat_id":    u.ChatID,
-			"username":   u.Username,
-			"hash":       u.Hash,
-			"created_at": u.CreatedAt,
-			"updated_at": u.UpdatedAt,
-		})
+		c.JSON(http.StatusCreated, u)
 		return
 	case sql.ErrNoRows:
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -161,6 +155,8 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(m["to"].(map[string]interface{})["chat_id"])
+
 	// Отправляю сообщение в NSQ
 	if err := pr.nsq.Publish(nsqstore.VERIFICATION_CODE__TOPIC, payload); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -222,12 +218,7 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 	user, err := pr.store.User().RegisterAsManager(&u)
 	switch err {
 	case nil:
-		c.JSON(http.StatusCreated, gin.H{
-			"chat_id":    user.ChatID,
-			"username":   user.Username,
-			"created_at": user.CreatedAt,
-			"updated_at": user.UpdatedAt,
-		})
+		c.JSON(http.StatusCreated, user)
 		return
 	case sql.ErrNoRows:
 		c.JSON(http.StatusNotFound, gin.H{
