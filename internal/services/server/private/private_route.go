@@ -43,12 +43,24 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 
 	/* Работа с конкретными ресурсами */
 
-	admin.POST("/message", g.AuthTokenValidation(), g.IsAuth(), pr.createNewBotMessageHandler)
-	admin.GET("/message", pr.getBotMessageHandler)
-	admin.PUT("/message", g.AuthTokenValidation(), g.IsAuth(), pr.updateAllBotMessageHandler)
-	admin.DELETE("/message", g.AuthTokenValidation(), g.IsAuth(), pr.deleteBotMessageHandler)
+	{
+		admin.POST("/message", g.AuthTokenValidation(), g.IsAuth(), pr.createNewBotMessageHandler)
+		admin.GET("/message", pr.getBotMessageHandler)
+		admin.PUT("/message", g.AuthTokenValidation(), g.IsAuth(), pr.updateAllBotMessageHandler)
+		admin.DELETE("/message", g.AuthTokenValidation(), g.IsAuth(), pr.deleteBotMessageHandler)
+	}
+
+	{
+		admin.POST("/notification", pr.createNotification)
+		admin.GET("/notification", pr.getNotification)
+		admin.PUT("/notification", pr.updateNotificationStatus)
+		admin.DELETE("/notification", pr.deleteNotification)
+	}
 
 	/* Работа с общим списокм конкретного ресурсами */
+	{
+		admin.GET("/notifications", g.AuthTokenValidation(), g.IsAuth(), pr.getAllNotifications)
+		admin.GET("/messages", g.AuthTokenValidation(), g.IsAuth(), pr.getAllBotMessageHandler)
+	}
 
-	admin.GET("/messages", g.AuthTokenValidation(), g.IsAuth(), pr.getAllBotMessageHandler)
 }

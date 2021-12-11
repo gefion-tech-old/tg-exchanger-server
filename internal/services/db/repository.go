@@ -20,6 +20,12 @@ type UserBillsRepository interface {
 
 type ManagerRepository interface {
 	BotMessages() BotMessagesRepository
+	Notification() NotificationRepository
+}
+
+type NotificationRepository interface {
+	Create(n *models.Notification) (*models.Notification, error)
+	Delete(n *models.Notification) (*models.Notification, error)
 }
 
 type BotMessagesRepository interface {

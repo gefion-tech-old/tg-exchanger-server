@@ -7,8 +7,9 @@ import (
 )
 
 type ManagerRepository struct {
-	store                 *sql.DB
-	botMessagesRepository *BotMessagesRepository
+	store                  *sql.DB
+	botMessagesRepository  *BotMessagesRepository
+	notificationRepository *NotificationRepository
 }
 
 /*
@@ -16,6 +17,18 @@ type ManagerRepository struct {
 	КОНСТРУКТОРЫ ВЛОЖЕННЫХ СТРУКТУР
 	==========================================================================================
 */
+
+func (r *ManagerRepository) Notification() db.NotificationRepository {
+	if r.notificationRepository != nil {
+		return r.notificationRepository
+	}
+
+	r.notificationRepository = &NotificationRepository{
+		store: r.store,
+	}
+
+	return r.notificationRepository
+}
 
 func (r *ManagerRepository) BotMessages() db.BotMessagesRepository {
 	if r.botMessagesRepository != nil {

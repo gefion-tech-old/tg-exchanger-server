@@ -6,7 +6,20 @@ import (
 )
 
 type ManagerRepository struct {
-	botMessagesRepository *BotMessagesRepository
+	botMessagesRepository  *BotMessagesRepository
+	notificationRepository *NotificationRepository
+}
+
+func (r *ManagerRepository) Notification() db.NotificationRepository {
+	if r.notificationRepository != nil {
+		return r.notificationRepository
+	}
+
+	r.notificationRepository = &NotificationRepository{
+		notification: make(map[uint]*models.Notification),
+	}
+
+	return r.notificationRepository
 }
 
 func (r *ManagerRepository) BotMessages() db.BotMessagesRepository {
