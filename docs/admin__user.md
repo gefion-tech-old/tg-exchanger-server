@@ -21,6 +21,8 @@
 {}
 ```
 
+<hr>
+
 ### Registration Step Two
 
 - **[POST]** `/api/v1/admin/registration` — Завершение регистрации пользователя
@@ -32,6 +34,8 @@
     "code": 588227
 }
 ```
+
+<hr>
 
 ### Auth
 
@@ -60,9 +64,11 @@
 }
 ```
 
+<hr>
+
 ### Update Access Token
 
-- **[POST]** `/api/v1/admin/auth` — Обновить сессию
+- **[POST]** `/api/v1/token/refresh` — Обновить сессию
 
 ***Request***
 
@@ -80,6 +86,8 @@
     "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaGF0X2lkIjozNTQ2MjIzLCJleHAiOjE2MzkwNjE5MTMsInJlZnJlc2hfdXVpZCI6IjgxYmY4ZGI1LTY0MGItNDQ0Zi1iMDM0LWYwMWJjNjUwN2RiOCIsInVzZXJuYW1lIjoiSTBIdUtjIn0.YaxLs25XUbgSTDqSxwNoqdrQ9CNl40PoTznVVRe81z4"
 }
 ```
+
+<hr>
 
 ### Logout
 

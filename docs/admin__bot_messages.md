@@ -39,6 +39,8 @@
 }
 ```
 
+<hr>
+
 ### Update
 
 - **[PUT]** `/api/v1/admin/message` — Обновить сообщение для бота.
@@ -71,6 +73,8 @@
 }
 ```
 
+<hr>
+
 ### Get
 
 - **[GET]** `/api/v1/admin/message?connector=<connector_name>` — получить конкретное сообщение из БД
@@ -88,6 +92,8 @@
 }
 ```
 
+<hr>
+
 ### Get All
 
 - **[GET]** `/api/v1/admin/messages` — получить массив всех созданных сообщений из БД
@@ -104,6 +110,8 @@
     }
 ]
 ```
+
+<hr>
 
 ### Delete
 
