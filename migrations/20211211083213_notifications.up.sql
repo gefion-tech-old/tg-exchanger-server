@@ -6,6 +6,7 @@ CREATE TABLE notifications(
     username VARCHAR(255) NOT NULL,
     code INT,
     user_card VARCHAR(255),
+    img_path VARCHAR(255),
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now()
 );
