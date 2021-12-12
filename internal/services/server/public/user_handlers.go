@@ -158,7 +158,7 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 	fmt.Println(m["to"].(map[string]interface{})["chat_id"])
 
 	// Отправляю сообщение в NSQ
-	if err := pr.nsq.Publish(nsqstore.VERIFICATION_CODE__TOPIC, payload); err != nil {
+	if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})

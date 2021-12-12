@@ -13,3 +13,15 @@ func (r *NotificationRepository) Create(n *models.Notification) (*models.Notific
 func (r *NotificationRepository) Delete(n *models.Notification) (*models.Notification, error) {
 	return nil, nil
 }
+
+func (r *NotificationRepository) Get(n *models.Notification) (*models.Notification, error) {
+	return nil, nil
+}
+
+func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.Notification, error) {
+	return nil, nil
+}
+
+func (r *NotificationRepository) All() ([]*models.Notification, error) {
+	return nil, nil
+}

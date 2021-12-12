@@ -65,3 +65,7 @@ func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
 	}
 	return nil, sql.ErrNoRows
 }
+
+func (r *UserRepository) GetAllManagers() ([]*models.User, error) {
+	return nil, nil
+}

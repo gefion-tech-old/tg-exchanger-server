@@ -9,14 +9,17 @@ import (
 
 type Notification struct {
 	ID       uint `json:"id"`
-	Type     int  `json:"type"`
+	Type     int  `json:"type" binding:"required"`
 	Status   int  `json:"status"`
 	MetaData struct {
-		ChatID   int64   `json:"chat_id" binding:"required"`
-		Username string  `json:"username" binding:"required"`
 		Code     *int    `json:"code"`
 		UserCard *string `json:"user_card"`
+		ImgPath  *string `json:"img_path"`
 	} `json:"meta_data"`
+	User struct {
+		ChatID   int64  `json:"chat_id" binding:"required"`
+		Username string `json:"username" binding:"required"`
+	} `json:"user"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }

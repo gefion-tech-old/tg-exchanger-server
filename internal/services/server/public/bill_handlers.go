@@ -33,9 +33,7 @@ func (pr *PublicRoutes) getAllBillsHandler(c *gin.Context) {
 	b, err := pr.store.User().Bills().All(int64(chatID))
 	switch err {
 	case nil:
-		c.JSON(http.StatusOK, gin.H{
-			"bills": b,
-		})
+		c.JSON(http.StatusOK, b)
 	case sql.ErrNoRows:
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": errors.ErrRecordNotFound.Error(),
@@ -125,12 +123,7 @@ func (pr *PublicRoutes) newBillHandler(c *gin.Context) {
 	bill, err := pr.store.User().Bills().Create(req)
 	switch err {
 	case nil:
-		c.JSON(http.StatusCreated, gin.H{
-			"id":         bill.ID,
-			"chat_id":    bill.ChatID,
-			"bill":       bill.Bill,
-			"created_at": bill.CreatedAt,
-		})
+		c.JSON(http.StatusCreated, bill)
 	case sql.ErrNoRows:
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": errors.ErrAlreadyExists.Error(),

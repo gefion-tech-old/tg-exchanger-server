@@ -10,6 +10,7 @@ type UserRepository interface {
 	Create(u *models.User) (*models.User, error)
 	RegisterAsManager(u *models.User) (*models.User, error)
 	FindByUsername(username string) (*models.User, error)
+	GetAllManagers() ([]*models.User, error)
 }
 
 type UserBillsRepository interface {
@@ -26,6 +27,9 @@ type ManagerRepository interface {
 type NotificationRepository interface {
 	Create(n *models.Notification) (*models.Notification, error)
 	Delete(n *models.Notification) (*models.Notification, error)
+	Get(n *models.Notification) (*models.Notification, error)
+	All() ([]*models.Notification, error)
+	UpdateStatus(n *models.Notification) (*models.Notification, error)
 }
 
 type BotMessagesRepository interface {
