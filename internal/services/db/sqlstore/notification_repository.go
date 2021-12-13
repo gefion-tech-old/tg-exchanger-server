@@ -11,6 +11,11 @@ type NotificationRepository struct {
 	store *sql.DB
 }
 
+/*
+	Создать уведомление в таблице `notifications`
+
+	# TESTED
+*/
 func (r *NotificationRepository) Create(n *models.Notification) (*models.Notification, error) {
 	if err := r.store.QueryRow(
 		`
@@ -70,6 +75,11 @@ func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.N
 	return n, nil
 }
 
+/*
+	Получить кол-во записей `notifications`
+
+	# TESTED
+*/
 func (r *NotificationRepository) Count() (int, error) {
 	var c int
 	if err := r.store.QueryRow(
@@ -86,6 +96,11 @@ func (r *NotificationRepository) Count() (int, error) {
 	return c, nil
 }
 
+/*
+	Получить выборку из таблицы `notifications`
+
+	# TESTED
+*/
 func (r *NotificationRepository) GetWithLimit(limit int) ([]*models.Notification, error) {
 	nArr := []*models.Notification{}
 
@@ -126,6 +141,11 @@ func (r *NotificationRepository) GetWithLimit(limit int) ([]*models.Notification
 	return nArr, nil
 }
 
+/*
+	Получить запись из таблицы `notifications`
+
+	# TESTED
+*/
 func (r *NotificationRepository) Get(n *models.Notification) (*models.Notification, error) {
 	if err := r.store.QueryRow(
 		`
@@ -151,6 +171,11 @@ func (r *NotificationRepository) Get(n *models.Notification) (*models.Notificati
 	return n, nil
 }
 
+/*
+	Удалить запись из таблицы `notifications`
+
+	# TESTED
+*/
 func (r *NotificationRepository) Delete(n *models.Notification) (*models.Notification, error) {
 	if err := r.store.QueryRow(
 		`

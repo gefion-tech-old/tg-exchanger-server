@@ -11,6 +11,11 @@ type BotMessagesRepository struct {
 	store *sql.DB
 }
 
+/*
+	Создать сообщение в таблице `bot_messages`
+
+	# TESTED
+*/
 func (r *BotMessagesRepository) Create(m *models.BotMessage) (*models.BotMessage, error) {
 	if err := r.store.QueryRow(
 		`
@@ -39,6 +44,8 @@ func (r *BotMessagesRepository) Create(m *models.BotMessage) (*models.BotMessage
 
 /*
 	Получить конкретное сообщение из таблицы `bot_messages`
+
+	# TESTED
 */
 func (r *BotMessagesRepository) Get(m *models.BotMessage) (*models.BotMessage, error) {
 	if err := r.store.QueryRow(
@@ -99,6 +106,8 @@ func (r *BotMessagesRepository) GetAll() ([]*models.BotMessage, error) {
 
 /*
 	Обновить конкретное сообщение в таблице `bot_messages`
+
+	# TESTED
 */
 func (r *BotMessagesRepository) Update(m *models.BotMessage) (*models.BotMessage, error) {
 	if err := r.store.QueryRow(

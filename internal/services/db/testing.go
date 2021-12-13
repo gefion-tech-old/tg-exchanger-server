@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
+	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
 
 func TestDB(t *testing.T, config *config.DatabaseConfig) (*sql.DB, func(...string)) {
@@ -33,4 +35,25 @@ func TestDB(t *testing.T, config *config.DatabaseConfig) (*sql.DB, func(...strin
 
 		db.Close()
 	}
+}
+
+func CreateUser(t *testing.T, s SQLStoreI) (*models.User, error) {
+	t.Helper()
+
+	// Регистрация человека как пользователя бота
+	u, err := s.User().Create(&models.User{
+		ChatID:   int64(mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"].(int)),
+		Username: mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Регистрация человека как менеджера
+	m, err := s.User().RegisterAsManager(u)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
