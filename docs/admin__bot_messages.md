@@ -94,9 +94,11 @@
 
 <hr>
 
-### Get All
+### Get Slice of Messages
 
-- **[GET]** `/api/v1/admin/messages` — получить массив всех созданных сообщений из БД
+Принцип работы с данным запросом и его параметрами идентичен [уведомлениям](#https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__notification.md#get-slice-of-notifications).
+
+- **[GET]** `/api/v1/admin/messages?page=1&limit=15` — получить массив сообщений из БД
 
 ```json
 [
