@@ -100,17 +100,15 @@
 
 - **[GET]** `/api/v1/admin/messages?page=1&limit=15` — получить массив сообщений из БД
 
+***Response***
+
 ```json
-[
-    {
-        "id": 4,
-        "connector": "text_connector",
-        "message_text": "some message text here11111",
-        "created_by": "I0HuKc",
-        "created_at": "2021-12-06T14:21:45.697571Z",
-        "updated_at": "2021-12-06T11:21:48.909578Z"
-    }
-]
+{
+    "current_page": 1,
+    "data": [],
+    "last_page": 2,
+    "limit": 15
+}
 ```
 
 <hr>
