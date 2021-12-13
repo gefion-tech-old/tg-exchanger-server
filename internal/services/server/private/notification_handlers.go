@@ -1,9 +1,12 @@
 package private
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
@@ -12,6 +15,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/sync/errgroup"
 )
 
 /*
@@ -52,7 +56,7 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 				},
 				"message": map[string]interface{}{
 					"type": "confirmation_req",
-					"text": fmt.Sprintf("🟢 Новая заявка на врефикацию карты 🟢\n\n*Пользователь*: @%s", req.User.Username),
+					"text": fmt.Sprintf("🟢 Новая заявка 🟢\n\n*Пользователь*: @%s", req.User.Username),
 				},
 				"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
 			})
@@ -80,26 +84,75 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 
 /*
 	@Method GET
-	@Path admin/notification
+	@Path admin/notifications?page=1&limit=15
 	@Type PRIVATE
 	@Documentation
 
-	При валидных данных из БД достается одно запрашиваемое уведомление.
-*/
-func (pr *PrivateRoutes) getNotification(c *gin.Context) {
+	При валидных данных из БД достаюется нужные записи в нужном количестве
 
+*/
+func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
+	errs, _ := errgroup.WithContext(c)
+
+	cArrN := make(chan []*models.Notification)
+	cCount := make(chan *int)
+
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+	}
+
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	// Достаю из БД запрашиваемые данные
+	errs.Go(func() error {
+		defer close(cArrN)
+		arrN, err := pr.store.Manager().Notification().GetWithLimit(page * limit)
+		if err != nil {
+			return err
+		}
+
+		cArrN <- arrN
+		return nil
+	})
+
+	// Подсчет кол-ва уведомлений в админке
+	errs.Go(func() error {
+		defer close(cCount)
+		c, err := pr.store.Manager().Notification().Count()
+		if err != nil {
+			return err
+		}
+
+		cCount <- &c
+		return nil
+	})
+
+	arrN := <-cArrN
+	count := <-cCount
+
+	if arrN == nil || count == nil {
+		tools.ServErr(c, http.StatusInternalServerError, errs.Wait())
+		return
+	}
+
+	// Делаю выборку нужного фрагмента данных
+	high := *count
+	if page*limit <= *count {
+		high = page * limit
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"limit":        limit,
+		"current_page": page,
+		"last_page":    math.Ceil(float64(*count) / float64(limit)),
+		"data":         arrN[(page-1)*limit : high],
+	})
 }
-
-/*
-	@Method GET
-	@Path admin/notifications
-	@Type PRIVATE
-	@Documentation
-
-	При валидных данных из БД достается список уведомлений
-	за последний месяц.
-*/
-func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {}
 
 /*
 	@Method PUT
@@ -109,7 +162,36 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {}
 
 	Обновить статус уведомления.
 */
-func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {}
+func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {
+	req := &models.Notification{}
+	if err := c.ShouldBindJSON(req); err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		return
+	}
+
+	if err := req.NotificationTypeValidation(); err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	if err := req.NotificationStatusValidation(); err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	n, err := pr.store.Manager().Notification().UpdateStatus(req)
+	switch err {
+	case nil:
+		c.JSON(http.StatusOK, n)
+		return
+	case sql.ErrNoRows:
+		tools.ServErr(c, http.StatusNotFound, errors.ErrRecordNotFound)
+		return
+	default:
+		tools.ServErr(c, http.StatusNotFound, err)
+		return
+	}
+}
 
 /*
 	@Method DELETE
@@ -119,4 +201,24 @@ func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {}
 
 	Удалить конкретное уведомление
 */
-func (pr *PrivateRoutes) deleteNotification(c *gin.Context) {}
+func (pr *PrivateRoutes) deleteNotification(c *gin.Context) {
+	req := &models.Notification{}
+	if err := c.ShouldBindJSON(req); err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		return
+	}
+
+	n, err := pr.store.Manager().Notification().Delete(req)
+	switch err {
+	case nil:
+		c.JSON(http.StatusOK, n)
+		return
+	case sql.ErrNoRows:
+		tools.ServErr(c, http.StatusNotFound, errors.ErrRecordNotFound)
+		return
+	default:
+		tools.ServErr(c, http.StatusNotFound, err)
+		return
+	}
+
+}

@@ -22,6 +22,10 @@ func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.N
 	return nil, nil
 }
 
-func (r *NotificationRepository) All() ([]*models.Notification, error) {
+func (r *NotificationRepository) GetWithLimit(limit int) ([]*models.Notification, error) {
 	return nil, nil
+}
+
+func (r *NotificationRepository) Count() (int, error) {
+	return 0, nil
 }

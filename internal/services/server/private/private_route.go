@@ -56,7 +56,6 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 
 	{
 		admin.POST("/notification", pr.createNotification)
-		admin.GET("/notification", pr.getNotification)
 		admin.PUT("/notification", pr.updateNotificationStatus)
 		admin.DELETE("/notification", pr.deleteNotification)
 	}

@@ -21,7 +21,6 @@ import (
 	# TESTED
 */
 func (pr *PublicRoutes) getAllBillsHandler(c *gin.Context) {
-
 	chatID, err := strconv.Atoi(c.Param("chat_id"))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{

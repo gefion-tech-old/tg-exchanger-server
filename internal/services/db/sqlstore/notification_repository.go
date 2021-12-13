@@ -70,14 +70,33 @@ func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.N
 	return n, nil
 }
 
-func (r *NotificationRepository) All() ([]*models.Notification, error) {
+func (r *NotificationRepository) Count() (int, error) {
+	var c int
+	if err := r.store.QueryRow(
+		`
+		SELECT count(*)
+		FROM notifications		
+		`,
+	).Scan(
+		&c,
+	); err != nil {
+		return 0, err
+	}
+
+	return c, nil
+}
+
+func (r *NotificationRepository) GetWithLimit(limit int) ([]*models.Notification, error) {
 	nArr := []*models.Notification{}
 
 	rows, err := r.store.Query(
 		`
 		SELECT id, type, status, chat_id, username, code, user_card, img_path, created_at, updated_at
 		FROM notifications
+		ORDER BY id DESC
+		LIMIT $1
 		`,
+		limit,
 	)
 	if err != nil {
 		return nil, err

@@ -246,7 +246,6 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 	# TESTED
 */
 func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
-
 	req := &models.UserFromAdminRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
