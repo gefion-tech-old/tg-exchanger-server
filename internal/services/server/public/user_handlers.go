@@ -155,8 +155,6 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(m["to"].(map[string]interface{})["chat_id"])
-
 	// Отправляю сообщение в NSQ
 	if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -259,8 +257,6 @@ func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
 	u, err := pr.store.User().FindByUsername(req.Username)
 	switch err {
 	case nil:
-		fmt.Println(tools.EncryptString(req.Password))
-		// fmt.Println(*u.Hash)
 		if u.Hash != nil && tools.ComparePassword(*u.Hash, req.Password) {
 			// Генерирую сборку токенов и сопутствующих деталей
 			td, err := pr.createToken(u.ChatID, u.Username)

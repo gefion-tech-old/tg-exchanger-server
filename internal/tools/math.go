@@ -40,3 +40,13 @@ func VerificationCode(testing bool) int {
 		return RandInt(100000, 999999)
 	}
 }
+
+// Сделать срез запрашиваемых ресурсов
+// Необходимо для корректного расчета, какие записи
+// отдавать для какой страницы
+func UpperThreshold(page, limit, count int) int {
+	if page*limit <= count {
+		return page * limit
+	}
+	return count
+}

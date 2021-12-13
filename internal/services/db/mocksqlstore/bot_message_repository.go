@@ -28,15 +28,17 @@ func (r *BotMessagesRepository) Get(m *models.BotMessage) (*models.BotMessage, e
 	}
 	return nil, sql.ErrNoRows
 }
-func (r *BotMessagesRepository) GetAll() ([]*models.BotMessage, error) {
+
+func (r *BotMessagesRepository) GetSlice(limit int) ([]*models.BotMessage, error) {
 	mArr := []*models.BotMessage{}
 
-	for _, msg := range r.messages {
-		mArr = append(mArr, msg)
+	for i := 0; i < limit; i++ {
+		mArr = append(mArr, r.messages[uint(i)])
 	}
 
 	return mArr, nil
 }
+
 func (r *BotMessagesRepository) Update(m *models.BotMessage) (*models.BotMessage, error) {
 	for _, msg := range r.messages {
 		if msg.Connector == m.Connector {
@@ -48,6 +50,7 @@ func (r *BotMessagesRepository) Update(m *models.BotMessage) (*models.BotMessage
 
 	return nil, sql.ErrNoRows
 }
+
 func (r *BotMessagesRepository) Delete(m *models.BotMessage) (*models.BotMessage, error) {
 	for _, msg := range r.messages {
 		if msg.Connector == m.Connector {
@@ -56,4 +59,8 @@ func (r *BotMessagesRepository) Delete(m *models.BotMessage) (*models.BotMessage
 		}
 	}
 	return nil, sql.ErrNoRows
+}
+
+func (r *BotMessagesRepository) Count() (int, error) {
+	return len(r.messages), nil
 }

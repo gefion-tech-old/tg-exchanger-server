@@ -2,11 +2,16 @@ package private
 
 import (
 	"database/sql"
+	"fmt"
+	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/sync/errgroup"
 )
 
 func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
@@ -96,18 +101,62 @@ func (pr *PrivateRoutes) updateAllBotMessageHandler(c *gin.Context) {
 	# TESTED
 */
 func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
-	msgs, err := pr.store.Manager().BotMessages().GetAll()
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, msgs)
-		return
+	errs, _ := errgroup.WithContext(c)
 
-	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+	cArrM := make(chan []*models.BotMessage)
+	cCount := make(chan *int)
+
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+	}
+
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
+
+	// Подсчет кол-ва сообщений в таблице
+	errs.Go(func() error {
+		defer close(cCount)
+		c, err := pr.store.Manager().BotMessages().Count()
+		if err != nil {
+			return err
+		}
+
+		cCount <- &c
+		return nil
+	})
+
+	// Достаю из БД запрашиваемые записи
+	errs.Go(func() error {
+		defer close(cArrM)
+		arrM, err := pr.store.Manager().BotMessages().GetSlice(page * limit)
+		if err != nil {
+			return err
+		}
+
+		cArrM <- arrM
+		return nil
+	})
+
+	arrM := <-cArrM
+	count := <-cCount
+
+	if arrM == nil || count == nil {
+		tools.ServErr(c, http.StatusInternalServerError, errs.Wait())
+		return
+	}
+
+	fmt.Println(*count)
+
+	c.JSON(http.StatusOK, gin.H{
+		"limit":        limit,
+		"current_page": page,
+		"last_page":    math.Ceil(float64(*count) / float64(limit)),
+		"data":         arrM[(page-1)*limit : tools.UpperThreshold(page, limit, *count)],
+	})
 }
 
 /*

@@ -47,6 +47,11 @@ func (r *NotificationRepository) Create(n *models.Notification) (*models.Notific
 	return n, nil
 }
 
+/*
+	Обновить поле status в таблице `notifications`
+
+	# TESTED
+*/
 func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.Notification, error) {
 	if err := r.store.QueryRow(
 		`
@@ -101,7 +106,7 @@ func (r *NotificationRepository) Count() (int, error) {
 
 	# TESTED
 */
-func (r *NotificationRepository) GetWithLimit(limit int) ([]*models.Notification, error) {
+func (r *NotificationRepository) GetSlice(limit int) ([]*models.Notification, error) {
 	nArr := []*models.Notification{}
 
 	rows, err := r.store.Query(

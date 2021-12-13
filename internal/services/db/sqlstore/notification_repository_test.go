@@ -35,7 +35,7 @@ func Test_SQL_NotificationRepository(t *testing.T) {
 	assert.NotNil(t, n2)
 
 	// Получить уведомления из БД
-	arrN, err := s.Manager().Notification().GetWithLimit(10)
+	arrN, err := s.Manager().Notification().GetSlice(10)
 	assert.NoError(t, err)
 	assert.NotNil(t, arrN)
 	assert.Len(t, arrN, 1)

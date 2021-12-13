@@ -34,14 +34,6 @@ func (g *Guard) IsAuth() gin.HandlerFunc {
 			return
 		}
 
-		// if errFetch := g.redis.Get(tokenAuth.AccessUuid).Err(); errFetch != nil {
-		// 	c.JSON(http.StatusUnauthorized, gin.H{
-		// 		"error": errors.ErrTokenInvalid,
-		// 	})
-		// 	c.Abort()
-		// 	return
-		// }
-
 		// Записываю в контекст структуру AccessDetails
 		c.Request = c.Request.WithContext(
 			context.WithValue(c.Request.Context(), CtxKeyToken, tokenAuth))

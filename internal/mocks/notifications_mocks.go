@@ -3,7 +3,9 @@ package mocks
 import "github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 
 var ADMIN_NOTIFICATION_854 = map[string]interface{}{
-	"type": static.NTF__T__VERIFICATION,
+	"id":     1,
+	"status": 2,
+	"type":   static.NTF__T__VERIFICATION,
 	"meta_data": map[string]interface{}{
 		"code":      245335,
 		"user_card": "5559494130410854",

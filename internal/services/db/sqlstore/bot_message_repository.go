@@ -42,6 +42,22 @@ func (r *BotMessagesRepository) Create(m *models.BotMessage) (*models.BotMessage
 	return m, nil
 }
 
+func (r *BotMessagesRepository) Count() (int, error) {
+	var c int
+	if err := r.store.QueryRow(
+		`
+		SELECT count(*)
+		FROM bot_messages		
+		`,
+	).Scan(
+		&c,
+	); err != nil {
+		return 0, err
+	}
+
+	return c, nil
+}
+
 /*
 	Получить конкретное сообщение из таблицы `bot_messages`
 
@@ -71,14 +87,17 @@ func (r *BotMessagesRepository) Get(m *models.BotMessage) (*models.BotMessage, e
 /*
 	Получить все сообщения из таблицы `bot_messages`
 */
-func (r *BotMessagesRepository) GetAll() ([]*models.BotMessage, error) {
+func (r *BotMessagesRepository) GetSlice(limit int) ([]*models.BotMessage, error) {
 	bm := []*models.BotMessage{}
 
 	rows, err := r.store.Query(
 		`
 		SELECT id, connector, message_text, created_by, created_at, updated_at
 		FROM bot_messages
+		ORDER BY id DESC
+		LIMIT $1
 		`,
+		limit,
 	)
 	if err != nil {
 		return nil, err

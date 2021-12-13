@@ -25,6 +25,8 @@ import (
 	@Documentation
 
 	При валидных данных в БД создается запись о новом уведомлении.
+
+	# TESTED
 */
 func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 	req := &models.Notification{}
@@ -90,6 +92,8 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 
 	При валидных данных из БД достаюется нужные записи в нужном количестве
 
+	# TESTED
+
 */
 func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 	errs, _ := errgroup.WithContext(c)
@@ -108,10 +112,10 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 		return
 	}
 
-	// Достаю из БД запрашиваемые данные
+	// Достаю из БД запрашиваемые записи
 	errs.Go(func() error {
 		defer close(cArrN)
-		arrN, err := pr.store.Manager().Notification().GetWithLimit(page * limit)
+		arrN, err := pr.store.Manager().Notification().GetSlice(page * limit)
 		if err != nil {
 			return err
 		}
@@ -120,7 +124,7 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 		return nil
 	})
 
-	// Подсчет кол-ва уведомлений в админке
+	// Подсчет кол-ва уведомлений в таблице
 	errs.Go(func() error {
 		defer close(cCount)
 		c, err := pr.store.Manager().Notification().Count()
@@ -140,17 +144,11 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 		return
 	}
 
-	// Делаю выборку нужного фрагмента данных
-	high := *count
-	if page*limit <= *count {
-		high = page * limit
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"limit":        limit,
 		"current_page": page,
 		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"data":         arrN[(page-1)*limit : high],
+		"data":         arrN[(page-1)*limit : tools.UpperThreshold(page, limit, *count)],
 	})
 }
 
@@ -161,6 +159,8 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 	@Documentation
 
 	Обновить статус уведомления.
+
+	# TESTED
 */
 func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {
 	req := &models.Notification{}

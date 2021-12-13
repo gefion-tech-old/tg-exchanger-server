@@ -75,6 +75,31 @@ func TestGetErrorText(t *testing.T, recBody *bytes.Buffer) (string, error) {
 	==========================================================================================
 */
 
+func TestNotification854(t *testing.T, s *Server, tokens map[string]interface{}) error {
+	t.Helper()
+
+	// Кодирую тело запроса
+	b := &bytes.Buffer{}
+	if err := json.NewEncoder(b).Encode(mocks.ADMIN_NOTIFICATION_854); err != nil {
+		return err
+	}
+
+	rec := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/admin/notification", b)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
+	s.Router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		return errors.New("не удалось создать тествое уведомление")
+	}
+
+	return nil
+}
+
 func TestBotMessage(t *testing.T, s *Server, tokens map[string]interface{}) error {
 	t.Helper()
 

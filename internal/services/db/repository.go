@@ -28,7 +28,7 @@ type NotificationRepository interface {
 	Create(n *models.Notification) (*models.Notification, error)
 	Delete(n *models.Notification) (*models.Notification, error)
 	Get(n *models.Notification) (*models.Notification, error)
-	GetWithLimit(limit int) ([]*models.Notification, error)
+	GetSlice(limit int) ([]*models.Notification, error)
 	UpdateStatus(n *models.Notification) (*models.Notification, error)
 	Count() (int, error)
 }
@@ -36,7 +36,8 @@ type NotificationRepository interface {
 type BotMessagesRepository interface {
 	Create(m *models.BotMessage) (*models.BotMessage, error)
 	Get(m *models.BotMessage) (*models.BotMessage, error)
-	GetAll() ([]*models.BotMessage, error)
+	GetSlice(limit int) ([]*models.BotMessage, error)
 	Update(m *models.BotMessage) (*models.BotMessage, error)
 	Delete(m *models.BotMessage) (*models.BotMessage, error)
+	Count() (int, error)
 }

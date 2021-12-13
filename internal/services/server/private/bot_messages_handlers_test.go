@@ -76,7 +76,7 @@ func Test_Server_DeleteBotMessageHandler(t *testing.T) {
 
 }
 
-func Test_Server_UpdateAllBotMessageHandler(t *testing.T) {
+func Test_Server_UpdateBotMessageHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
@@ -198,10 +198,10 @@ func Test_Server_GetAllBotMessageHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	body := []models.BotMessage{}
+	body := map[string]interface{}{}
 	decodeErr := json.NewDecoder(rec.Body).Decode(&body)
 	assert.NoError(t, decodeErr)
-	assert.Len(t, body, 1)
+	assert.Len(t, body["data"], 1)
 
 }
 
