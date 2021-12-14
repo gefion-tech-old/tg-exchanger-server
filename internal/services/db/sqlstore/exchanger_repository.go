@@ -50,6 +50,7 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) (*models.Exchanger, er
 		e.Name,
 		e.UrlToParse,
 		time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		e.ID,
 	).Scan(
 		&e.ID,
 		&e.Name,
@@ -84,7 +85,7 @@ func (r *ExchangerRepository) Get(e *models.Exchanger) (*models.Exchanger, error
 		`
 		SELECT id, name, url, created_at, updated_at
 		FROM exchangers
-		WHERE id=$1
+		WHERE id=$1		
 		`,
 		e.ID,
 	).Scan(
