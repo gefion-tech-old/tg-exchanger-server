@@ -1,6 +1,11 @@
 SOURCES=./cmd/main
 SERVICE=server
 
+.PHONY: init
+
+init:
+	mkdir logs
+
 .PHONY: run
 
 run:
