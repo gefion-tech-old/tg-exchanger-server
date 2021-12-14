@@ -20,16 +20,18 @@ type ExchangerRepository struct {
 func (r *ExchangerRepository) Create(e *models.Exchanger) (*models.Exchanger, error) {
 	if err := r.store.QueryRow(
 		`
-		INSERT INTO exchangers(name, url)
-		SELECT $1, $2
-		RETURNING id, name, url, created_at, updated_at
+		INSERT INTO exchangers(name, url, created_by)
+		SELECT $1, $2, $3
+		RETURNING id, name, url, created_by, created_at, updated_at
 		`,
 		e.Name,
 		e.UrlToParse,
+		e.CreatedBy,
 	).Scan(
 		&e.ID,
 		&e.Name,
-		&e.UpdatedAt,
+		&e.UrlToParse,
+		&e.CreatedBy,
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	); err != nil {
@@ -45,7 +47,7 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) (*models.Exchanger, er
 		UPDATE exchangers
 		SET name=$1, url=$2, updated_at=$3
 		WHERE id=$4
-		RETURNING id, name, url, created_at, updated_at
+		RETURNING id, name, url, created_by, created_at, updated_at
 		`,
 		e.Name,
 		e.UrlToParse,
@@ -54,7 +56,8 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) (*models.Exchanger, er
 	).Scan(
 		&e.ID,
 		&e.Name,
-		&e.UpdatedAt,
+		&e.UrlToParse,
+		&e.CreatedBy,
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	); err != nil {
@@ -83,7 +86,7 @@ func (r *ExchangerRepository) Count() (int, error) {
 func (r *ExchangerRepository) Get(e *models.Exchanger) (*models.Exchanger, error) {
 	if err := r.store.QueryRow(
 		`
-		SELECT id, name, url, created_at, updated_at
+		SELECT id, name, url, created_by, created_at, updated_at
 		FROM exchangers
 		WHERE id=$1		
 		`,
@@ -91,7 +94,8 @@ func (r *ExchangerRepository) Get(e *models.Exchanger) (*models.Exchanger, error
 	).Scan(
 		&e.ID,
 		&e.Name,
-		&e.UpdatedAt,
+		&e.UrlToParse,
+		&e.CreatedBy,
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	); err != nil {
@@ -106,7 +110,7 @@ func (r *ExchangerRepository) GetSlice(limit int) ([]*models.Exchanger, error) {
 
 	rows, err := r.store.Query(
 		`
-		SELECT id, name, url, created_at, updated_at
+		SELECT id, name, url, created_by, created_at, updated_at
 		FROM exchangers
 		ORDER BY id DESC
 		LIMIT $1
@@ -123,7 +127,8 @@ func (r *ExchangerRepository) GetSlice(limit int) ([]*models.Exchanger, error) {
 		if err := rows.Scan(
 			&e.ID,
 			&e.Name,
-			&e.UpdatedAt,
+			&e.UrlToParse,
+			&e.CreatedBy,
 			&e.CreatedAt,
 			&e.UpdatedAt,
 		); err != nil {
@@ -143,13 +148,14 @@ func (r *ExchangerRepository) Delete(e *models.Exchanger) (*models.Exchanger, er
 		`
 		DELETE FROM exchangers
 		WHERE id=$1
-		RETURNING id, name, url, created_at, updated_at
+		RETURNING id, name, url, created_by, created_at, updated_at
 		`,
 		e.ID,
 	).Scan(
 		&e.ID,
 		&e.Name,
-		&e.UpdatedAt,
+		&e.UrlToParse,
+		&e.CreatedBy,
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	); err != nil {
