@@ -25,7 +25,14 @@ type ManagerRepository interface {
 	Exchanger() ExchangerRepository
 }
 
-type ExchangerRepository interface{}
+type ExchangerRepository interface {
+	Create(e *models.Exchanger) (*models.Exchanger, error)
+	Update(e *models.Exchanger) (*models.Exchanger, error)
+	Count() (int, error)
+	Get(e *models.Exchanger) (*models.Exchanger, error)
+	Delete(e *models.Exchanger) (*models.Exchanger, error)
+	GetSlice(limit int) ([]*models.Exchanger, error)
+}
 
 type NotificationRepository interface {
 	Create(n *models.Notification) (*models.Notification, error)
