@@ -10,6 +10,7 @@ type ManagerRepository struct {
 	store                  *sql.DB
 	botMessagesRepository  *BotMessagesRepository
 	notificationRepository *NotificationRepository
+	exchangerRepository    *ExchangerRepository
 }
 
 /*
@@ -17,6 +18,18 @@ type ManagerRepository struct {
 	КОНСТРУКТОРЫ ВЛОЖЕННЫХ СТРУКТУР
 	==========================================================================================
 */
+
+func (r *ManagerRepository) Exchanger() db.ExchangerRepository {
+	if r.exchangerRepository != nil {
+		return r.exchangerRepository
+	}
+
+	r.exchangerRepository = &ExchangerRepository{
+		store: r.store,
+	}
+
+	return r.exchangerRepository
+}
 
 func (r *ManagerRepository) Notification() db.NotificationRepository {
 	if r.notificationRepository != nil {

@@ -22,7 +22,10 @@ type UserBillsRepository interface {
 type ManagerRepository interface {
 	BotMessages() BotMessagesRepository
 	Notification() NotificationRepository
+	Exchanger() ExchangerRepository
 }
+
+type ExchangerRepository interface{}
 
 type NotificationRepository interface {
 	Create(n *models.Notification) (*models.Notification, error)

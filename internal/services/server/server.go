@@ -1,6 +1,8 @@
 package server
 
 import (
+	"os"
+
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
@@ -9,12 +11,14 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/private"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/public"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type Server struct {
 	store  db.SQLStoreI
 	Router *gin.Engine
 	config *config.Config
+	logger *logrus.Logger
 
 	guard          guard.GuardI
 	public_routes  public.PublicRoutesI
@@ -47,6 +51,21 @@ func (s *Server) configure() {
 }
 
 func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, c *config.Config) *Server {
+	// Настрока логгера
+	log := logrus.New()
+	f, err := os.OpenFile("logs/test.log", os.O_WRONLY|os.O_CREATE, 0755)
+	if err != nil {
+
+	}
+
+	log.SetOutput(f)
+	log.SetLevel(logrus.ErrorLevel)
+
+	log.WithFields(logrus.Fields{
+		"animal": "walrus",
+		"size":   10,
+	}).Error("A group of walrus emerges from the ocean")
+
 	// Инициализация роутера
 	router := gin.New()
 
@@ -63,6 +82,7 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 		store:          s,
 		Router:         router,
 		config:         c,
+		logger:         log,
 		guard:          guard,
 		public_routes:  pub,
 		private_routes: prv,

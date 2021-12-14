@@ -11,8 +11,9 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Host string `toml:"host"`
-	Port string `toml:"port"`
+	Host     string `toml:"host"`
+	Port     string `toml:"port"`
+	LogLevel string `toml:"log_level"`
 }
 
 type SecretsConfig struct {

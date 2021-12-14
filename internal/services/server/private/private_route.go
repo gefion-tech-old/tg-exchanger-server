@@ -56,12 +56,20 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 
 	{
 		admin.POST("/notification", pr.createNotification)
-		admin.PUT("/notification", pr.updateNotificationStatus)
-		admin.DELETE("/notification", pr.deleteNotification)
+		admin.PUT("/notification", g.AuthTokenValidation(), g.IsAuth(), pr.updateNotificationStatus)
+		admin.DELETE("/notification", g.AuthTokenValidation(), g.IsAuth(), pr.deleteNotification)
+	}
+
+	{
+		admin.POST("/exchanger", g.AuthTokenValidation(), g.IsAuth(), pr.createExchanger)
+		admin.PUT("/exchanger", g.AuthTokenValidation(), g.IsAuth(), pr.updateExchanger)
+		admin.DELETE("/exchanger", g.AuthTokenValidation(), g.IsAuth(), pr.deleteExchanger)
+		admin.GET("/exchanger", g.AuthTokenValidation(), g.IsAuth(), pr.getExchanger)
 	}
 
 	/* Работа с общим списокм конкретного ресурсами */
 	{
+		admin.GET("/exchangers", g.AuthTokenValidation(), g.IsAuth(), pr.getAllExchangers)
 		admin.GET("/notifications", g.AuthTokenValidation(), g.IsAuth(), pr.getAllNotifications)
 		admin.GET("/messages", g.AuthTokenValidation(), g.IsAuth(), pr.getAllBotMessageHandler)
 	}

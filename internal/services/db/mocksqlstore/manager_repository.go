@@ -8,6 +8,19 @@ import (
 type ManagerRepository struct {
 	botMessagesRepository  *BotMessagesRepository
 	notificationRepository *NotificationRepository
+	exchangerRepository    *ExchangerRepository
+}
+
+func (r *ManagerRepository) Exchanger() db.ExchangerRepository {
+	if r.exchangerRepository != nil {
+		return r.exchangerRepository
+	}
+
+	r.exchangerRepository = &ExchangerRepository{
+		exchangers: make(map[uint]*models.Exchanger),
+	}
+
+	return r.exchangerRepository
 }
 
 func (r *ManagerRepository) Notification() db.NotificationRepository {
