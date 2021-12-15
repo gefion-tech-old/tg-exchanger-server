@@ -15,15 +15,7 @@ import (
 )
 
 func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
-	req := &models.BotMessage{}
-	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
-		return
-	}
-
-	msg, err := pr.store.Manager().BotMessages().Delete(req)
+	msg, err := pr.store.Manager().BotMessages().Delete(&models.BotMessage{Connector: c.Param("connector")})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, msg)
@@ -53,8 +45,9 @@ func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) updateAllBotMessageHandler(c *gin.Context) {
-	req := &models.BotMessage{}
+func (pr *PrivateRoutes) updateBotMessageHandler(c *gin.Context) {
+	req := &models.BotMessage{Connector: c.Param("connector")}
+
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": errors.ErrInvalidBody.Error(),
@@ -62,7 +55,7 @@ func (pr *PrivateRoutes) updateAllBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	if err := req.BotMessageValidation(pr.users.Managers, pr.users.Developers); err != nil {
+	if err := req.UpdateBotMessageValidation(pr.users.Managers, pr.users.Developers); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
@@ -170,12 +163,7 @@ func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 	# TESTED
 */
 func (pr *PrivateRoutes) getBotMessageHandler(c *gin.Context) {
-	if c.Query("connector") == "" {
-		c.JSON(http.StatusNotFound, gin.H{})
-		return
-	}
-
-	msg, err := pr.store.Manager().BotMessages().Get(&models.BotMessage{Connector: c.Query("connector")})
+	msg, err := pr.store.Manager().BotMessages().Get(&models.BotMessage{Connector: c.Param("connector")})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, msg)
@@ -216,7 +204,7 @@ func (pr *PrivateRoutes) createNewBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	if err := req.BotMessageValidation(pr.users.Managers, pr.users.Developers); err != nil {
+	if err := req.CreateBotMessageValidation(pr.users.Managers, pr.users.Developers); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})

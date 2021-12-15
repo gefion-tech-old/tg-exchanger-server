@@ -49,9 +49,9 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 
 	{
 		admin.POST("/message", g.AuthTokenValidation(), g.IsAuth(), pr.createNewBotMessageHandler)
-		admin.GET("/message", pr.getBotMessageHandler)
-		admin.PUT("/message", g.AuthTokenValidation(), g.IsAuth(), pr.updateAllBotMessageHandler)
-		admin.DELETE("/message", g.AuthTokenValidation(), g.IsAuth(), pr.deleteBotMessageHandler)
+		admin.GET("/message/:connector", pr.getBotMessageHandler)
+		admin.PUT("/message/:connector", g.AuthTokenValidation(), g.IsAuth(), pr.updateBotMessageHandler)
+		admin.DELETE("/message/:connector", g.AuthTokenValidation(), g.IsAuth(), pr.deleteBotMessageHandler)
 	}
 
 	{
