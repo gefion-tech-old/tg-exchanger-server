@@ -8,11 +8,11 @@ import (
 )
 
 type NotificationRepository struct {
-	notification map[uint]*models.Notification
+	notification map[int]*models.Notification
 }
 
 func (r *NotificationRepository) Create(n *models.Notification) (*models.Notification, error) {
-	n.ID = uint(len(r.notification) + 1)
+	n.ID = len(r.notification) + 1
 	n.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 	n.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 
@@ -22,8 +22,8 @@ func (r *NotificationRepository) Create(n *models.Notification) (*models.Notific
 
 func (r *NotificationRepository) Get(n *models.Notification) (*models.Notification, error) {
 	for i := 0; i < len(r.notification); i++ {
-		if r.notification[uint(i)].ID == n.ID {
-			return r.notification[uint(i)], nil
+		if r.notification[i].ID == n.ID {
+			return r.notification[i], nil
 		}
 	}
 
@@ -31,19 +31,19 @@ func (r *NotificationRepository) Get(n *models.Notification) (*models.Notificati
 }
 
 func (r *NotificationRepository) Delete(n *models.Notification) (*models.Notification, error) {
-	if r.notification[uint(n.ID)] != nil {
-		defer delete(r.notification, r.notification[uint(n.ID)].ID)
-		return r.notification[uint(n.ID)], nil
+	if r.notification[n.ID] != nil {
+		defer delete(r.notification, r.notification[n.ID].ID)
+		return r.notification[n.ID], nil
 	}
 
 	return nil, sql.ErrNoRows
 }
 
 func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.Notification, error) {
-	if r.notification[uint(n.ID)] != nil {
-		r.notification[uint(n.ID)].Status = n.Status
-		r.notification[uint(n.ID)].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
-		return r.notification[uint(n.ID)], nil
+	if r.notification[n.ID] != nil {
+		r.notification[n.ID].Status = n.Status
+		r.notification[n.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+		return r.notification[n.ID], nil
 	}
 
 	return nil, sql.ErrNoRows
@@ -53,7 +53,7 @@ func (r *NotificationRepository) GetSlice(limit int) ([]*models.Notification, er
 	nArr := []*models.Notification{}
 
 	for i := 0; i < limit; i++ {
-		nArr = append(nArr, r.notification[uint(i)])
+		nArr = append(nArr, r.notification[i])
 	}
 
 	return nArr, nil

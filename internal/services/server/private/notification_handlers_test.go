@@ -26,69 +26,27 @@ func Test_Server_DeleteNotification(t *testing.T) {
 
 	testCases := []struct {
 		name         string
+		id           int
 		payload      interface{}
 		expectedCode int
 	}{
 		{
-			name:         "invalid payload",
-			payload:      "invalid",
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "empty type",
-			payload: map[string]interface{}{
-				"id": 1,
-				// "type": 854,
-				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
-			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "invalid type 1",
-			payload: map[string]interface{}{
-				"id":   1,
-				"type": "invalid",
-				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
-			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "invalid type 2",
-			payload: map[string]interface{}{
-				"id":   1,
-				"type": 0,
-				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
-			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "undefined id",
-			payload: map[string]interface{}{
-				"id":   10,
-				"type": 854,
-				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
-			},
+			name:         "undefined id",
+			id:           10,
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name: "valid",
-			payload: map[string]interface{}{
-				"id":   1,
-				"type": 854,
-				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
-			},
+			name:         "valid",
+			id:           1,
 			expectedCode: http.StatusOK,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Кодирую тело запроса
-			b := &bytes.Buffer{}
-			json.NewEncoder(b).Encode(tc.payload)
 
 			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/notification", b)
+			req, _ := http.NewRequest(http.MethodDelete, fmt.Sprintf("/api/v1/admin/notification/%d", tc.id), nil)
 			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
 			s.Router.ServeHTTP(rec, req)
 
@@ -110,6 +68,7 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 
 	testCases := []struct {
 		name         string
+		id           int
 		payload      interface{}
 		expectedCode int
 	}{
@@ -120,8 +79,8 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 		},
 		{
 			name: "empty type",
+			id:   1,
 			payload: map[string]interface{}{
-				"id":     1,
 				"status": 2,
 				"meta_data": map[string]interface{}{
 					"code":      245335,
@@ -134,8 +93,8 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 		},
 		{
 			name: "invalid type 1",
+			id:   1,
 			payload: map[string]interface{}{
-				"id":     1,
 				"status": 2,
 				"type":   "invalid",
 				"meta_data": map[string]interface{}{
@@ -149,8 +108,8 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 		},
 		{
 			name: "invalid type 2",
+			id:   1,
 			payload: map[string]interface{}{
-				"id":     1,
 				"status": 2,
 				"type":   100,
 				"meta_data": map[string]interface{}{
@@ -164,9 +123,8 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 		},
 		{
 			name: "empty status",
+			id:   1,
 			payload: map[string]interface{}{
-				"id": 1,
-				// "status": 2,
 				"type": 854,
 				"meta_data": map[string]interface{}{
 					"code":      245335,
@@ -179,8 +137,8 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 		},
 		{
 			name: "invalid status 1",
+			id:   1,
 			payload: map[string]interface{}{
-				"id":     1,
 				"status": "invalid",
 				"type":   854,
 				"meta_data": map[string]interface{}{
@@ -194,8 +152,8 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 		},
 		{
 			name: "invalid status 2",
+			id:   1,
 			payload: map[string]interface{}{
-				"id":     1,
 				"status": 100,
 				"type":   854,
 				"meta_data": map[string]interface{}{
@@ -209,8 +167,8 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 		},
 		{
 			name: "invalid user",
+			id:   1,
 			payload: map[string]interface{}{
-				"id":     1,
 				"status": 2,
 				"type":   854,
 				"meta_data": map[string]interface{}{
@@ -224,8 +182,8 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 		},
 		{
 			name: "valid",
+			id:   1,
 			payload: map[string]interface{}{
-				"id":     1,
 				"status": 2,
 				"type":   854,
 				"meta_data": map[string]interface{}{
@@ -246,7 +204,7 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 			json.NewEncoder(b).Encode(tc.payload)
 
 			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodPut, "/api/v1/admin/notification", b)
+			req, _ := http.NewRequest(http.MethodPut, fmt.Sprintf("/api/v1/admin/notification/%d", tc.id), b)
 			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
 			s.Router.ServeHTTP(rec, req)
 

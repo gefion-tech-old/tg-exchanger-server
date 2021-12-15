@@ -169,15 +169,18 @@ func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {
 		return
 	}
 
-	if err := req.NotificationTypeValidation(); err != nil {
+	if req.NotificationStatusValidation() != nil || req.NotificationTypeValidation() != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		return
+	}
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	if err := req.NotificationStatusValidation(); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	req.ID = id
 
 	n, err := pr.store.Manager().Notification().UpdateStatus(req)
 	switch err {
@@ -202,13 +205,13 @@ func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {
 	Удалить конкретное уведомление
 */
 func (pr *PrivateRoutes) deleteNotification(c *gin.Context) {
-	req := &models.Notification{}
-	if err := c.ShouldBindJSON(req); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	n, err := pr.store.Manager().Notification().Delete(req)
+	n, err := pr.store.Manager().Notification().Delete(&models.Notification{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, n)

@@ -8,9 +8,9 @@ import (
 )
 
 type Notification struct {
-	ID       uint `json:"id"`
-	Type     int  `json:"type" binding:"required"`
-	Status   int  `json:"status"`
+	ID       int `json:"id"`
+	Type     int `json:"type" binding:"required"`
+	Status   int `json:"status"`
 	MetaData struct {
 		Code     *int    `json:"code"`
 		UserCard *string `json:"user_card"`

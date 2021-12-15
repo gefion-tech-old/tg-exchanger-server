@@ -18,12 +18,3 @@ func (e *Exchanger) ExchangerValidation() error {
 		validation.Field(&e.UrlToParse, validation.Required),
 	)
 }
-
-func (e *Exchanger) ExchangerValidationFull() error {
-	return validation.ValidateStruct(
-		e,
-		validation.Field(&e.ID, validation.Required, validation.Min(1)),
-		validation.Field(&e.Name, validation.Required),
-		validation.Field(&e.UrlToParse, validation.Required),
-	)
-}

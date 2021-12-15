@@ -29,7 +29,7 @@ func (r *ManagerRepository) Notification() db.NotificationRepository {
 	}
 
 	r.notificationRepository = &NotificationRepository{
-		notification: make(map[uint]*models.Notification),
+		notification: make(map[int]*models.Notification),
 	}
 
 	return r.notificationRepository

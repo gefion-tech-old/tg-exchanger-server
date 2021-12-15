@@ -13,18 +13,29 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+/*
+	@Method POST
+	@Path admin/exchanger
+	@Type PRIVATE
+	@Documentation
+
+	При валидных данных в БД `exchangers` создается запись.
+*/
 func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
+	// Декодирование
 	req := &models.Exchanger{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
+	// Валидация
 	if err := req.ExchangerValidation(); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
+	// Операция записи в БД
 	e, err := pr.store.Manager().Exchanger().Create(req)
 	switch err {
 	case nil:
@@ -34,21 +45,23 @@ func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
-
 }
 
 func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
+	// Декодирование
 	req := &models.Exchanger{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
-	if err := req.ExchangerValidationFull(); err != nil {
+	// Валидация
+	if err := req.ExchangerValidation(); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
+	// Операция обновления записи в БД
 	e, err := pr.store.Manager().Exchanger().Update(req)
 	switch err {
 	case nil:
@@ -65,18 +78,14 @@ func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
 }
 
 func (pr *PrivateRoutes) deleteExchanger(c *gin.Context) {
-	req := &models.Exchanger{}
-	if err := c.ShouldBindJSON(req); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	if req.ID < 1 {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
-		return
-	}
-
-	e, err := pr.store.Manager().Exchanger().Delete(req)
+	// Операция удаления записи из БД
+	e, err := pr.store.Manager().Exchanger().Delete(&models.Exchanger{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, e)
@@ -91,19 +100,23 @@ func (pr *PrivateRoutes) deleteExchanger(c *gin.Context) {
 	}
 }
 
+/*
+	@Method POST
+	@Path admin/exchangers/:id
+	@Type PRIVATE
+	@Documentation
+
+	Получение одной записи из таблицы `exchangers`
+*/
 func (pr *PrivateRoutes) getExchanger(c *gin.Context) {
-	req := &models.Exchanger{}
-	if err := c.ShouldBindJSON(req); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	if req.ID < 1 {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
-		return
-	}
-
-	e, err := pr.store.Manager().Exchanger().Get(req)
+	// Операция получения записи из БД
+	e, err := pr.store.Manager().Exchanger().Get(&models.Exchanger{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, e)
@@ -118,11 +131,19 @@ func (pr *PrivateRoutes) getExchanger(c *gin.Context) {
 	}
 }
 
+/*
+	@Method POST
+	@Path admin/exchangers
+	@Type PRIVATE
+	@Documentation
+
+	Получение лимитированного объема записей из таблицы `exchangers`
+*/
 func (pr *PrivateRoutes) getAllExchangers(c *gin.Context) {
 	errs, _ := errgroup.WithContext(c)
 
-	cArrE := make(chan []*models.Exchanger)
-	cCount := make(chan *int)
+	cArrE := make(chan []*models.Exchanger, 1)
+	cCount := make(chan *int, 1)
 
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
@@ -147,7 +168,7 @@ func (pr *PrivateRoutes) getAllExchangers(c *gin.Context) {
 		return nil
 	})
 
-	// Подсчет кол-ва уведомлений в таблице
+	// Подсчет кол-ва записей в таблице
 	errs.Go(func() error {
 		defer close(cCount)
 		c, err := pr.store.Manager().Exchanger().Count()
