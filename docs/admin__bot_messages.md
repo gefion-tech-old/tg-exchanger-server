@@ -43,7 +43,7 @@
 
 ### Update
 
-- **[PUT]** `/api/v1/admin/message` — Обновить сообщение для бота.
+- **[PUT]** `/api/v1/admin/message/:connector` — Обновить сообщение для бота.
 
 ```json
 {
@@ -54,8 +54,7 @@
 ***Request***
 
 ```json
-{
-    "connector": "msg_connector",
+{   
     "message_text": "some message text here",   
 }
 ```
@@ -77,7 +76,7 @@
 
 ### Get
 
-- **[GET]** `/api/v1/admin/message?connector=<connector_name>` — получить конкретное сообщение из БД
+- **[GET]** `/api/v1/admin/message/:connector` — получить конкретное сообщение из БД
 
 ***Response***
 
@@ -115,7 +114,7 @@
 
 ### Delete
 
-- **[DELETE]** `/api/v1/admin/message` — Удалить сообщение бота.
+- **[DELETE]** `/api/v1/admin/message/:connector` — Удалить сообщение бота.
 
 ***Header***
 
@@ -125,13 +124,6 @@
 }
 ```
 
-***Request***
-
-```json
-{
-    "connector": "msg_connector"
-}
-```
 
 ***Response***
 

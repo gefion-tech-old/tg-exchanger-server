@@ -119,7 +119,7 @@ API путь указан с значениями по умолчанию для
 
 ### Update Status
 
-- **[PUT]** `/api/v1/admin/notification` — обновить статус уведомления
+- **[PUT]** `/api/v1/admin/notification/:id` — обновить статус уведомления
 
 
 ***Header***
@@ -171,7 +171,7 @@ API путь указан с значениями по умолчанию для
 
 ### Delete
 
-- **[DELETE]** `/api/v1/admin/notification` — удалить уведомление
+- **[DELETE]** `/api/v1/admin/notification/:id` — удалить уведомление
 
 ***Header***
 

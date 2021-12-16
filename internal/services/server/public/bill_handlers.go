@@ -12,7 +12,7 @@ import (
 
 /*
 	@Method GET
-	@Path /bot/user/<chat_id>/bills
+	@Path /bot/user/:chat_id/bills
 	@Type PUBLIC
 	@Documentation
 
@@ -48,7 +48,7 @@ func (pr *PublicRoutes) getAllBillsHandler(c *gin.Context) {
 
 /*
 	@Method DELETE
-	@Path /bot/user/bill
+	@Path /bot/user/bill/:id
 	@Type PUBLIC
 	@Documentation
 
