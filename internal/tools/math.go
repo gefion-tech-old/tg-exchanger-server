@@ -42,7 +42,7 @@ func VerificationCode(testing bool) int {
 }
 
 // Сделать срез запрашиваемых ресурсов
-// Необходимо для корректного расчета, какие записи
+// Необходимо для расчета, какие записи
 // отдавать для какой страницы
 func UpperThreshold(page, limit, count int) int {
 	if page*limit <= count {

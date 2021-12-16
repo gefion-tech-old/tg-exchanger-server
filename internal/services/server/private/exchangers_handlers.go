@@ -102,21 +102,15 @@ func (pr *PrivateRoutes) deleteExchanger(c *gin.Context) {
 
 /*
 	@Method POST
-	@Path admin/exchangers/:id
+	@Path admin/exchangers/:name
 	@Type PRIVATE
 	@Documentation
 
 	Получение одной записи из таблицы `exchangers`
 */
-func (pr *PrivateRoutes) getExchanger(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
-
+func (pr *PrivateRoutes) getExchangerByName(c *gin.Context) {
 	// Операция получения записи из БД
-	e, err := pr.store.Manager().Exchanger().Get(&models.Exchanger{ID: id})
+	e, err := pr.store.Manager().Exchanger().GetByName(&models.Exchanger{Name: c.Param("name")})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, e)

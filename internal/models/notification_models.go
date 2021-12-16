@@ -12,9 +12,16 @@ type Notification struct {
 	Type     int `json:"type" binding:"required"`
 	Status   int `json:"status"`
 	MetaData struct {
-		Code     *int    `json:"code"`
-		UserCard *string `json:"user_card"`
-		ImgPath  *string `json:"img_path"`
+		CardVerification struct {
+			Code     *int    `json:"code"`
+			UserCard *string `json:"user_card"`
+			ImgPath  *string `json:"img_path"`
+		} `json:"card_verification"`
+
+		ExActionCancel struct {
+			ExFrom *string `json:"ex_from"`
+			ExTo   *string `json:"ex_to"`
+		} `json:"ex_action_cancel"`
 	} `json:"meta_data"`
 	User struct {
 		ChatID   int64  `json:"chat_id" binding:"required"`

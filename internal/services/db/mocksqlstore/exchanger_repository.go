@@ -14,7 +14,7 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) (*models.Exchanger, er
 	return nil, nil
 }
 
-func (r *ExchangerRepository) Get(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) GetByName(e *models.Exchanger) (*models.Exchanger, error) {
 	return nil, nil
 }
 

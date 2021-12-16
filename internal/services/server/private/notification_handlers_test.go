@@ -236,9 +236,11 @@ func Test_Server_CreateNotification(t *testing.T) {
 			name: "empty type",
 			payload: map[string]interface{}{
 				"meta_data": map[string]interface{}{
-					"code":      245335,
-					"user_card": "5559494130410854",
-					"img_path":  "tmp/some_path.png",
+					"card_verification": map[string]interface{}{
+						"code":      245335,
+						"user_card": "5559494130410854",
+						"img_path":  "tmp/some_path.png",
+					},
 				},
 				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
 			},
@@ -249,9 +251,11 @@ func Test_Server_CreateNotification(t *testing.T) {
 			payload: map[string]interface{}{
 				"type": "invalid",
 				"meta_data": map[string]interface{}{
-					"code":      245335,
-					"user_card": "5559494130410854",
-					"img_path":  "tmp/some_path.png",
+					"card_verification": map[string]interface{}{
+						"code":      245335,
+						"user_card": "5559494130410854",
+						"img_path":  "tmp/some_path.png",
+					},
 				},
 				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
 			},
@@ -262,9 +266,11 @@ func Test_Server_CreateNotification(t *testing.T) {
 			payload: map[string]interface{}{
 				"type": 100,
 				"meta_data": map[string]interface{}{
-					"code":      245335,
-					"user_card": "5559494130410854",
-					"img_path":  "tmp/some_path.png",
+					"card_verification": map[string]interface{}{
+						"code":      245335,
+						"user_card": "5559494130410854",
+						"img_path":  "tmp/some_path.png",
+					},
 				},
 				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
 			},
@@ -275,9 +281,11 @@ func Test_Server_CreateNotification(t *testing.T) {
 			payload: map[string]interface{}{
 				"type": 854,
 				"meta_data": map[string]interface{}{
-					"code":      245335,
-					"user_card": "5559494130410854",
-					"img_path":  "tmp/some_path.png",
+					"card_verification": map[string]interface{}{
+						"code":      245335,
+						"user_card": "5559494130410854",
+						"img_path":  "tmp/some_path.png",
+					},
 				},
 				"user": "invalid",
 			},

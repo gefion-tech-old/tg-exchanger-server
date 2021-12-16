@@ -51,17 +51,20 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 	case static.NTF__T__VERIFICATION:
 		// Запись уведомления в очередь для всех менеджеров
 		for i := 0; i < len(uArr); i++ {
-			payload, err := json.Marshal(map[string]interface{}{
-				"to": map[string]interface{}{
-					"chat_id":  uArr[i].ChatID,
-					"username": uArr[i].Username,
-				},
-				"message": map[string]interface{}{
-					"type": "confirmation_req",
-					"text": fmt.Sprintf("🟢 Новая заявка 🟢\n\n*Пользователь*: @%s", req.User.Username),
-				},
-				"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
-			})
+			payload, err := json.Marshal(newVefificationNotify(uArr, i, req))
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+				fmt.Println(err)
+			}
+		}
+
+	case static.NTF__T__EXCHANGE_ERROR:
+		// Запись уведомления в очередь для всех менеджеров
+		for i := 0; i < len(uArr); i++ {
+			payload, err := json.Marshal(newActionCancelNotify(uArr, i, req))
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -224,4 +227,32 @@ func (pr *PrivateRoutes) deleteNotification(c *gin.Context) {
 		return
 	}
 
+}
+
+func newVefificationNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {
+	return map[string]interface{}{
+		"to": map[string]interface{}{
+			"chat_id":  uArr[i].ChatID,
+			"username": uArr[i].Username,
+		},
+		"message": map[string]interface{}{
+			"type": "confirmation_req",
+			"text": fmt.Sprintf("🟢 Новая заявка 🟢\n\n*Пользователь*: @%s", n.User.Username),
+		},
+		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+	}
+}
+
+func newActionCancelNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {
+	return map[string]interface{}{
+		"to": map[string]interface{}{
+			"chat_id":  uArr[i].ChatID,
+			"username": uArr[i].Username,
+		},
+		"message": map[string]interface{}{
+			"type": "skip_operation",
+			"text": fmt.Sprintf("🔴 Отмена операции 🔴\n\n*Пользователь*: @%s", n.User.Username),
+		},
+		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+	}
 }

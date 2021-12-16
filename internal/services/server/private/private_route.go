@@ -64,7 +64,7 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 		admin.POST("/exchanger", g.AuthTokenValidation(), g.IsAuth(), pr.createExchanger)
 		admin.PUT("/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), pr.updateExchanger)
 		admin.DELETE("/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), pr.deleteExchanger)
-		admin.GET("/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), pr.getExchanger)
+		admin.GET("/exchanger/:name", pr.getExchangerByName)
 	}
 
 	/* Работа с общим списокм конкретного ресурсами */
@@ -73,5 +73,4 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 		admin.GET("/notifications", g.AuthTokenValidation(), g.IsAuth(), pr.getAllNotifications)
 		admin.GET("/messages", g.AuthTokenValidation(), g.IsAuth(), pr.getAllBotMessageHandler)
 	}
-
 }

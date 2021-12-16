@@ -29,7 +29,7 @@ type ExchangerRepository interface {
 	Create(e *models.Exchanger) (*models.Exchanger, error)
 	Update(e *models.Exchanger) (*models.Exchanger, error)
 	Count() (int, error)
-	Get(e *models.Exchanger) (*models.Exchanger, error)
+	GetByName(e *models.Exchanger) (*models.Exchanger, error)
 	Delete(e *models.Exchanger) (*models.Exchanger, error)
 	GetSlice(limit int) ([]*models.Exchanger, error)
 }

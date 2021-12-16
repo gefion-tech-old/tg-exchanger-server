@@ -83,14 +83,14 @@ func (r *ExchangerRepository) Count() (int, error) {
 	return c, nil
 }
 
-func (r *ExchangerRepository) Get(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) GetByName(e *models.Exchanger) (*models.Exchanger, error) {
 	if err := r.store.QueryRow(
 		`
 		SELECT id, name, url, created_by, created_at, updated_at
 		FROM exchangers
-		WHERE id=$1		
+		WHERE name=$1		
 		`,
-		e.ID,
+		e.Name,
 	).Scan(
 		&e.ID,
 		&e.Name,

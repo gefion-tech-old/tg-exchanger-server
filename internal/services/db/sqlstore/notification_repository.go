@@ -19,25 +19,29 @@ type NotificationRepository struct {
 func (r *NotificationRepository) Create(n *models.Notification) (*models.Notification, error) {
 	if err := r.store.QueryRow(
 		`
-		INSERT INTO notifications(type, chat_id, username, code, user_card, img_path)
-		SELECT $1, $2, $3, $4, $5, $6
-		RETURNING id, type, status, chat_id, username, code, user_card, img_path, created_at, updated_at
+		INSERT INTO notifications(type, chat_id, username, code, user_card, img_path, ex_from, ex_to)
+		SELECT $1, $2, $3, $4, $5, $6, $7, $8
+		RETURNING id, type, status, chat_id, username, code, user_card, img_path, ex_from, ex_to, created_at, updated_at
 		`,
 		n.Type,
 		n.User.ChatID,
 		n.User.Username,
-		n.MetaData.Code,
-		n.MetaData.UserCard,
-		n.MetaData.ImgPath,
+		n.MetaData.CardVerification.Code,
+		n.MetaData.CardVerification.UserCard,
+		n.MetaData.CardVerification.ImgPath,
+		n.MetaData.ExActionCancel.ExFrom,
+		n.MetaData.ExActionCancel.ExTo,
 	).Scan(
 		&n.ID,
 		&n.Type,
 		&n.Status,
 		&n.User.ChatID,
 		&n.User.Username,
-		&n.MetaData.Code,
-		&n.MetaData.UserCard,
-		&n.MetaData.ImgPath,
+		&n.MetaData.CardVerification.Code,
+		&n.MetaData.CardVerification.UserCard,
+		&n.MetaData.CardVerification.ImgPath,
+		&n.MetaData.ExActionCancel.ExFrom,
+		&n.MetaData.ExActionCancel.ExTo,
 		&n.CreatedAt,
 		&n.UpdatedAt,
 	); err != nil {
@@ -58,7 +62,7 @@ func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.N
 		UPDATE notifications
 		SET status=$1, updated_at=$2
 		WHERE id=$3
-		RETURNING id, type, status, chat_id, username, code, user_card, img_path, created_at, updated_at
+		RETURNING id, type, status, chat_id, username, code, user_card, img_path, ex_from, ex_to, created_at, updated_at
 		`,
 		n.Status,
 		time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
@@ -69,9 +73,11 @@ func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.N
 		&n.Status,
 		&n.User.ChatID,
 		&n.User.Username,
-		&n.MetaData.Code,
-		&n.MetaData.UserCard,
-		&n.MetaData.ImgPath,
+		&n.MetaData.CardVerification.Code,
+		&n.MetaData.CardVerification.UserCard,
+		&n.MetaData.CardVerification.ImgPath,
+		&n.MetaData.ExActionCancel.ExFrom,
+		&n.MetaData.ExActionCancel.ExTo,
 		&n.CreatedAt,
 		&n.UpdatedAt,
 	); err != nil {
@@ -111,7 +117,7 @@ func (r *NotificationRepository) GetSlice(limit int) ([]*models.Notification, er
 
 	rows, err := r.store.Query(
 		`
-		SELECT id, type, status, chat_id, username, code, user_card, img_path, created_at, updated_at
+		SELECT id, type, status, chat_id, username, code, user_card, img_path, ex_from, ex_to, created_at, updated_at
 		FROM notifications
 		ORDER BY id DESC
 		LIMIT $1
@@ -131,9 +137,11 @@ func (r *NotificationRepository) GetSlice(limit int) ([]*models.Notification, er
 			&n.Status,
 			&n.User.ChatID,
 			&n.User.Username,
-			&n.MetaData.Code,
-			&n.MetaData.UserCard,
-			&n.MetaData.ImgPath,
+			&n.MetaData.CardVerification.Code,
+			&n.MetaData.CardVerification.UserCard,
+			&n.MetaData.CardVerification.ImgPath,
+			&n.MetaData.ExActionCancel.ExFrom,
+			&n.MetaData.ExActionCancel.ExTo,
 			&n.CreatedAt,
 			&n.UpdatedAt,
 		); err != nil {
@@ -154,7 +162,7 @@ func (r *NotificationRepository) GetSlice(limit int) ([]*models.Notification, er
 func (r *NotificationRepository) Get(n *models.Notification) (*models.Notification, error) {
 	if err := r.store.QueryRow(
 		`
-		SELECT id, type, status, chat_id, username, code, user_card, img_path, created_at, updated_at
+		SELECT id, type, status, chat_id, username, code, user_card, img_path, ex_from, ex_to, created_at, updated_at
 		FROM notifications
 		WHERE id=$1
 		`,
@@ -165,9 +173,11 @@ func (r *NotificationRepository) Get(n *models.Notification) (*models.Notificati
 		&n.Status,
 		&n.User.ChatID,
 		&n.User.Username,
-		&n.MetaData.Code,
-		&n.MetaData.UserCard,
-		&n.MetaData.ImgPath,
+		&n.MetaData.CardVerification.Code,
+		&n.MetaData.CardVerification.UserCard,
+		&n.MetaData.CardVerification.ImgPath,
+		&n.MetaData.ExActionCancel.ExFrom,
+		&n.MetaData.ExActionCancel.ExTo,
 		&n.CreatedAt,
 		&n.UpdatedAt,
 	); err != nil {
@@ -186,7 +196,7 @@ func (r *NotificationRepository) Delete(n *models.Notification) (*models.Notific
 		`
 		DELETE FROM notifications
 		WHERE id=$1
-		RETURNING id, type, status, chat_id, username, code, user_card, img_path, created_at, updated_at
+		RETURNING id, type, status, chat_id, username, code, user_card, img_path, ex_from, ex_to, created_at, updated_at
 		`,
 		n.ID,
 	).Scan(
@@ -195,9 +205,11 @@ func (r *NotificationRepository) Delete(n *models.Notification) (*models.Notific
 		&n.Status,
 		&n.User.ChatID,
 		&n.User.Username,
-		&n.MetaData.Code,
-		&n.MetaData.UserCard,
-		&n.MetaData.ImgPath,
+		&n.MetaData.CardVerification.Code,
+		&n.MetaData.CardVerification.UserCard,
+		&n.MetaData.CardVerification.ImgPath,
+		&n.MetaData.ExActionCancel.ExFrom,
+		&n.MetaData.ExActionCancel.ExTo,
 		&n.CreatedAt,
 		&n.UpdatedAt,
 	); err != nil {
