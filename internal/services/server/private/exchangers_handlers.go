@@ -20,6 +20,8 @@ import (
 	@Documentation
 
 	Создать запись в таблице `exchangers`
+
+	# TESTED
 */
 func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
 	// Декодирование
@@ -30,7 +32,7 @@ func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
 	}
 
 	// Валидация
-	if err := req.ExchangerValidation(); err != nil {
+	if err := req.ExchangerCreateValidation(); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
@@ -54,6 +56,8 @@ func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
 	@Documentation
 
 	Обновить запись в таблице `exchangers`
+
+	# TESTED
 */
 func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
 	// Декодирование
@@ -63,8 +67,16 @@ func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
 		return
 	}
 
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	req.ID = id
+
 	// Валидация
-	if err := req.ExchangerValidation(); err != nil {
+	if err := req.ExchangerUpdateValidation(); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
@@ -92,6 +104,8 @@ func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
 	@Documentation
 
 	Удалить запись в таблице `exchangers`
+
+	# TESTED
 */
 func (pr *PrivateRoutes) deleteExchanger(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
@@ -123,6 +137,8 @@ func (pr *PrivateRoutes) deleteExchanger(c *gin.Context) {
 	@Documentation
 
 	Получение одной записи из таблицы `exchangers`
+
+	# TESTED
 */
 func (pr *PrivateRoutes) getExchangerByName(c *gin.Context) {
 	// Операция получения записи из БД
@@ -148,6 +164,8 @@ func (pr *PrivateRoutes) getExchangerByName(c *gin.Context) {
 	@Documentation
 
 	Получение лимитированного объема записей из таблицы `exchangers`
+
+	# TESTED
 */
 func (pr *PrivateRoutes) getAllExchangers(c *gin.Context) {
 	errs, _ := errgroup.WithContext(c)

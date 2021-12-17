@@ -26,18 +26,23 @@ func Test_Server_DeleteNotification(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		id           int
+		id           string
 		payload      interface{}
 		expectedCode int
 	}{
 		{
 			name:         "undefined id",
-			id:           10,
+			id:           "",
 			expectedCode: http.StatusNotFound,
 		},
 		{
+			name:         "invalid id",
+			id:           "invalid",
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
 			name:         "valid",
-			id:           1,
+			id:           "1",
 			expectedCode: http.StatusOK,
 		},
 	}
@@ -46,7 +51,7 @@ func Test_Server_DeleteNotification(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 
 			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodDelete, fmt.Sprintf("/api/v1/admin/notification/%d", tc.id), nil)
+			req, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/notification/"+tc.id, nil)
 			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
 			s.Router.ServeHTTP(rec, req)
 

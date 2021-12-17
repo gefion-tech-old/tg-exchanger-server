@@ -12,7 +12,7 @@ type NotificationRepository struct {
 }
 
 /*
-	Создать уведомление в таблице `notifications`
+	Создать записи в таблице `notifications`
 
 	# TESTED
 */

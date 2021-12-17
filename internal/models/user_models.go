@@ -40,15 +40,24 @@ type UserCodeRequest struct {
 func (req *UserCodeRequest) UserCodeRequestValidation() error {
 	return validation.ValidateStruct(
 		req,
-		validation.Field(&req.Code, validation.By(verificationСodeValidation(req.Code))),
+		validation.Field(
+			&req.Code,
+			validation.By(verificationСodeValidation(req.Code)),
+		),
 	)
 }
 
 func (req *UserFromAdminRequest) UserFromAdminRequestValidation(managers, developers []string) error {
 	return validation.ValidateStruct(
 		req,
-		validation.Field(&req.Username, validation.By(userRightsValidation(req.Username, managers, developers))),
-		validation.Field(&req.Password, validation.Length(8, 15)),
+		validation.Field(
+			&req.Username,
+			validation.By(userRightsValidation(req.Username, managers, developers)),
+		),
+		validation.Field(
+			&req.Password,
+			validation.Length(8, 15),
+		),
 	)
 }
 

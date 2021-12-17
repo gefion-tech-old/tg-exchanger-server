@@ -31,17 +31,29 @@ type Notification struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+/*
+	==========================================================================================
+	ВАЛИДАЦИЯ ДАННЫХ
+	==========================================================================================
+*/
+
 func (n *Notification) NotificationTypeValidation() error {
 	return validation.ValidateStruct(
 		n,
-		validation.Field(&n.Type, validation.By(nTypeValidation(n.Type))),
+		validation.Field(
+			&n.Type,
+			validation.By(nTypeValidation(n.Type)),
+		),
 	)
 }
 
 func (n *Notification) NotificationStatusValidation() error {
 	return validation.ValidateStruct(
 		n,
-		validation.Field(&n.Status, validation.By(nStatusValidation(n.Status))),
+		validation.Field(
+			&n.Status,
+			validation.By(nStatusValidation(n.Status)),
+		),
 	)
 }
 

@@ -17,7 +17,7 @@ func (r *ManagerRepository) Exchanger() db.ExchangerRepository {
 	}
 
 	r.exchangerRepository = &ExchangerRepository{
-		exchangers: make(map[uint]*models.Exchanger),
+		exchangers: make(map[int]*models.Exchanger),
 	}
 
 	return r.exchangerRepository

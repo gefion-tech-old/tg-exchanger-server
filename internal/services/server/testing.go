@@ -214,6 +214,26 @@ func TestBotUser(t *testing.T, s *Server) error {
 	return nil
 }
 
+func TestExchanger(t *testing.T, s *Server, tokens map[string]interface{}) error {
+	t.Helper()
+
+	b := &bytes.Buffer{}
+	if err := json.NewEncoder(b).Encode(mocks.ADMIN_EXCHANGER); err != nil {
+		return err
+	}
+
+	rec := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/admin/exchanger", b)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
+	if err != nil {
+		return err
+	}
+
+	s.Router.ServeHTTP(rec, req)
+
+	return nil
+}
+
 func TestUserBill(t *testing.T, s *Server, tokens map[string]interface{}) error {
 	t.Helper()
 

@@ -17,6 +17,11 @@ type ExchangerRepository struct {
 	==========================================================================================
 */
 
+/*
+	Создать запись в таблице `exchangers`
+
+	# TESTED
+*/
 func (r *ExchangerRepository) Create(e *models.Exchanger) (*models.Exchanger, error) {
 	if err := r.store.QueryRow(
 		`
@@ -41,6 +46,11 @@ func (r *ExchangerRepository) Create(e *models.Exchanger) (*models.Exchanger, er
 	return e, nil
 }
 
+/*
+	Обновить запись в таблице `exchangers`
+
+	# TESTED
+*/
 func (r *ExchangerRepository) Update(e *models.Exchanger) (*models.Exchanger, error) {
 	if err := r.store.QueryRow(
 		`
@@ -67,6 +77,11 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) (*models.Exchanger, er
 	return e, nil
 }
 
+/*
+	Подсчет кол-ва записей в таблице `exchangers`
+
+	# TESTED
+*/
 func (r *ExchangerRepository) Count() (int, error) {
 	var c int
 	if err := r.store.QueryRow(
@@ -83,6 +98,11 @@ func (r *ExchangerRepository) Count() (int, error) {
 	return c, nil
 }
 
+/*
+	Поиск записи по поля `name` в таблице `exchangers`
+
+	# TESTED
+*/
 func (r *ExchangerRepository) GetByName(e *models.Exchanger) (*models.Exchanger, error) {
 	if err := r.store.QueryRow(
 		`
@@ -105,6 +125,11 @@ func (r *ExchangerRepository) GetByName(e *models.Exchanger) (*models.Exchanger,
 	return e, nil
 }
 
+/*
+	Получить лдимитированный объем записей в таблице `exchangers`
+
+	# TESTED
+*/
 func (r *ExchangerRepository) GetSlice(limit int) ([]*models.Exchanger, error) {
 	eArr := []*models.Exchanger{}
 
@@ -140,9 +165,13 @@ func (r *ExchangerRepository) GetSlice(limit int) ([]*models.Exchanger, error) {
 	}
 
 	return eArr, nil
-
 }
 
+/*
+	Удалить запись в таблице `exchangers`
+
+	# TESTED
+*/
 func (r *ExchangerRepository) Delete(e *models.Exchanger) (*models.Exchanger, error) {
 	if err := r.store.QueryRow(
 		`
