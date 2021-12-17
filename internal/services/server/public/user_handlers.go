@@ -31,9 +31,7 @@ func (pr *PublicRoutes) userInBotRegistrationHandler(c *gin.Context) {
 
 	// Парсинг входящего тела запроса
 	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
@@ -44,9 +42,7 @@ func (pr *PublicRoutes) userInBotRegistrationHandler(c *gin.Context) {
 		c.JSON(http.StatusCreated, u)
 		return
 	case sql.ErrNoRows:
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrAlreadyRegistered.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrAlreadyRegistered)
 		return
 	default:
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -72,9 +68,7 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 	req := &models.UserFromAdminRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
@@ -95,9 +89,7 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 			})
 			return
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
+			tools.ServErr(c, http.StatusInternalServerError, err)
 			return
 		}
 	}
@@ -120,18 +112,14 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 
 	payload, err := json.Marshal(m)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Хеширую пароль
 	hash, err := tools.EncryptString(req.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -141,25 +129,19 @@ func (pr *PublicRoutes) userGenerateCodeHandler(c *gin.Context) {
 		"hash":     hash,
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Записываю в Redis
 	if err := pr.redis.Registration.SaveVerificationCode(code, b); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Отправляю сообщение в NSQ
 	if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -182,17 +164,13 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 
 	// Парсинг входящего тела запроса
 	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	// Валидация
 	if err := req.UserCodeRequestValidation(); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -207,9 +185,7 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 
 	u := models.User{}
 	if err := json.Unmarshal([]byte(data), &u); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -219,14 +195,10 @@ func (pr *PublicRoutes) userInAdminRegistrationHandler(c *gin.Context) {
 		c.JSON(http.StatusCreated, user)
 		return
 	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": errors.ErrNotRegistered.Error(),
-		})
+		tools.ServErr(c, http.StatusNotFound, errors.ErrNotRegistered)
 		return
 	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 }
@@ -247,9 +219,7 @@ func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
 	req := &models.UserFromAdminRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
@@ -261,17 +231,13 @@ func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
 			// Генерирую сборку токенов и сопутствующих деталей
 			td, err := pr.createToken(u.ChatID, u.Username)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"error": err.Error(),
-				})
+				tools.ServErr(c, http.StatusInternalServerError, err)
 				return
 			}
 
 			// Аутентифицирую пользователя
 			if err := pr.createAuth(u.ChatID, td); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"error": err.Error(),
-				})
+				tools.ServErr(c, http.StatusInternalServerError, err)
 			}
 
 			c.JSON(http.StatusOK, gin.H{
@@ -292,9 +258,7 @@ func (pr *PublicRoutes) userInAdminAuthHandler(c *gin.Context) {
 		})
 		return
 	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 

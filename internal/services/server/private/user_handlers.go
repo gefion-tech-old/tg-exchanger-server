@@ -3,8 +3,10 @@ package private
 import (
 	"net/http"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/guard"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,9 +28,7 @@ func (pr *PrivateRoutes) logoutHandler(c *gin.Context) {
 	// Удаляю токен
 	deleted, err := pr.redis.Auth.DeleteAuth(ctxToken.AccessUuid)
 	if err != nil || deleted == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "unauthorized",
-		})
+		tools.ServErr(c, http.StatusUnauthorized, errors.ErrUnauthorized)
 		return
 	}
 

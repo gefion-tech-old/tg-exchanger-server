@@ -7,6 +7,7 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,9 +24,7 @@ import (
 func (pr *PublicRoutes) getAllBillsHandler(c *gin.Context) {
 	chatID, err := strconv.Atoi(c.Param("chat_id"))
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidPathParams.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
 		return
 	}
 
@@ -34,14 +33,10 @@ func (pr *PublicRoutes) getAllBillsHandler(c *gin.Context) {
 	case nil:
 		c.JSON(http.StatusOK, b)
 	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": errors.ErrRecordNotFound.Error(),
-		})
+		tools.ServErr(c, http.StatusNotFound, errors.ErrRecordNotFound)
 		return
 	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 }

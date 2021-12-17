@@ -38,15 +38,11 @@ func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
 		return
 
 	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "message with current connector is not found",
-		})
+		tools.ServErr(c, http.StatusNotFound, errors.ErrRecordNotFound)
 		return
 
 	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 }

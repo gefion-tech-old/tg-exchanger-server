@@ -6,22 +6,19 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 )
 
 func (pr *PrivateRoutes) createBill(c *gin.Context) {
 	req := &models.Bill{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	if err := req.BillValidation(); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -30,14 +27,10 @@ func (pr *PrivateRoutes) createBill(c *gin.Context) {
 	case nil:
 		c.JSON(http.StatusCreated, bill)
 	case sql.ErrNoRows:
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrAlreadyExists.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrAlreadyExists)
 		return
 	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 }

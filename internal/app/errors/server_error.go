@@ -7,4 +7,5 @@ var (
 	ErrInvalidPathParams = errors.New("params in path is invalid")
 	ErrNotEnoughRights   = errors.New("not enough rights to make this request")
 	ErrTokenInvalid      = errors.New("token is invalid")
+	ErrUnauthorized      = errors.New("unauthorized")
 )
