@@ -28,22 +28,22 @@ func Test_Server_DeleteBotMessageHandler(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		connector    string
+		id           string
 		expectedCode int
 	}{
 		{
 			name:         "empty connector",
-			connector:    "",
+			id:           "",
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name:         "undefined connector",
-			connector:    "undefined",
-			expectedCode: http.StatusNotFound,
+			name:         "invalid connector",
+			id:           "undefined",
+			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
 			name:         "valid",
-			connector:    mocks.BOT_MESSAGE_REQ["connector"].(string),
+			id:           "1",
 			expectedCode: http.StatusOK,
 		},
 	}
@@ -51,7 +51,7 @@ func Test_Server_DeleteBotMessageHandler(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/message/"+tc.connector, nil)
+			req, _ := http.NewRequest(http.MethodDelete, "/api/v1/admin/message/"+tc.id, nil)
 			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
 			s.Router.ServeHTTP(rec, req)
 
@@ -75,35 +75,43 @@ func Test_Server_UpdateBotMessageHandler(t *testing.T) {
 
 	testCases := []struct {
 		name         string
-		connector    string
+		id           string
 		payload      interface{}
 		expectedCode int
 	}{
 		{
 			name:         "invalid payload",
-			connector:    mocks.BOT_MESSAGE_REQ["connector"].(string),
+			id:           "1",
 			payload:      "invalid",
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name:      "empty connector",
-			connector: "",
+			name: "empty connector",
+			id:   "",
 			payload: map[string]interface{}{
 				"message_text": mocks.BOT_MESSAGE_REQ["message_text"],
 			},
 			expectedCode: http.StatusNotFound,
 		},
 		{
-			name:      "empty message_text",
-			connector: mocks.BOT_MESSAGE_REQ["connector"].(string),
+			name: "empty message_text",
+			id:   "1",
 			payload: map[string]interface{}{
 				"message_text": "",
 			},
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name:      "valid",
-			connector: mocks.BOT_MESSAGE_REQ["connector"].(string),
+			name: "invalid id",
+			id:   "invalid",
+			payload: map[string]interface{}{
+				"message_text": "new text",
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "valid",
+			id:   "1",
 			payload: map[string]interface{}{
 				"message_text": "new text",
 			},
@@ -118,7 +126,7 @@ func Test_Server_UpdateBotMessageHandler(t *testing.T) {
 			json.NewEncoder(b).Encode(tc.payload)
 
 			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodPut, "/api/v1/admin/message/"+tc.connector, b)
+			req, _ := http.NewRequest(http.MethodPut, "/api/v1/admin/message/"+tc.id, b)
 			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
 			s.Router.ServeHTTP(rec, req)
 

@@ -33,7 +33,6 @@ func (b *BotMessage) CreateBotMessageValidation(managers, developers []string) e
 func (b *BotMessage) UpdateBotMessageValidation(managers, developers []string) error {
 	return validation.ValidateStruct(
 		b,
-		validation.Field(&b.Connector, validation.Required, validation.Match(regexp.MustCompile(`^[^._ ](?:[\w-]|\.[\w-])+[^._ ]$`))),
 		validation.Field(&b.MessageText, validation.Required),
 	)
 }

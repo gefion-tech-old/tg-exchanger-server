@@ -133,12 +133,12 @@ func (r *BotMessagesRepository) Update(m *models.BotMessage) (*models.BotMessage
 		`
 		UPDATE bot_messages
 		SET message_text=$1, updated_at=$2
-		WHERE connector=$3
+		WHERE id=$3
 		RETURNING id, connector, message_text, created_by, created_at, updated_at
 		`,
 		m.MessageText,
 		time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
-		m.Connector,
+		m.ID,
 	).Scan(
 		&m.ID,
 		&m.Connector,
@@ -160,10 +160,10 @@ func (r *BotMessagesRepository) Delete(m *models.BotMessage) (*models.BotMessage
 	if err := r.store.QueryRow(
 		`
 		DELETE FROM bot_messages
-		WHERE connector=$1
+		WHERE id=$1
 		RETURNING id, connector, message_text, created_by, created_at, updated_at
 		`,
-		m.Connector,
+		m.ID,
 	).Scan(
 		&m.ID,
 		&m.Connector,

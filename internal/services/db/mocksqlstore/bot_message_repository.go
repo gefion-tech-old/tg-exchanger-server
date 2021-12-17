@@ -41,7 +41,7 @@ func (r *BotMessagesRepository) GetSlice(limit int) ([]*models.BotMessage, error
 
 func (r *BotMessagesRepository) Update(m *models.BotMessage) (*models.BotMessage, error) {
 	for _, msg := range r.messages {
-		if msg.Connector == m.Connector {
+		if msg.ID == m.ID {
 			r.messages[msg.ID].MessageText = m.MessageText
 			r.messages[msg.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 			return r.messages[msg.ID], nil
@@ -53,7 +53,7 @@ func (r *BotMessagesRepository) Update(m *models.BotMessage) (*models.BotMessage
 
 func (r *BotMessagesRepository) Delete(m *models.BotMessage) (*models.BotMessage, error) {
 	for _, msg := range r.messages {
-		if msg.Connector == m.Connector {
+		if msg.ID == m.ID {
 			defer delete(r.messages, msg.ID)
 			return r.messages[m.ID], nil
 		}

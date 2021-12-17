@@ -15,7 +15,13 @@ import (
 )
 
 func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
-	msg, err := pr.store.Manager().BotMessages().Delete(&models.BotMessage{Connector: c.Param("connector")})
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	msg, err := pr.store.Manager().BotMessages().Delete(&models.BotMessage{ID: uint(id)})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, msg)
@@ -46,14 +52,21 @@ func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
 	# TESTED
 */
 func (pr *PrivateRoutes) updateBotMessageHandler(c *gin.Context) {
-	req := &models.BotMessage{Connector: c.Param("connector")}
-
+	req := &models.BotMessage{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": errors.ErrInvalidBody.Error(),
 		})
 		return
 	}
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	req.ID = uint(id)
 
 	if err := req.UpdateBotMessageValidation(pr.users.Managers, pr.users.Developers); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -70,7 +83,7 @@ func (pr *PrivateRoutes) updateBotMessageHandler(c *gin.Context) {
 
 	case sql.ErrNoRows:
 		c.JSON(http.StatusNotFound, gin.H{
-			"error": "message with current connector is not found",
+			"error": errors.ErrRecordNotFound,
 		})
 		return
 
