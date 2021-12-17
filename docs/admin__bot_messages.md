@@ -43,7 +43,7 @@
 
 ### Update
 
-- **[PUT]** `/api/v1/admin/message/:connector` — Обновить сообщение для бота.
+- **[PUT]** `/api/v1/admin/message/:id` — Обновить сообщение для бота.
 
 ```json
 {
@@ -114,7 +114,7 @@
 
 ### Delete
 
-- **[DELETE]** `/api/v1/admin/message/:connector` — Удалить сообщение бота.
+- **[DELETE]** `/api/v1/admin/message/:id` — Удалить сообщение бота.
 
 ***Header***
 

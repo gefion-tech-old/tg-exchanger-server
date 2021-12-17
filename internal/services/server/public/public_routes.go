@@ -51,14 +51,19 @@ func (pr *PublicRoutes) ConfigurePublicRouter(router *gin.RouterGroup) {
 	bot.POST("/registration", pr.userInBotRegistrationHandler)
 
 	user := bot.Group("/user")
-	user.POST("/bill", pr.newBillHandler)
-	user.DELETE("/bill", pr.deleteBillHandler)
-	user.GET("/:chat_id/bills", pr.getAllBillsHandler)
+
+	{
+		user.DELETE("/bill", pr.deleteBillHandler)
+		user.GET("/:chat_id/bills", pr.getAllBillsHandler)
+	}
 
 	admin := router.Group("/admin")
-	admin.POST("/registration/code", pr.userGenerateCodeHandler)
-	admin.POST("/registration", pr.userInAdminRegistrationHandler)
-	admin.POST("/auth", pr.userInAdminAuthHandler)
+
+	{
+		admin.POST("/registration/code", pr.userGenerateCodeHandler)
+		admin.POST("/registration", pr.userInAdminRegistrationHandler)
+		admin.POST("/auth", pr.userInAdminAuthHandler)
+	}
 }
 
 /*

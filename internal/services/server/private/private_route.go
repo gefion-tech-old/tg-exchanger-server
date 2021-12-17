@@ -67,6 +67,10 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 		admin.GET("/exchanger/:name", pr.getExchangerByName)
 	}
 
+	{
+		admin.POST("/bill", g.AuthTokenValidation(), g.IsAuth(), pr.createBill)
+	}
+
 	/* Работа с общим списокм конкретного ресурсами */
 	{
 		admin.GET("/exchangers", g.AuthTokenValidation(), g.IsAuth(), pr.getAllExchangers)

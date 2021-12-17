@@ -1,4 +1,4 @@
-package public_test
+package private_test
 
 import (
 	"bytes"
@@ -13,52 +13,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Server_GetAllBillsHandler(t *testing.T) {
+func Test_Server_CreateBill(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
-
-	// Регистрирую пользователя в боте
-	assert.NoError(t, server.TestBotUser(t, s))
-
-	// Создаю тестовый пользовательский счет
-	assert.NoError(t, server.TestUserBill(t, s, nil))
-
-	testCases := []struct {
-		name         string
-		expectedCode int
-	}{
-		{
-			name:         "valid",
-			expectedCode: http.StatusOK,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/api/v1/bot/user/%d/bills", mocks.USER_BILL_REQ["chat_id"]), nil)
-			s.Router.ServeHTTP(rec, req)
-
-			assert.Equal(t, tc.expectedCode, rec.Code)
-		})
-	}
-
-}
-
-func Test_Server_DeleteBillHandler(t *testing.T) {
-	s, redis, teardown := server.TestServer(t)
-	defer teardown(redis)
-
-	// Регистрирую пользователя в боте
-	assert.NoError(t, server.TestBotUser(t, s))
 
 	// Регистрирую менеджера в админке
 	tokens, err := server.TestManager(t, s)
 	assert.NotNil(t, tokens)
 	assert.NoError(t, err)
 
-	// Создаю тестовый пользовательский счет
-	assert.NoError(t, server.TestUserBill(t, s, tokens))
+	// Регистрирую пользователя в боте
+	assert.NoError(t, server.TestBotUser(t, s))
 
 	testCases := []struct {
 		name         string
@@ -81,7 +46,7 @@ func Test_Server_DeleteBillHandler(t *testing.T) {
 		{
 			name: "empty bill",
 			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
+				"chat_id": mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"],
 				"bill":    "",
 			},
 			expectedCode: http.StatusUnprocessableEntity,
@@ -89,7 +54,7 @@ func Test_Server_DeleteBillHandler(t *testing.T) {
 		{
 			name: "invalid bill format",
 			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
+				"chat_id": mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"],
 				"bill":    "5559493 130410854",
 			},
 			expectedCode: http.StatusUnprocessableEntity,
@@ -97,7 +62,7 @@ func Test_Server_DeleteBillHandler(t *testing.T) {
 		{
 			name: "invalid bill lenght (short)",
 			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
+				"chat_id": mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"],
 				"bill":    "55594931304108",
 			},
 			expectedCode: http.StatusUnprocessableEntity,
@@ -105,26 +70,18 @@ func Test_Server_DeleteBillHandler(t *testing.T) {
 		{
 			name: "invalid bill lenght (long)",
 			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
+				"chat_id": mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"],
 				"bill":    "5559493130410854000",
 			},
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name: "not found bill",
-			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
-				"bill":    "5559494130410829",
-			},
-			expectedCode: http.StatusNotFound,
-		},
-		{
 			name: "valid",
 			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
-				"bill":    mocks.USER_BILL_REQ["bill"],
+				"chat_id": mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"],
+				"bill":    "5559493130410854",
 			},
-			expectedCode: http.StatusOK,
+			expectedCode: http.StatusCreated,
 		},
 	}
 
@@ -135,11 +92,11 @@ func Test_Server_DeleteBillHandler(t *testing.T) {
 			json.NewEncoder(b).Encode(tc.payload)
 
 			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodDelete, "/api/v1/bot/user/bill", b)
+			req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/bill", b)
+			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
 			s.Router.ServeHTTP(rec, req)
 
 			assert.Equal(t, tc.expectedCode, rec.Code)
 		})
 	}
-
 }

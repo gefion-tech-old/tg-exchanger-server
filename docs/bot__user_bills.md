@@ -1,6 +1,14 @@
 ### Create
 
-- **[POST]** `/api/v1/bot/user/bill` — Создать новый пользовательский счет
+- **[POST]** `/api/v1/admin/bill` — Создать новый пользовательский счет
+
+***Header***
+
+```json
+{
+    "Authorization": "Bearer <token>"
+}
+```
 
 ***Request***
 

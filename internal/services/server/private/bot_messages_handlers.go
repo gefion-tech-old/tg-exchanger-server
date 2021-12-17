@@ -14,6 +14,16 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+/*
+	@Method DELETE
+	@Path admin/message/:id
+	@Type PRIVATE
+	@Documentation
+
+	Удалить запись в таблице `bot_messages`
+
+	# TESTED
+*/
 func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -42,12 +52,12 @@ func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
 }
 
 /*
-	@Method GET
-	@Path admin/message?connector=<connector_name>
+	@Method PUT
+	@Path admin/message/:id
 	@Type PRIVATE
-	@Documentation https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__bot_messages.md#get-all
+	@Documentation
 
-	При валидных данных обновляет запись конкретного сообщения в БД.
+	Обновить запись в таблице `bot_messages`
 
 	# TESTED
 */
@@ -98,11 +108,11 @@ func (pr *PrivateRoutes) updateBotMessageHandler(c *gin.Context) {
 
 /*
 	@Method GET
-	@Path admin/message?connector=<connector_name>
-	@Type PUBLIC
-	@Documentation https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__bot_messages.md#get-all
+	@Path admin/messages
+	@Type PRIVATE
+	@Documentation
 
-	При валидных данных возвращается запрашиваемое сообщение.
+	Получение лимитированного объема записей из таблицы `bot_messages`
 
 	# TESTED
 */
@@ -167,11 +177,11 @@ func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 
 /*
 	@Method GET
-	@Path admin/message?connector=<connector_name>
-	@Type PUBLIC
-	@Documentation https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__bot_messages.md#get
+	@Path admin/message/:connector
+	@Type PRIVATE
+	@Documentation
 
-	При валидных данных возвращается запрашиваемое сообщение.
+	Получить запись из таблицы `bot_messages`
 
 	# TESTED
 */
@@ -201,10 +211,9 @@ func (pr *PrivateRoutes) getBotMessageHandler(c *gin.Context) {
 	@Method POST
 	@Path admin/message
 	@Type PRIVATE
-	@Documentation https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__bot_messages.md#create
+	@Documentation
 
-	При валидных данных создаем в БД запись нового сообщения
-	и возвращаю созданное сообщение.
+	Создать запись в таблице `bot_messages`
 
 	# TESTED
 */

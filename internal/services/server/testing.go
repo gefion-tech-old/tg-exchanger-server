@@ -214,7 +214,7 @@ func TestBotUser(t *testing.T, s *Server) error {
 	return nil
 }
 
-func TestUserBill(t *testing.T, s *Server) error {
+func TestUserBill(t *testing.T, s *Server, tokens map[string]interface{}) error {
 	t.Helper()
 
 	b := &bytes.Buffer{}
@@ -223,7 +223,8 @@ func TestUserBill(t *testing.T, s *Server) error {
 	}
 
 	rec := httptest.NewRecorder()
-	req, err := http.NewRequest(http.MethodPost, "/api/v1/bot/user/bill", b)
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/admin/bill", b)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
 	if err != nil {
 		return err
 	}

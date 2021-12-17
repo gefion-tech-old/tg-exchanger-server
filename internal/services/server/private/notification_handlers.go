@@ -24,7 +24,7 @@ import (
 	@Type PUBLIC
 	@Documentation
 
-	При валидных данных в БД создается запись о новом уведомлении.
+	Создать запись в таблице `notifications`
 
 	# TESTED
 */
@@ -93,7 +93,7 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 	@Type PRIVATE
 	@Documentation
 
-	При валидных данных из БД достаюется нужные записи в нужном количестве
+	Получение лимитированного объема записей из таблицы `notifications`
 
 	# TESTED
 
@@ -161,7 +161,7 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 	@Type PRIVATE
 	@Documentation
 
-	Обновить статус уведомления.
+	Обновить поле status записи в таблице `notifications`
 
 	# TESTED
 */
@@ -205,7 +205,9 @@ func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {
 	@Type PRIVATE
 	@Documentation
 
-	Удалить конкретное уведомление
+	Удалить запись в таблице `notifications`
+
+	# TESTED
 */
 func (pr *PrivateRoutes) deleteNotification(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))

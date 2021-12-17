@@ -19,7 +19,7 @@ import (
 	@Type PRIVATE
 	@Documentation
 
-	При валидных данных в БД `exchangers` создается запись.
+	Создать запись в таблице `exchangers`
 */
 func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
 	// Декодирование
@@ -47,6 +47,14 @@ func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
 	}
 }
 
+/*
+	@Method PUT
+	@Path admin/exchanger/:id
+	@Type PRIVATE
+	@Documentation
+
+	Обновить запись в таблице `exchangers`
+*/
 func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
 	// Декодирование
 	req := &models.Exchanger{}
@@ -77,6 +85,14 @@ func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
 	}
 }
 
+/*
+	@Method DELETE
+	@Path admin/exchanger/:id
+	@Type PRIVATE
+	@Documentation
+
+	Удалить запись в таблице `exchangers`
+*/
 func (pr *PrivateRoutes) deleteExchanger(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
