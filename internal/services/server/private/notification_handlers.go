@@ -73,6 +73,19 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 				fmt.Println(err)
 			}
 		}
+
+	case static.NTF__T__REQ_SUPPORT:
+		// Запись уведомления в очередь для всех менеджеров
+		for i := 0; i < len(uArr); i++ {
+			payload, err := json.Marshal(newSupportReqNotify(uArr, i, req))
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+				fmt.Println(err)
+			}
+		}
 	}
 
 	n, err := pr.store.Manager().Notification().Create(req)
@@ -228,7 +241,20 @@ func (pr *PrivateRoutes) deleteNotification(c *gin.Context) {
 		tools.ServErr(c, http.StatusNotFound, err)
 		return
 	}
+}
 
+func newSupportReqNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {
+	return map[string]interface{}{
+		"to": map[string]interface{}{
+			"chat_id":  uArr[i].ChatID,
+			"username": uArr[i].Username,
+		},
+		"message": map[string]interface{}{
+			"type": "confirmation_req",
+			"text": fmt.Sprintf("🔵 Запрос тех. поддержки 🔵\n\n*Пользователь*: @%s", n.User.Username),
+		},
+		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+	}
 }
 
 func newVefificationNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {

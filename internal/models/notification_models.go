@@ -59,7 +59,7 @@ func (n *Notification) NotificationStatusValidation() error {
 
 func nTypeValidation(s int) validation.RuleFunc {
 	return func(value interface{}) error {
-		permitted := []int{static.NTF__T__VERIFICATION, static.NTF__T__EXCHANGE_ERROR}
+		permitted := []int{static.NTF__T__VERIFICATION, static.NTF__T__EXCHANGE_ERROR, static.NTF__T__REQ_SUPPORT}
 
 		for i := 0; i < len(permitted); i++ {
 			if s == permitted[i] {

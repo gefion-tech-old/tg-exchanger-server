@@ -11,4 +11,6 @@ const (
 const (
 	NTF__T__VERIFICATION   = 854
 	NTF__T__EXCHANGE_ERROR = 855
+
+	NTF__T__REQ_SUPPORT = 900
 )
