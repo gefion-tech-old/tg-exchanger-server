@@ -164,7 +164,7 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 		"limit":        limit,
 		"current_page": page,
 		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"data":         arrN[(page-1)*limit : tools.UpperThreshold(page, limit, *count)],
+		"data":         arrN[(tools.LowerThreshold(page, limit, *count)-1)*limit : tools.UpperThreshold(page, limit, *count)],
 	})
 }
 

@@ -167,7 +167,7 @@ func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 		"limit":        limit,
 		"current_page": page,
 		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"data":         arrM[(page-1)*limit : tools.UpperThreshold(page, limit, *count)],
+		"data":         arrM[(tools.LowerThreshold(page, limit, *count)-1)*limit : tools.UpperThreshold(page, limit, *count)],
 	})
 }
 

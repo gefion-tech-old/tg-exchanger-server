@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"math"
 	"math/rand"
 	"time"
 
@@ -49,4 +50,11 @@ func UpperThreshold(page, limit, count int) int {
 		return page * limit
 	}
 	return count
+}
+
+func LowerThreshold(page, limit, count int) int {
+	if math.Ceil(float64(count)/float64(limit)) <= float64(page) {
+		return int(math.Ceil(float64(count) / float64(limit)))
+	}
+	return page
 }
