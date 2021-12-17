@@ -30,7 +30,7 @@ func (pr *PrivateRoutes) createBill(c *gin.Context) {
 	case nil:
 		c.JSON(http.StatusCreated, bill)
 	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": errors.ErrAlreadyExists.Error(),
 		})
 		return
