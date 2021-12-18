@@ -58,6 +58,10 @@
             "code": 245335,
             "user_card": "5559494130410854",
             "img_path": "tmp/I0HuKc_2021-12-12T16:33:29.26685161.png"
+        },
+        "ex_action_cancel": {
+            "ex_from": null,
+            "ex_to": null
         }
     },
     "user": {
@@ -86,6 +90,26 @@
     "created_at": "2021-12-13T11:57:10.809798Z",
     "updated_at": "2021-12-13T11:57:10.809798Z"
 }
+```
+
+#### 855
+
+***Request***
+
+```json
+{
+    "type": 855,
+    "meta_data": {
+        "ex_action_cancel": {
+            "ex_from": "BTC",
+            "ex_to": "ETH"
+        }
+    },
+    "user": {
+        "chat_id": 3546223,
+        "username": "I0HuKc"
+    }
+
 ```
 
 <hr>

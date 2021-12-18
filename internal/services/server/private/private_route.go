@@ -69,6 +69,7 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 
 	{
 		admin.POST("/bill", g.AuthTokenValidation(), g.IsAuth(), pr.createBill)
+		admin.POST("/bill/reject", g.AuthTokenValidation(), g.IsAuth(), pr.rejectBill)
 	}
 
 	/* Работа с общим списокм конкретного ресурсами */

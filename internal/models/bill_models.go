@@ -14,6 +14,12 @@ type Bill struct {
 	CreatedAt string `json:"created_at"`
 }
 
+type RejectBill struct {
+	ChatID int64  `json:"chat_id"`
+	Bill   string `json:"bill"`
+	Reason string `json:"reason"`
+}
+
 /*
 	==========================================================================================
 	ВАЛИДАЦИЯ ДАННЫХ
