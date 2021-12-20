@@ -2,6 +2,7 @@
 host = "80.78.253.68"
 port = ":4000"
 log_level = "error"
+tmp = "/var/www/html/tmp"
 
 [secrets]
 access_secret = "uhOmoMnMvOyfHizBVB7DlA0TcyHF3ySfg1tfi1Ay"

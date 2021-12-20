@@ -16,6 +16,7 @@ type PrivateRoutes struct {
 	router  *gin.Engine
 	secrets *config.SecretsConfig
 	users   *config.UsersConfig
+	sCnf    *config.ServerConfig
 }
 
 type PrivateRoutesI interface {
@@ -29,6 +30,7 @@ func Init(
 	nsq nsqstore.NsqI,
 	router *gin.Engine,
 	secrets *config.SecretsConfig,
+	sCnf *config.ServerConfig,
 	users *config.UsersConfig) PrivateRoutesI {
 	return &PrivateRoutes{
 		store:   store,
@@ -37,6 +39,7 @@ func Init(
 		router:  router,
 		secrets: secrets,
 		users:   users,
+		sCnf:    sCnf,
 	}
 }
 
@@ -65,6 +68,8 @@ func (pr *PrivateRoutes) ConfigurePrivateRouter(router *gin.RouterGroup, g guard
 		admin.PUT("/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), pr.updateExchanger)
 		admin.DELETE("/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), pr.deleteExchanger)
 		admin.GET("/exchanger/:name", pr.getExchangerByName)
+
+		admin.GET("/exchanger/document", g.AuthTokenValidation(), g.IsAuth(), pr.getExchangerDocument)
 	}
 
 	{

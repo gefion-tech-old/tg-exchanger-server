@@ -2,6 +2,7 @@ package private
 
 import (
 	"database/sql"
+	"encoding/xml"
 	"math"
 	"net/http"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
+	"github.com/valyala/fasthttp"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -228,5 +230,27 @@ func (pr *PrivateRoutes) getAllExchangers(c *gin.Context) {
 		"current_page": page,
 		"last_page":    math.Ceil(float64(*count) / float64(limit)),
 		"data":         d,
+	})
+}
+
+func (pr *PrivateRoutes) getExchangerDocument(c *gin.Context) {
+	req := fasthttp.AcquireRequest()
+	req.Header.SetMethod("GET")
+	req.SetRequestURI("https://1obmen.net/request-exportxml.xml")
+	res := fasthttp.AcquireResponse()
+	if err := fasthttp.Do(req, res); err != nil {
+		tools.ServErr(c, http.StatusInternalServerError, err)
+	}
+
+	defer fasthttp.ReleaseRequest(req)
+	defer fasthttp.ReleaseResponse(res)
+
+	data := models.OneObmen{}
+	if err := xml.Unmarshal(res.Body(), &data); err != nil {
+		tools.ServErr(c, http.StatusInternalServerError, err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"file": tools.OneObmenDocumentGenerate(&data, pr.sCnf.Tmp),
 	})
 }

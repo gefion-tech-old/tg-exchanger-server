@@ -14,6 +14,7 @@ type ServerConfig struct {
 	Host     string `toml:"host"`
 	Port     string `toml:"port"`
 	LogLevel string `toml:"log_level"`
+	Tmp      string `toml:"tmp"`
 }
 
 type SecretsConfig struct {

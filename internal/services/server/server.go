@@ -76,7 +76,7 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 	pub := public.Init(s, nsq, r, router, &c.Secrets, &c.Users)
 
 	// Инициализация модуля приватных маршрутов
-	prv := private.Init(s, r, nsq, router, &c.Secrets, &c.Users)
+	prv := private.Init(s, r, nsq, router, &c.Secrets, &c.Server, &c.Users)
 
 	server := &Server{
 		store:          s,

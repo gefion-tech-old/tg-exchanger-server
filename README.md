@@ -38,6 +38,7 @@
             - [Get](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__exchanger.md#get)
             - [Get Slice of Exchangers](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__exchanger.md#get-slice-of-messages)
             - [Delete](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__exchanger.md#delete)
+            - [Get File](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__exchanger.md#get-file)
 - [Database](#database)
     - [Postgres](#postgres)
     - [Redis](#redis)

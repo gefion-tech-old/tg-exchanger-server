@@ -126,3 +126,22 @@
 }
 ```
 
+<hr>
+
+### Get File 
+
+- **[GET]** `/api/v1/admin/exchanger/document` — Получить документ с данными обменников
+
+```json
+{
+    "Authorization": "Bearer <token>"
+}
+```
+
+***Response***
+
+```json
+{
+    "file": "/var/www/html/tmp/file/2021-12-17T12:58:04.05367541.xlsx"
+}
+```
