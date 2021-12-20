@@ -19,6 +19,10 @@ func (r *UserBillsRepository) Create(b *models.Bill) (*models.Bill, error) {
 	return r.bills[b.ID], nil
 }
 
+func (r *UserBillsRepository) FindById(b *models.Bill) (*models.Bill, error) {
+	return nil, nil
+}
+
 func (r *UserBillsRepository) Delete(b *models.Bill) (*models.Bill, error) {
 	for _, bill := range r.bills {
 		if bill.Bill == b.Bill && bill.ChatID == b.ChatID {

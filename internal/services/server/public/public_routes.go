@@ -55,6 +55,7 @@ func (pr *PublicRoutes) ConfigurePublicRouter(router *gin.RouterGroup) {
 	{
 		user.DELETE("/bill", pr.deleteBillHandler)
 		user.GET("/:chat_id/bills", pr.getAllBillsHandler)
+		user.GET("/bill/:id", pr.getBill)
 	}
 
 	admin := router.Group("/admin")

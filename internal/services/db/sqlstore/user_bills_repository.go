@@ -59,6 +59,25 @@ func (r *UserBillsRepository) Delete(b *models.Bill) (*models.Bill, error) {
 	return b, nil
 }
 
+func (r *UserBillsRepository) FindById(b *models.Bill) (*models.Bill, error) {
+	if err := r.store.QueryRow(
+		`
+		SELECT id, chat_id, bill, created_at 
+		FROM bills WHERE id=$1
+		`,
+		b.ID,
+	).Scan(
+		&b.ID,
+		&b.ChatID,
+		&b.Bill,
+		&b.CreatedAt,
+	); err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
 /*
 	Получить все счета пользователя
 */

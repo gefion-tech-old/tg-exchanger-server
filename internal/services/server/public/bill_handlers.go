@@ -87,46 +87,25 @@ func (pr *PublicRoutes) deleteBillHandler(c *gin.Context) {
 	}
 }
 
-/*
-	@Method POST
-	@Path /bot/user/bill
-	@Type PUBLIC
-	@Documentation
-
-	В методе проверяется валидность переданых данных, если все ок создается
-	банковский счет закрепленный за конкретным пользователем.
-
-	# TESTED
-*/
-func (pr *PublicRoutes) newBillHandler(c *gin.Context) {
-	req := &models.Bill{}
-	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
+func (pr *PublicRoutes) getBill(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	if err := req.BillValidation(); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-	bill, err := pr.store.User().Bills().Create(req)
+	b, err := pr.store.User().Bills().FindById(&models.Bill{ID: uint(id)})
 	switch err {
 	case nil:
-		c.JSON(http.StatusCreated, bill)
-	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": errors.ErrAlreadyExists.Error(),
-		})
+		c.JSON(http.StatusOK, b)
 		return
+
+	case sql.ErrNoRows:
+		c.JSON(http.StatusNotFound, errors.ErrRecordNotFound)
+		return
+
 	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 }

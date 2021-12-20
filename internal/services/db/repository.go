@@ -17,6 +17,7 @@ type UserBillsRepository interface {
 	Create(b *models.Bill) (*models.Bill, error)
 	Delete(b *models.Bill) (*models.Bill, error)
 	All(chatID int64) ([]*models.Bill, error)
+	FindById(b *models.Bill) (*models.Bill, error)
 }
 
 type ManagerRepository interface {
