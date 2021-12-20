@@ -160,11 +160,18 @@ func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 		return
 	}
 
+	d := []*models.BotMessage{}
+
+	// Проверка что БД не пустая
+	if len(arrM) > 0 {
+		d = arrM[(tools.LowerThreshold(page, limit, *count)-1)*limit : tools.UpperThreshold(page, limit, *count)]
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"limit":        limit,
 		"current_page": page,
 		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"data":         arrM[(tools.LowerThreshold(page, limit, *count)-1)*limit : tools.UpperThreshold(page, limit, *count)],
+		"data":         d,
 	})
 }
 

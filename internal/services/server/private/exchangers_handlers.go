@@ -216,10 +216,17 @@ func (pr *PrivateRoutes) getAllExchangers(c *gin.Context) {
 		return
 	}
 
+	d := []*models.Exchanger{}
+
+	// Проверка что БД не пустая
+	if len(arrE) > 0 {
+		d = arrE[(tools.LowerThreshold(page, limit, *count)-1)*limit : tools.UpperThreshold(page, limit, *count)]
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"limit":        limit,
 		"current_page": page,
 		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"data":         arrE[(tools.LowerThreshold(page, limit, *count)-1)*limit : tools.UpperThreshold(page, limit, *count)],
+		"data":         d,
 	})
 }
