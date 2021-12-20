@@ -2,7 +2,6 @@ package private
 
 import (
 	"database/sql"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -160,8 +159,6 @@ func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 		tools.ServErr(c, http.StatusInternalServerError, errs.Wait())
 		return
 	}
-
-	fmt.Println(*count)
 
 	c.JSON(http.StatusOK, gin.H{
 		"limit":        limit,
