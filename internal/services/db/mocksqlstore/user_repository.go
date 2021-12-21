@@ -26,7 +26,7 @@ func (r *UserRepository) Bills() db.UserBillsRepository {
 	}
 
 	r.userBillsRepository = &UserBillsRepository{
-		bills: make(map[uint]*models.Bill),
+		bills: make(map[int]*models.Bill),
 	}
 
 	return r.userBillsRepository

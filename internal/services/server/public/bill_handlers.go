@@ -87,6 +87,17 @@ func (pr *PublicRoutes) deleteBillHandler(c *gin.Context) {
 	}
 }
 
+/*
+	@Method DELETE
+	@Path /bot/user/bill/:id
+	@Type PUBLIC
+	@Documentation
+
+	Получить запись из таблицы `bills`
+
+
+	# TESTED
+*/
 func (pr *PublicRoutes) getBill(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -94,7 +105,7 @@ func (pr *PublicRoutes) getBill(c *gin.Context) {
 		return
 	}
 
-	b, err := pr.store.User().Bills().FindById(&models.Bill{ID: uint(id)})
+	b, err := pr.store.User().Bills().FindById(&models.Bill{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, b)

@@ -47,7 +47,6 @@ func (pr *PrivateRoutes) rejectBill(c *gin.Context) {
 		fmt.Println(err)
 	}
 	c.JSON(http.StatusOK, gin.H{})
-
 }
 
 /*

@@ -45,20 +45,18 @@ func Init(
 
 // Метод конфигуратор всех публичных маршрутов
 func (pr *PublicRoutes) ConfigurePublicRouter(router *gin.RouterGroup) {
-	router.POST("/token/refresh", pr.refreshToken)
-
 	bot := router.Group("/bot")
-	bot.POST("/registration", pr.userInBotRegistrationHandler)
-
 	user := bot.Group("/user")
+	admin := router.Group("/admin")
+
+	router.POST("/token/refresh", pr.refreshToken)
+	bot.POST("/registration", pr.userInBotRegistrationHandler)
 
 	{
 		user.DELETE("/bill", pr.deleteBillHandler)
-		user.GET("/:chat_id/bills", pr.getAllBillsHandler)
 		user.GET("/bill/:id", pr.getBill)
+		user.GET("/:chat_id/bills", pr.getAllBillsHandler)
 	}
-
-	admin := router.Group("/admin")
 
 	{
 		admin.POST("/registration/code", pr.userGenerateCodeHandler)

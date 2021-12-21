@@ -36,6 +36,12 @@ func Test_SQL_UserBillsRepository(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, nBill)
 
+	// Получение одного счета
+	bill, err := s.User().Bills().FindById(&models.Bill{ID: nBill.ID})
+	assert.NoError(t, err)
+	assert.NotNil(t, bill)
+	assert.Equal(t, nBill.ID, bill.ID)
+
 	// Получение списка счетов
 	bList, err := s.User().Bills().All(u.ChatID)
 	assert.NoError(t, err)

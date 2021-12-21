@@ -26,6 +26,7 @@ func (r *BotMessagesRepository) Get(m *models.BotMessage) (*models.BotMessage, e
 			return r.messages[msg.ID], nil
 		}
 	}
+
 	return nil, sql.ErrNoRows
 }
 
@@ -58,6 +59,7 @@ func (r *BotMessagesRepository) Delete(m *models.BotMessage) (*models.BotMessage
 			return r.messages[m.ID], nil
 		}
 	}
+
 	return nil, sql.ErrNoRows
 }
 

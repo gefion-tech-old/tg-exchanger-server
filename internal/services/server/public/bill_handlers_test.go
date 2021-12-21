@@ -13,6 +13,44 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_Server_GetBill(t *testing.T) {
+	s, redis, teardown := server.TestServer(t)
+	defer teardown(redis)
+
+	// Регистрирую пользователя в боте
+	assert.NoError(t, server.TestBotUser(t, s))
+
+	// Создаю тестовый пользовательский счет
+	assert.NoError(t, server.TestUserBill(t, s, nil))
+
+	testCases := []struct {
+		name         string
+		id           string
+		expectedCode int
+	}{
+		{
+			name:         "invalid id",
+			id:           "invalid",
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name:         "undefined id",
+			id:           "10",
+			expectedCode: http.StatusNotFound,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodGet, "/api/v1/bot/user/bill/"+tc.id, nil)
+			s.Router.ServeHTTP(rec, req)
+
+			assert.Equal(t, tc.expectedCode, rec.Code)
+		})
+	}
+}
+
 func Test_Server_GetAllBillsHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
@@ -141,5 +179,4 @@ func Test_Server_DeleteBillHandler(t *testing.T) {
 			assert.Equal(t, tc.expectedCode, rec.Code)
 		})
 	}
-
 }
