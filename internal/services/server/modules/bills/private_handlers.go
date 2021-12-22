@@ -1,4 +1,4 @@
-package private
+package bills
 
 import (
 	"database/sql"
@@ -22,10 +22,15 @@ import (
 
 	Отклонить верификацию карты
 */
-func (pr *PrivateRoutes) rejectBill(c *gin.Context) {
+func (m *ModBills) RejectBillHandler(c *gin.Context) {
 	req := &models.RejectBill{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		return
+	}
+
+	if err := req.RejectBillValidation(); err != nil {
+		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -43,7 +48,7 @@ func (pr *PrivateRoutes) rejectBill(c *gin.Context) {
 		fmt.Println(err)
 	}
 
-	if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+	if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 		fmt.Println(err)
 	}
 	c.JSON(http.StatusOK, gin.H{})
@@ -59,7 +64,7 @@ func (pr *PrivateRoutes) rejectBill(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) createBill(c *gin.Context) {
+func (m *ModBills) CreateBillHandler(c *gin.Context) {
 	req := &models.Bill{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
@@ -71,7 +76,7 @@ func (pr *PrivateRoutes) createBill(c *gin.Context) {
 		return
 	}
 
-	bill, err := pr.store.User().Bills().Create(req)
+	bill, err := m.store.User().Bills().Create(req)
 	switch err {
 	case nil:
 		payload, err := json.Marshal(map[string]interface{}{
@@ -88,7 +93,7 @@ func (pr *PrivateRoutes) createBill(c *gin.Context) {
 			fmt.Println(err)
 		}
 
-		if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+		if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 			fmt.Println(err)
 		}
 		c.JSON(http.StatusCreated, bill)

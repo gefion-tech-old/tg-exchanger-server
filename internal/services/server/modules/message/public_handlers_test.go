@@ -1,4 +1,4 @@
-package private_test
+package message_test
 
 import (
 	"fmt"
@@ -6,11 +6,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Server_LogoutHandler(t *testing.T) {
+func Test_Server_GetMessageHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
@@ -19,24 +20,22 @@ func Test_Server_LogoutHandler(t *testing.T) {
 	assert.NotNil(t, tokens)
 	assert.NoError(t, err)
 
+	// Создаю тестовое сообщение
+	assert.NoError(t, server.TestBotMessage(t, s, tokens))
+
 	testCases := []struct {
 		name         string
-		token        string
+		connector    string
 		expectedCode int
 	}{
 		{
-			name:         "empty token",
-			token:        "",
-			expectedCode: http.StatusUnauthorized,
-		},
-		{
-			name:         "invalid token",
-			token:        fmt.Sprintf("Bearer %s", "invalid"),
-			expectedCode: http.StatusUnauthorized,
+			name:         "undefined connector",
+			connector:    "undefined",
+			expectedCode: http.StatusNotFound,
 		},
 		{
 			name:         "valid",
-			token:        fmt.Sprintf("Bearer %s", tokens["access_token"]),
+			connector:    mocks.BOT_MESSAGE_REQ["connector"].(string),
 			expectedCode: http.StatusOK,
 		},
 	}
@@ -44,11 +43,12 @@ func Test_Server_LogoutHandler(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/logout", nil)
-			req.Header.Add("Authorization", tc.token)
+			req, _ := http.NewRequest(http.MethodGet, "/api/v1/admin/message/"+tc.connector, nil)
+			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
 			s.Router.ServeHTTP(rec, req)
 
 			assert.Equal(t, tc.expectedCode, rec.Code)
 		})
 	}
+
 }

@@ -1,4 +1,4 @@
-package public
+package bills
 
 import (
 	"database/sql"
@@ -21,7 +21,7 @@ import (
 
 	# TESTED
 */
-func (pr *PublicRoutes) getAllBillsHandler(c *gin.Context) {
+func (pr *ModBills) GetAllBillsHandler(c *gin.Context) {
 	chatID, err := strconv.Atoi(c.Param("chat_id"))
 	if err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
@@ -52,7 +52,7 @@ func (pr *PublicRoutes) getAllBillsHandler(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PublicRoutes) deleteBillHandler(c *gin.Context) {
+func (pr *ModBills) DeleteBillHandler(c *gin.Context) {
 	req := &models.Bill{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -98,7 +98,7 @@ func (pr *PublicRoutes) deleteBillHandler(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PublicRoutes) getBill(c *gin.Context) {
+func (pr *ModBills) GetBillHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)

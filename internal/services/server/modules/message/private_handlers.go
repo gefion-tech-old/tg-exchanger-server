@@ -1,4 +1,4 @@
-package private
+package message
 
 import (
 	"database/sql"
@@ -23,14 +23,14 @@ import (
 
 	# TESTED
 */
-func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
+func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	msg, err := pr.store.Manager().BotMessages().Delete(&models.BotMessage{ID: uint(id)})
+	msg, err := m.store.Manager().BotMessages().Delete(&models.BotMessage{ID: uint(id)})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, msg)
@@ -56,7 +56,7 @@ func (pr *PrivateRoutes) deleteBotMessageHandler(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) updateBotMessageHandler(c *gin.Context) {
+func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 	req := &models.BotMessage{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -73,14 +73,14 @@ func (pr *PrivateRoutes) updateBotMessageHandler(c *gin.Context) {
 
 	req.ID = uint(id)
 
-	if err := req.UpdateBotMessageValidation(pr.users.Managers, pr.users.Developers); err != nil {
+	if err := req.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	msg, err := pr.store.Manager().BotMessages().Update(req)
+	msg, err := m.store.Manager().BotMessages().Update(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, msg)
@@ -111,7 +111,7 @@ func (pr *PrivateRoutes) updateBotMessageHandler(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
+func (m *ModMessage) GetAllMessagesHandler(c *gin.Context) {
 	errs, _ := errgroup.WithContext(c)
 
 	cArrM := make(chan []*models.BotMessage)
@@ -131,7 +131,7 @@ func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 	// Подсчет кол-ва сообщений в таблице
 	errs.Go(func() error {
 		defer close(cCount)
-		c, err := pr.store.Manager().BotMessages().Count()
+		c, err := m.store.Manager().BotMessages().Count()
 		if err != nil {
 			return err
 		}
@@ -143,7 +143,7 @@ func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 	// Достаю из БД запрашиваемые записи
 	errs.Go(func() error {
 		defer close(cArrM)
-		arrM, err := pr.store.Manager().BotMessages().GetSlice(page * limit)
+		arrM, err := m.store.Manager().BotMessages().GetSlice(page * limit)
 		if err != nil {
 			return err
 		}
@@ -176,38 +176,6 @@ func (pr *PrivateRoutes) getAllBotMessageHandler(c *gin.Context) {
 }
 
 /*
-	@Method GET
-	@Path admin/message/:connector
-	@Type PRIVATE
-	@Documentation
-
-	Получить запись из таблицы `bot_messages`
-
-	# TESTED
-*/
-func (pr *PrivateRoutes) getBotMessageHandler(c *gin.Context) {
-	msg, err := pr.store.Manager().BotMessages().Get(&models.BotMessage{Connector: c.Param("connector")})
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, msg)
-		return
-
-	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "message with current connector is not found",
-		})
-		return
-
-	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
-}
-
-/*
 	@Method POST
 	@Path admin/message
 	@Type PRIVATE
@@ -217,7 +185,7 @@ func (pr *PrivateRoutes) getBotMessageHandler(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) createNewBotMessageHandler(c *gin.Context) {
+func (m *ModMessage) CreateNewMessageHandler(c *gin.Context) {
 	req := &models.BotMessage{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -226,14 +194,14 @@ func (pr *PrivateRoutes) createNewBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	if err := req.CreateBotMessageValidation(pr.users.Managers, pr.users.Developers); err != nil {
+	if err := req.CreateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	msg, err := pr.store.Manager().BotMessages().Create(req)
+	msg, err := m.store.Manager().BotMessages().Create(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusCreated, msg)

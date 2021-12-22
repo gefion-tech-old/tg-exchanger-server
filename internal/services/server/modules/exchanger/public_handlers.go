@@ -1,4 +1,4 @@
-package private
+package exchanger
 
 import (
 	"database/sql"
@@ -25,7 +25,7 @@ import (
 
 	# TESTED
 */
-func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
+func (m *ModExchanger) CreateExchangerHandler(c *gin.Context) {
 	// Декодирование
 	req := &models.Exchanger{}
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -40,7 +40,7 @@ func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
 	}
 
 	// Операция записи в БД
-	e, err := pr.store.Manager().Exchanger().Create(req)
+	e, err := m.store.Manager().Exchanger().Create(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusCreated, e)
@@ -61,7 +61,7 @@ func (pr *PrivateRoutes) createExchanger(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
+func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 	// Декодирование
 	req := &models.Exchanger{}
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -84,7 +84,7 @@ func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
 	}
 
 	// Операция обновления записи в БД
-	e, err := pr.store.Manager().Exchanger().Update(req)
+	e, err := m.store.Manager().Exchanger().Update(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, e)
@@ -109,7 +109,7 @@ func (pr *PrivateRoutes) updateExchanger(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) deleteExchanger(c *gin.Context) {
+func (m *ModExchanger) DeleteExchangerHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
@@ -117,7 +117,7 @@ func (pr *PrivateRoutes) deleteExchanger(c *gin.Context) {
 	}
 
 	// Операция удаления записи из БД
-	e, err := pr.store.Manager().Exchanger().Delete(&models.Exchanger{ID: id})
+	e, err := m.store.Manager().Exchanger().Delete(&models.Exchanger{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, e)
@@ -142,9 +142,9 @@ func (pr *PrivateRoutes) deleteExchanger(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) getExchangerByName(c *gin.Context) {
+func (m *ModExchanger) GetExchangerByNameHandler(c *gin.Context) {
 	// Операция получения записи из БД
-	e, err := pr.store.Manager().Exchanger().GetByName(&models.Exchanger{Name: c.Param("name")})
+	e, err := m.store.Manager().Exchanger().GetByName(&models.Exchanger{Name: c.Param("name")})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, e)
@@ -169,7 +169,7 @@ func (pr *PrivateRoutes) getExchangerByName(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) getAllExchangers(c *gin.Context) {
+func (m *ModExchanger) GetAllExchangersHandler(c *gin.Context) {
 	errs, _ := errgroup.WithContext(c)
 
 	cArrE := make(chan []*models.Exchanger, 1)
@@ -189,7 +189,7 @@ func (pr *PrivateRoutes) getAllExchangers(c *gin.Context) {
 	// Достаю из БД запрашиваемые записи
 	errs.Go(func() error {
 		defer close(cArrE)
-		arrE, err := pr.store.Manager().Exchanger().GetSlice(page * limit)
+		arrE, err := m.store.Manager().Exchanger().GetSlice(page * limit)
 		if err != nil {
 			return err
 		}
@@ -201,7 +201,7 @@ func (pr *PrivateRoutes) getAllExchangers(c *gin.Context) {
 	// Подсчет кол-ва записей в таблице
 	errs.Go(func() error {
 		defer close(cCount)
-		c, err := pr.store.Manager().Exchanger().Count()
+		c, err := m.store.Manager().Exchanger().Count()
 		if err != nil {
 			return err
 		}
@@ -233,7 +233,7 @@ func (pr *PrivateRoutes) getAllExchangers(c *gin.Context) {
 	})
 }
 
-func (pr *PrivateRoutes) getExchangerDocument(c *gin.Context) {
+func (m *ModExchanger) GetExchangerDocumentHandler(c *gin.Context) {
 	req := fasthttp.AcquireRequest()
 	req.Header.SetMethod("GET")
 	req.SetRequestURI("https://1obmen.net/request-exportxml.xml")
@@ -251,6 +251,6 @@ func (pr *PrivateRoutes) getExchangerDocument(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"file": tools.OneObmenDocumentGenerate(&data, pr.sCnf.Tmp),
+		"file": tools.OneObmenDocumentGenerate(&data, m.cnf.Server.Tmp),
 	})
 }

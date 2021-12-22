@@ -1,4 +1,4 @@
-package private_test
+package notification_test
 
 import (
 	"bytes"

@@ -1,4 +1,4 @@
-package public_test
+package user_test
 
 import (
 	"bytes"
@@ -66,7 +66,7 @@ func Test_Server_UserInBotRegistrationHandler(t *testing.T) {
 			json.NewEncoder(b).Encode(tc.payload)
 
 			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodPost, "/api/v1/bot/registration", b)
+			req, _ := http.NewRequest(http.MethodPost, "/api/v1/bot/user/registration", b)
 			s.Router.ServeHTTP(rec, req)
 
 			assert.Equal(t, tc.expectedCode, rec.Code)

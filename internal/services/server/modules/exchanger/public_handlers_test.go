@@ -1,4 +1,4 @@
-package private_test
+package exchanger_test
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Server_GetAllExchangers(t *testing.T) {
+func Test_Server_GetAllExchangersHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
@@ -80,7 +80,7 @@ func Test_Server_GetAllExchangers(t *testing.T) {
 	}
 }
 
-func Test_Server_GetExchangerByName(t *testing.T) {
+func Test_Server_GetExchangerByNameHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
@@ -120,7 +120,7 @@ func Test_Server_GetExchangerByName(t *testing.T) {
 	}
 }
 
-func Test_Server_DeleteExchanger(t *testing.T) {
+func Test_Server_DeleteExchangerHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
@@ -165,7 +165,7 @@ func Test_Server_DeleteExchanger(t *testing.T) {
 	}
 }
 
-func Test_Server_UpdateExchanger(t *testing.T) {
+func Test_Server_UpdateExchangerHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
@@ -266,7 +266,7 @@ func Test_Server_UpdateExchanger(t *testing.T) {
 	}
 }
 
-func Test_Server_CreateExchanger(t *testing.T) {
+func Test_Server_CreateExchangerHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 

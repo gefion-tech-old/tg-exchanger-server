@@ -1,4 +1,4 @@
-package private
+package notification
 
 import (
 	"database/sql"
@@ -28,7 +28,7 @@ import (
 
 	# TESTED
 */
-func (pr *PrivateRoutes) createNotification(c *gin.Context) {
+func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 	req := &models.Notification{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
@@ -42,7 +42,7 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 	}
 
 	// Получаю всех менеджеров из БД
-	uArr, err := pr.store.User().GetAllManagers()
+	uArr, err := m.store.User().GetAllManagers()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -56,7 +56,7 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 				fmt.Println(err)
 			}
 
-			if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+			if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 				fmt.Println(err)
 			}
 		}
@@ -69,7 +69,7 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 				fmt.Println(err)
 			}
 
-			if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+			if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 				fmt.Println(err)
 			}
 		}
@@ -82,13 +82,13 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 				fmt.Println(err)
 			}
 
-			if err := pr.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+			if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 				fmt.Println(err)
 			}
 		}
 	}
 
-	n, err := pr.store.Manager().Notification().Create(req)
+	n, err := m.store.Manager().Notification().Create(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusCreated, n)
@@ -111,7 +111,7 @@ func (pr *PrivateRoutes) createNotification(c *gin.Context) {
 	# TESTED
 
 */
-func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
+func (m *ModNotification) GetAllNotificationsHandler(c *gin.Context) {
 	errs, _ := errgroup.WithContext(c)
 
 	cArrN := make(chan []*models.Notification)
@@ -131,7 +131,7 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 	// Достаю из БД запрашиваемые записи
 	errs.Go(func() error {
 		defer close(cArrN)
-		arrN, err := pr.store.Manager().Notification().GetSlice(page * limit)
+		arrN, err := m.store.Manager().Notification().GetSlice(page * limit)
 		if err != nil {
 			return err
 		}
@@ -143,7 +143,7 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 	// Подсчет кол-ва уведомлений в таблице
 	errs.Go(func() error {
 		defer close(cCount)
-		c, err := pr.store.Manager().Notification().Count()
+		c, err := m.store.Manager().Notification().Count()
 		if err != nil {
 			return err
 		}
@@ -185,7 +185,7 @@ func (pr *PrivateRoutes) getAllNotifications(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {
+func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 	req := &models.Notification{}
 	if err := c.ShouldBindJSON(req); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
@@ -205,7 +205,7 @@ func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {
 
 	req.ID = id
 
-	n, err := pr.store.Manager().Notification().UpdateStatus(req)
+	n, err := m.store.Manager().Notification().UpdateStatus(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, n)
@@ -229,14 +229,14 @@ func (pr *PrivateRoutes) updateNotificationStatus(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *PrivateRoutes) deleteNotification(c *gin.Context) {
+func (m *ModNotification) DeleteNotificationHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	n, err := pr.store.Manager().Notification().Delete(&models.Notification{ID: id})
+	n, err := m.store.Manager().Notification().Delete(&models.Notification{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, n)

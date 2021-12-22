@@ -1,4 +1,4 @@
-package private_test
+package bills_test
 
 import (
 	"bytes"

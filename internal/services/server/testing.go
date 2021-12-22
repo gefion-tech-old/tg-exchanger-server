@@ -205,7 +205,7 @@ func TestBotUser(t *testing.T, s *Server) error {
 	}
 
 	rec := httptest.NewRecorder()
-	req, err := http.NewRequest(http.MethodPost, "/api/v1/bot/registration", b)
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/bot/user/registration", b)
 	if err != nil {
 		return err
 	}

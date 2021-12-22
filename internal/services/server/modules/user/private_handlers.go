@@ -1,4 +1,4 @@
-package private
+package user
 
 import (
 	"net/http"
@@ -21,12 +21,12 @@ import (
 
 	# TESTED
 */
-func (pr *PrivateRoutes) logoutHandler(c *gin.Context) {
+func (m *ModUsers) LogoutHandler(c *gin.Context) {
 	// Извлекаю метаданные JWT
 	ctxToken := c.Request.Context().Value(guard.CtxKeyToken).(*models.AccessDetails)
 
 	// Удаляю токен
-	deleted, err := pr.redis.Auth.DeleteAuth(ctxToken.AccessUuid)
+	deleted, err := m.redis.Auth.DeleteAuth(ctxToken.AccessUuid)
 	if err != nil || deleted == 0 {
 		tools.ServErr(c, http.StatusUnauthorized, errors.ErrUnauthorized)
 		return

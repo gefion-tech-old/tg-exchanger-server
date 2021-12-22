@@ -1,4 +1,4 @@
-package public_test
+package bills_test
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Server_GetBill(t *testing.T) {
+func Test_Server_GetBillHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 

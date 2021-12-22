@@ -1,4 +1,4 @@
-package private_test
+package message_test
 
 import (
 	"bytes"
@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Server_DeleteBotMessageHandler(t *testing.T) {
+func Test_Server_DeleteMessageHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
@@ -61,7 +61,7 @@ func Test_Server_DeleteBotMessageHandler(t *testing.T) {
 
 }
 
-func Test_Server_UpdateBotMessageHandler(t *testing.T) {
+func Test_Server_UpdateMessageHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
@@ -144,7 +144,7 @@ func Test_Server_UpdateBotMessageHandler(t *testing.T) {
 
 }
 
-func Test_Server_GetAllBotMessageHandler(t *testing.T) {
+func Test_Server_GetAllMessageHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
@@ -170,49 +170,7 @@ func Test_Server_GetAllBotMessageHandler(t *testing.T) {
 
 }
 
-func Test_Server_GetBotMessageHandler(t *testing.T) {
-	s, redis, teardown := server.TestServer(t)
-	defer teardown(redis)
-
-	// Регистрирую менеджера в админке
-	tokens, err := server.TestManager(t, s)
-	assert.NotNil(t, tokens)
-	assert.NoError(t, err)
-
-	// Создаю тестовое сообщение
-	assert.NoError(t, server.TestBotMessage(t, s, tokens))
-
-	testCases := []struct {
-		name         string
-		connector    string
-		expectedCode int
-	}{
-		{
-			name:         "undefined connector",
-			connector:    "undefined",
-			expectedCode: http.StatusNotFound,
-		},
-		{
-			name:         "valid",
-			connector:    mocks.BOT_MESSAGE_REQ["connector"].(string),
-			expectedCode: http.StatusOK,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodGet, "/api/v1/admin/message/"+tc.connector, nil)
-			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
-			s.Router.ServeHTTP(rec, req)
-
-			assert.Equal(t, tc.expectedCode, rec.Code)
-		})
-	}
-
-}
-
-func Test_Server_CreateNewBotMessageHandler(t *testing.T) {
+func Test_Server_CreateNewMessageHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
 
