@@ -26,6 +26,20 @@ type RejectBill struct {
 	==========================================================================================
 */
 
+func (rb *RejectBill) RejectBillValidation() error {
+	return validation.ValidateStruct(
+		rb,
+		validation.Field(&rb.ChatID, validation.Required),
+		validation.Field(
+			&rb.Bill,
+			validation.Required,
+			validation.Length(16, 16),
+			validation.Match(regexp.MustCompile(static.REGEX__CARD)),
+		),
+		validation.Field(&rb.Reason, validation.Required),
+	)
+}
+
 func (b *Bill) BillValidation() error {
 	return validation.ValidateStruct(
 		b,
