@@ -1,6 +1,7 @@
 # TG Exchanger Server
 
 ## Table of Contents
+- [Base Info](#base-info)
 - [REST API](#rest-api)    
     - [Bot API Routs](#)
         - [User](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/bot__user.md)
@@ -47,6 +48,24 @@
     - [Migrations](#migrations)
         - [Create Migration](#create-migration)
         - [Up/Down Migration](#up/down-migration)
+
+
+## Base Info
+
+### Start Server
+
+1. Необходимо поднять NSQ очередь использую docker-compose
+
+```
+sudo docker-compose up -d
+```
+
+2. Запустить сервер 
+
+```
+./server -prod true
+```
+
 
 ## Tools
 
