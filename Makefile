@@ -18,13 +18,7 @@ run:
 
 build:
 	go build -o $(SERVICE) -v $(SOURCES)
-	clear	
-
-
-.PHONY: test
-
-test:
-	go test -v -race -timeout 30s ./...
+	clear
 
 
 count:

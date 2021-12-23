@@ -49,9 +49,9 @@ func InitServerModules(store db.SQLStoreI, redis *redisstore.AppRedisDictionarie
 func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI) {
 	router.POST("/bot/user/registration", m.userMod.UserInBotRegistrationHandler)
 
-	router.DELETE("/bot/user/bill", m.billsMod.DeleteBillHandler)
 	router.GET("/bot/user/bill/:id", m.billsMod.GetBillHandler)
 	router.GET("/bot/user/:chat_id/bills", m.billsMod.GetAllBillsHandler)
+	router.DELETE("/bot/user/bill", m.billsMod.DeleteBillHandler)
 
 	router.POST("/admin/bill", g.AuthTokenValidation(), g.IsAuth(), m.billsMod.CreateBillHandler)
 	router.POST("/admin/bill/reject", g.AuthTokenValidation(), g.IsAuth(), m.billsMod.RejectBillHandler)
