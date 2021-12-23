@@ -24,6 +24,3 @@ db_url = "postgres://exchanger:qwerty@localhost:5432/exchanger_server_dev?sslmod
 [users]
 managers = []
 developers = ["I0HuKc", "enthusedfir"]
-
-[environment]
-production = false

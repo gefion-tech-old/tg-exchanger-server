@@ -35,7 +35,6 @@ func InitTestConfig(t *testing.T) *Config {
 			Managers:   []string{},
 			Developers: []string{"I0HuKc"},
 		},
-		Environment: EnvironmentConfig{},
 	}
 
 }

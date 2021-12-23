@@ -1,13 +1,12 @@
 package config
 
 type Config struct {
-	Server      ServerConfig      `toml:"server"`
-	Secrets     SecretsConfig     `toml:"secrets"`
-	Redis       RedisConfig       `toml:"redis"`
-	NSQ         NsqConfig         `toml:"nsq"`
-	DB          DatabaseConfig    `toml:"database"`
-	Users       UsersConfig       `toml:"users"`
-	Environment EnvironmentConfig `toml:"environment"`
+	Server  ServerConfig   `toml:"server"`
+	Secrets SecretsConfig  `toml:"secrets"`
+	Redis   RedisConfig    `toml:"redis"`
+	NSQ     NsqConfig      `toml:"nsq"`
+	DB      DatabaseConfig `toml:"database"`
+	Users   UsersConfig    `toml:"users"`
 }
 
 type ServerConfig struct {
@@ -31,10 +30,6 @@ type RedisConfig struct {
 
 type DatabaseConfig struct {
 	DbUrl string `toml:"db_url"`
-}
-
-type EnvironmentConfig struct {
-	Production bool `toml:"production"`
 }
 
 type NsqConfig struct {
