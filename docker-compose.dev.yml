@@ -1,0 +1,39 @@
+version: "3"
+
+services: 
+  nsq-lookupd:
+    image: nsqio/nsq:v1.2.0
+    container_name: nsq-lookupd
+    ports: 
+      - 4160:4160
+      - 4161:4161
+    command: /nsqlookupd 
+    restart: always
+
+  nsq-nsqd:
+    image: nsqio/nsq:v1.2.0
+    container_name: nsq-nsqd
+    volumes:
+      - ./nsq/data:/data 
+    ports: 
+      - 4150:4150
+      - 4151:4151
+    depends_on: 
+      - nsq-lookupd
+    links: 
+      - nsq-lookupd
+    command: /nsqd -data-path=/data -lookupd-tcp-address=nsq-lookupd:4160 -broadcast-address=80.78.253.68 -max-msg-size=10485760
+    restart: always
+
+  nsq-admin:
+    image: nsqio/nsq:v1.2.0
+    container_name: nsq-admin
+    ports: 
+      - 4171:4171
+    depends_on: 
+        - nsq-lookupd
+    links: 
+      - nsq-lookupd
+      - nsq-nsqd
+    command: /nsqadmin -lookupd-http-address=nsq-lookupd:4161
+    restart: always
