@@ -381,7 +381,7 @@ func Test_Server_GetAllNotifications(t *testing.T) {
 			assert.NoError(t, decodeErr)
 			assert.NotNil(t, body["data"])
 
-			assert.Equal(t, len(body["data"].([]interface{})), tc.expectedArrLength)
+			assert.Equal(t, tc.expectedArrLength, len(body["data"].([]interface{})))
 		})
 	}
 }

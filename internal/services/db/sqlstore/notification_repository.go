@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type NotificationRepository struct {
@@ -112,7 +113,7 @@ func (r *NotificationRepository) Count() (int, error) {
 
 	# TESTED
 */
-func (r *NotificationRepository) GetSlice(limit int) ([]*models.Notification, error) {
+func (r *NotificationRepository) Selection(page, limit int) ([]*models.Notification, error) {
 	nArr := []*models.Notification{}
 
 	rows, err := r.store.Query(
@@ -120,8 +121,10 @@ func (r *NotificationRepository) GetSlice(limit int) ([]*models.Notification, er
 		SELECT id, type, status, chat_id, username, code, user_card, img_path, ex_from, ex_to, created_at, updated_at
 		FROM notifications
 		ORDER BY id DESC
-		LIMIT $1
+		OFFSET $1
+		LIMIT $2
 		`,
+		tools.OffsetThreshold(page, limit),
 		limit,
 	)
 	if err != nil {

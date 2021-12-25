@@ -39,7 +39,7 @@ type NotificationRepository interface {
 	Create(n *models.Notification) (*models.Notification, error)
 	Delete(n *models.Notification) (*models.Notification, error)
 	Get(n *models.Notification) (*models.Notification, error)
-	GetSlice(limit int) ([]*models.Notification, error)
+	Selection(page, limit int) ([]*models.Notification, error)
 	UpdateStatus(n *models.Notification) (*models.Notification, error)
 	Count() (int, error)
 }

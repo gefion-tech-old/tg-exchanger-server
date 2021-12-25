@@ -58,3 +58,11 @@ func LowerThreshold(page, limit, count int) int {
 	}
 	return page
 }
+
+func OffsetThreshold(page, limit int) int {
+	if page > 1 {
+		return (page - 1) * limit
+	}
+
+	return page - 1
+}

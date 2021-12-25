@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type NotificationRepository struct {
@@ -49,14 +50,17 @@ func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.N
 	return nil, sql.ErrNoRows
 }
 
-func (r *NotificationRepository) GetSlice(limit int) ([]*models.Notification, error) {
-	nArr := []*models.Notification{}
+func (r *NotificationRepository) Selection(page, limit int) ([]*models.Notification, error) {
+	arr := []*models.Notification{}
 
-	for i := 0; i < limit; i++ {
-		nArr = append(nArr, r.notification[i])
+	for i, v := range r.notification {
+		if i > tools.OffsetThreshold(page, limit) && i <= tools.OffsetThreshold(page, limit)+limit {
+			arr = append(arr, v)
+		}
+		i++
 	}
 
-	return nArr, nil
+	return arr, nil
 }
 
 func (r *NotificationRepository) Count() (int, error) {

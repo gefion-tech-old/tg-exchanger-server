@@ -131,7 +131,7 @@ func (m *ModNotification) GetAllNotificationsHandler(c *gin.Context) {
 	// Достаю из БД запрашиваемые записи
 	errs.Go(func() error {
 		defer close(cArrN)
-		arrN, err := m.store.Manager().Notification().GetSlice(page * limit)
+		arrN, err := m.store.Manager().Notification().Selection(page, limit)
 		if err != nil {
 			return err
 		}
@@ -160,18 +160,11 @@ func (m *ModNotification) GetAllNotificationsHandler(c *gin.Context) {
 		return
 	}
 
-	d := []*models.Notification{}
-
-	// Проверка что БД не пустая
-	if len(arrN) > 0 {
-		d = arrN[(tools.LowerThreshold(page, limit, *count)-1)*limit : tools.UpperThreshold(page, limit, *count)]
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"limit":        limit,
 		"current_page": page,
 		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"data":         d,
+		"data":         arrN,
 	})
 }
 
