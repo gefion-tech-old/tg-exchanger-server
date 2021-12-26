@@ -9,6 +9,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/guard"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/middleware"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -20,8 +21,9 @@ type Server struct {
 	config *config.Config
 	logger *logrus.Logger
 
-	guard guard.GuardI
-	mods  modules.ServerModulesI
+	guard      guard.GuardI
+	middleware middleware.MiddlewareI
+	mods       modules.ServerModulesI
 }
 
 type ServerI interface {
@@ -43,7 +45,7 @@ func (s *Server) configure() {
 	v1 := api.Group("/v1")
 
 	// Подключение всех модулей
-	s.mods.ModulesConfigure(v1, s.guard)
+	s.mods.ModulesConfigure(v1, s.guard, s.middleware)
 }
 
 func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, c *config.Config) *Server {
@@ -69,12 +71,13 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 	guard := guard.Init(r, &c.Secrets)
 
 	server := &Server{
-		store:  s,
-		Router: router,
-		config: c,
-		logger: log,
-		guard:  guard,
-		mods:   modules.InitServerModules(s, r, nsq, c),
+		store:      s,
+		Router:     router,
+		config:     c,
+		logger:     log,
+		guard:      guard,
+		middleware: middleware.InitMiddleware(),
+		mods:       modules.InitServerModules(s, r, nsq, c),
 	}
 
 	gin.ForceConsoleColor()

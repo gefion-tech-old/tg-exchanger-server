@@ -6,6 +6,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/guard"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/middleware"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/bills"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/exchanger"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/message"
@@ -28,7 +29,7 @@ type ServerModules struct {
 }
 
 type ServerModulesI interface {
-	ModulesConfigure(router *gin.RouterGroup, g guard.GuardI)
+	ModulesConfigure(router *gin.RouterGroup, g guard.GuardI, mdl middleware.MiddlewareI)
 }
 
 func InitServerModules(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config) ServerModulesI {
@@ -46,7 +47,7 @@ func InitServerModules(store db.SQLStoreI, redis *redisstore.AppRedisDictionarie
 	}
 }
 
-func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI) {
+func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI, mdl middleware.MiddlewareI) {
 	router.POST("/bot/user/registration", m.userMod.UserInBotRegistrationHandler)
 
 	router.GET("/bot/user/bill/:id", m.billsMod.GetBillHandler)
@@ -58,7 +59,7 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 
 	router.POST("/admin/registration/code", m.userMod.UserGenerateCodeHandler)
 	router.POST("/admin/registration", m.userMod.UserInAdminRegistrationHandler)
-	router.POST("/admin/auth", m.userMod.UserInAdminAuthHandler)
+	router.POST("/admin/auth", mdl.SetCors(), m.userMod.UserInAdminAuthHandler)
 	router.POST("/admin/token/refresh", m.userMod.UserRefreshToken)
 	router.POST("/admin/logout", g.AuthTokenValidation(), g.IsAuth(), m.userMod.LogoutHandler)
 
