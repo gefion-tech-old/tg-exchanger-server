@@ -67,6 +67,9 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 	// Инициализация роутера
 	router := gin.New()
 
+	m := middleware.InitMiddleware()
+	router.Use(m.CORSMiddleware())
+
 	// Инициализация охранников маршрутов
 	guard := guard.Init(r, &c.Secrets)
 
@@ -76,7 +79,7 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 		config:     c,
 		logger:     log,
 		guard:      guard,
-		middleware: middleware.InitMiddleware(),
+		middleware: m,
 		mods:       modules.InitServerModules(s, r, nsq, c),
 	}
 

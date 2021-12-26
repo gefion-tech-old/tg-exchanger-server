@@ -59,7 +59,7 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 
 	router.POST("/admin/registration/code", m.userMod.UserGenerateCodeHandler)
 	router.POST("/admin/registration", m.userMod.UserInAdminRegistrationHandler)
-	router.POST("/admin/auth", mdl.CORSMiddleware(), m.userMod.UserInAdminAuthHandler)
+	router.POST("/admin/auth", m.userMod.UserInAdminAuthHandler)
 	router.POST("/admin/token/refresh", m.userMod.UserRefreshToken)
 	router.POST("/admin/logout", g.AuthTokenValidation(), g.IsAuth(), m.userMod.LogoutHandler)
 
