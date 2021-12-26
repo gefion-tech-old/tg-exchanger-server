@@ -23,4 +23,4 @@ db_url = "postgres://exchanger:oHEKX73YQsZMSZo05@localhost:5432/exchanger_prod?s
 
 [users]
 managers = []
-developers = ["I0HuKc", "enthusedfir"]
+developers = ["I0HuKc", "enthusedfir", "bau00"]
