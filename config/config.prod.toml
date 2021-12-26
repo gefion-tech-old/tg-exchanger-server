@@ -1,5 +1,5 @@
 [server]
-host = "80.78.253.68"
+host = "80.87.197.206"
 port = ":4000"
 log_level = "error"
 tmp = "/var/www/html/tmp"
@@ -15,7 +15,7 @@ port = 6379
 db = 1
 
 [nsq]
-host = "80.78.253.68"
+host = "80.87.197.206"
 port = 4150
 
 [database]
