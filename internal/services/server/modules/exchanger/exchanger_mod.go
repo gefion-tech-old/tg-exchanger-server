@@ -20,7 +20,7 @@ type ModExchangerI interface {
 	UpdateExchangerHandler(c *gin.Context)
 	DeleteExchangerHandler(c *gin.Context)
 	GetExchangerByNameHandler(c *gin.Context)
-	GetAllExchangersHandler(c *gin.Context)
+	GetExchangersSelectionHandler(c *gin.Context)
 	GetExchangerDocumentHandler(c *gin.Context)
 }
 

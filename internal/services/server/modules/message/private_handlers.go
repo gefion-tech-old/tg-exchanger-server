@@ -30,7 +30,7 @@ func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	msg, err := m.store.Manager().BotMessages().Delete(&models.BotMessage{ID: uint(id)})
+	msg, err := m.store.Manager().BotMessages().Delete(&models.BotMessage{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, msg)
@@ -71,7 +71,7 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	req.ID = uint(id)
+	req.ID = id
 
 	if err := req.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -111,7 +111,7 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 
 	# TESTED
 */
-func (m *ModMessage) GetAllMessagesHandler(c *gin.Context) {
+func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
 	errs, _ := errgroup.WithContext(c)
 
 	cArrM := make(chan []*models.BotMessage)
@@ -143,7 +143,7 @@ func (m *ModMessage) GetAllMessagesHandler(c *gin.Context) {
 	// Достаю из БД запрашиваемые записи
 	errs.Go(func() error {
 		defer close(cArrM)
-		arrM, err := m.store.Manager().BotMessages().GetSlice(page * limit)
+		arrM, err := m.store.Manager().BotMessages().Selection(page, limit)
 		if err != nil {
 			return err
 		}
@@ -160,18 +160,11 @@ func (m *ModMessage) GetAllMessagesHandler(c *gin.Context) {
 		return
 	}
 
-	d := []*models.BotMessage{}
-
-	// Проверка что БД не пустая
-	if len(arrM) > 0 {
-		d = arrM[(tools.LowerThreshold(page, limit, *count)-1)*limit : tools.UpperThreshold(page, limit, *count)]
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"limit":        limit,
 		"current_page": page,
 		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"data":         d,
+		"data":         arrM,
 	})
 }
 

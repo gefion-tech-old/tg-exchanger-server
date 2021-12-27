@@ -67,17 +67,17 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 	router.PUT("/admin/message/:id", g.AuthTokenValidation(), g.IsAuth(), m.msgMod.UpdateBotMessageHandler)
 	router.DELETE("/admin/message/:id", g.AuthTokenValidation(), g.IsAuth(), m.msgMod.DeleteBotMessageHandler)
 	router.GET("/admin/message/:connector", m.msgMod.GetMessageHandler)
-	router.GET("/admin/messages", g.AuthTokenValidation(), g.IsAuth(), m.msgMod.GetAllMessagesHandler)
+	router.GET("/admin/messages", g.AuthTokenValidation(), g.IsAuth(), m.msgMod.GetMessagesSelectionHandler)
 
 	router.POST("/admin/notification", m.notifyMod.CreateNotificationHandler)
 	router.PUT("/admin/notification/:id", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.UpdateNotificationStatusHandler)
 	router.DELETE("/admin/notification/:id", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.DeleteNotificationHandler)
-	router.GET("/admin/notifications", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.GetAllNotificationsHandler)
+	router.GET("/admin/notifications", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.GetNotificationsSelectionHandler)
 
 	router.POST("/admin/exchanger", g.AuthTokenValidation(), g.IsAuth(), m.exMod.CreateExchangerHandler)
 	router.PUT("/admin/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), m.exMod.UpdateExchangerHandler)
 	router.DELETE("/admin/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), m.exMod.DeleteExchangerHandler)
 	router.GET("/admin/exchanger/:name", m.exMod.GetExchangerByNameHandler)
 	router.GET("/admin/exchanger/document", g.AuthTokenValidation(), g.IsAuth(), m.exMod.GetExchangerDocumentHandler)
-	router.GET("/admin/exchangers", g.AuthTokenValidation(), g.IsAuth(), m.exMod.GetAllExchangersHandler)
+	router.GET("/admin/exchangers", g.AuthTokenValidation(), g.IsAuth(), m.exMod.GetExchangersSelectionHandler)
 }

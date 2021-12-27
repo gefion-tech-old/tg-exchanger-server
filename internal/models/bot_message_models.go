@@ -7,7 +7,7 @@ import (
 )
 
 type BotMessage struct {
-	ID          uint   `json:"id"`
+	ID          int    `json:"id"`
 	Connector   string `json:"connector"`
 	MessageText string `json:"message_text"`
 	CreatedBy   string `json:"created_by"`

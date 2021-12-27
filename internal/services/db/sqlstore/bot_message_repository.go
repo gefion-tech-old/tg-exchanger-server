@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type BotMessagesRepository struct {
@@ -85,18 +86,20 @@ func (r *BotMessagesRepository) Get(m *models.BotMessage) (*models.BotMessage, e
 }
 
 /*
-	Получить все сообщения из таблицы `bot_messages`
+	Получить выборку из таблицы `bot_messages`
 */
-func (r *BotMessagesRepository) GetSlice(limit int) ([]*models.BotMessage, error) {
-	bm := []*models.BotMessage{}
+func (r *BotMessagesRepository) Selection(page, limit int) ([]*models.BotMessage, error) {
+	bmArr := []*models.BotMessage{}
 
 	rows, err := r.store.Query(
 		`
 		SELECT id, connector, message_text, created_by, created_at, updated_at
 		FROM bot_messages
 		ORDER BY id DESC
-		LIMIT $1
+		OFFSET $1
+		LIMIT $2
 		`,
+		tools.OffsetThreshold(page, limit),
 		limit,
 	)
 	if err != nil {
@@ -117,10 +120,10 @@ func (r *BotMessagesRepository) GetSlice(limit int) ([]*models.BotMessage, error
 			continue
 		}
 
-		bm = append(bm, m)
+		bmArr = append(bmArr, m)
 	}
 
-	return bm, nil
+	return bmArr, nil
 }
 
 /*

@@ -18,7 +18,7 @@ type ModMessage struct {
 type ModMessageI interface {
 	DeleteBotMessageHandler(c *gin.Context)
 	UpdateBotMessageHandler(c *gin.Context)
-	GetAllMessagesHandler(c *gin.Context)
+	GetMessagesSelectionHandler(c *gin.Context)
 	CreateNewMessageHandler(c *gin.Context)
 
 	GetMessageHandler(c *gin.Context)

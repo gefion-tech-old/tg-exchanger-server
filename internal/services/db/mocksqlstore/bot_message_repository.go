@@ -5,14 +5,15 @@ import (
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type BotMessagesRepository struct {
-	messages map[uint]*models.BotMessage
+	messages map[int]*models.BotMessage
 }
 
 func (r *BotMessagesRepository) Create(m *models.BotMessage) (*models.BotMessage, error) {
-	m.ID = uint(len(r.messages) + 1)
+	m.ID = len(r.messages) + 1
 	m.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 	m.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 
@@ -30,14 +31,17 @@ func (r *BotMessagesRepository) Get(m *models.BotMessage) (*models.BotMessage, e
 	return nil, sql.ErrNoRows
 }
 
-func (r *BotMessagesRepository) GetSlice(limit int) ([]*models.BotMessage, error) {
-	mArr := []*models.BotMessage{}
+func (r *BotMessagesRepository) Selection(page, limit int) ([]*models.BotMessage, error) {
+	arr := []*models.BotMessage{}
 
-	for i := 0; i < limit; i++ {
-		mArr = append(mArr, r.messages[uint(i)])
+	for i, v := range r.messages {
+		if i > tools.OffsetThreshold(page, limit) && i <= tools.OffsetThreshold(page, limit)+limit {
+			arr = append(arr, v)
+		}
+		i++
 	}
 
-	return mArr, nil
+	return arr, nil
 }
 
 func (r *BotMessagesRepository) Update(m *models.BotMessage) (*models.BotMessage, error) {

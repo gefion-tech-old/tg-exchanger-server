@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type ExchangerRepository struct {
@@ -53,6 +54,19 @@ func (r *ExchangerRepository) Delete(e *models.Exchanger) (*models.Exchanger, er
 
 func (r *ExchangerRepository) Count() (int, error) {
 	return len(r.exchangers), nil
+}
+
+func (r *ExchangerRepository) Selection(page, limit int) ([]*models.Exchanger, error) {
+	arr := []*models.Exchanger{}
+
+	for i, v := range r.exchangers {
+		if i > tools.OffsetThreshold(page, limit) && i <= tools.OffsetThreshold(page, limit)+limit {
+			arr = append(arr, v)
+		}
+		i++
+	}
+
+	return arr, nil
 }
 
 func (r *ExchangerRepository) GetSlice(limit int) ([]*models.Exchanger, error) {

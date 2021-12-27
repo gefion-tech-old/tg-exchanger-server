@@ -41,7 +41,7 @@ func (r *ManagerRepository) BotMessages() db.BotMessagesRepository {
 	}
 
 	r.botMessagesRepository = &BotMessagesRepository{
-		messages: make(map[uint]*models.BotMessage),
+		messages: make(map[int]*models.BotMessage),
 	}
 
 	return r.botMessagesRepository

@@ -32,6 +32,7 @@ type ExchangerRepository interface {
 	Count() (int, error)
 	GetByName(e *models.Exchanger) (*models.Exchanger, error)
 	Delete(e *models.Exchanger) (*models.Exchanger, error)
+	Selection(page, limit int) ([]*models.Exchanger, error)
 	GetSlice(limit int) ([]*models.Exchanger, error)
 }
 
@@ -47,7 +48,7 @@ type NotificationRepository interface {
 type BotMessagesRepository interface {
 	Create(m *models.BotMessage) (*models.BotMessage, error)
 	Get(m *models.BotMessage) (*models.BotMessage, error)
-	GetSlice(limit int) ([]*models.BotMessage, error)
+	Selection(page, limit int) ([]*models.BotMessage, error)
 	Update(m *models.BotMessage) (*models.BotMessage, error)
 	Delete(m *models.BotMessage) (*models.BotMessage, error)
 	Count() (int, error)

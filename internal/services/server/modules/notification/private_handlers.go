@@ -111,7 +111,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 	# TESTED
 
 */
-func (m *ModNotification) GetAllNotificationsHandler(c *gin.Context) {
+func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 	errs, _ := errgroup.WithContext(c)
 
 	cArrN := make(chan []*models.Notification)

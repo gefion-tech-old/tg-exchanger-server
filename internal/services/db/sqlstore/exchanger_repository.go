@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type ExchangerRepository struct {
@@ -96,6 +97,45 @@ func (r *ExchangerRepository) Count() (int, error) {
 	}
 
 	return c, nil
+}
+
+func (r *ExchangerRepository) Selection(page, limit int) ([]*models.Exchanger, error) {
+	arr := []*models.Exchanger{}
+
+	rows, err := r.store.Query(
+		`
+		SELECT id, name, url, created_by, created_at, updated_at
+		FROM exchangers
+		ORDER BY id DESC
+		OFFSET $1
+		LIMIT $2
+		`,
+		tools.OffsetThreshold(page, limit),
+		limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		e := models.Exchanger{}
+		if err := rows.Scan(
+			&e.ID,
+			&e.Name,
+			&e.UrlToParse,
+			&e.CreatedBy,
+			&e.CreatedAt,
+			&e.UpdatedAt,
+		); err != nil {
+			continue
+		}
+
+		arr = append(arr, &e)
+
+	}
+
+	return arr, nil
 }
 
 /*
