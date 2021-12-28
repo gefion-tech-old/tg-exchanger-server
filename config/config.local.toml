@@ -22,6 +22,6 @@ port = 4150
 db_url = "postgres://exchanger:qwerty@localhost:5432/exchanger_server_dev?sslmode=disable"
 
 [users]
-managers = ["I0HuKc"]
-developers = ["enthusedfir"]
+managers = []
+developers = ["I0HuKc", "enthusedfir"]
 admins = []
