@@ -7,7 +7,7 @@ import "github.com/gefion-tech/tg-exchanger-server/internal/models"
 */
 type UserRepository interface {
 	Create(u *models.User) (*models.User, error)
-	RegisterAsManager(u *models.User) (*models.User, error)
+	RegisterInAdminPanel(u *models.User) (*models.User, error)
 	FindByUsername(username string) (*models.User, error)
 	GetAllManagers() ([]*models.User, error)
 }

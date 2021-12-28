@@ -1,5 +1,13 @@
 package static
 
+// Роли
+
+const (
+	S__ROLE__ADMIN   = 2
+	S__ROLE__MANAGER = 1
+	S__ROLE__USER    = 0
+)
+
 // Нобор статусов уведомлений
 const (
 	NTF__S__NEW        = 1

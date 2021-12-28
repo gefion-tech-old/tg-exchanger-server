@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
@@ -20,7 +21,7 @@ import (
 
 /*
 	@Method POST
-	@Path /bot/registration
+	@Path /bot/user/registration
 	@Type PUBLIC
 	@Documentation https://github.com/gefion-tech/tg-exchanger-server#registration-in-bot
 
@@ -76,7 +77,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 	}
 
 	// Валидирую полученные данные
-	if err := req.UserFromAdminRequestValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
+	if err := req.UserFromAdminRequestValidation(m.cnf.Users); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
@@ -180,9 +181,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 	// Ищу данные по этому коду в Redis
 	data, err := m.redis.Registration.FetchVerificationCode(int(req.Code))
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": _errors.New("activation period for this code has expired").Error(),
-		})
+		tools.ServErr(c, http.StatusUnprocessableEntity, _errors.New("activation period for this code has expired"))
 		return
 	}
 
@@ -192,7 +191,15 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 		return
 	}
 
-	user, err := m.store.User().RegisterAsManager(&u)
+	// Назначение роли пользователю
+	if r := tools.RoleDefine(u.Username, m.cnf.Users); r != static.S__ROLE__USER {
+		u.Role = r
+	} else {
+		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrNotEnoughRights)
+		return
+	}
+
+	user, err := m.store.User().RegisterInAdminPanel(&u)
 	switch err {
 	case nil:
 		c.JSON(http.StatusCreated, user)
@@ -232,7 +239,7 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 	case nil:
 		if u.Hash != nil && tools.ComparePassword(*u.Hash, req.Password) {
 			// Генерирую сборку токенов и сопутствующих деталей
-			td, err := m.createToken(u.ChatID, u.Username)
+			td, err := m.createToken(u.ChatID, u.Username, u.Role)
 			if err != nil {
 				tools.ServErr(c, http.StatusInternalServerError, err)
 				return
@@ -250,15 +257,11 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": _errors.New("user with this username or password is not registered as manager").Error(),
-		})
+		tools.ServErr(c, http.StatusNotFound, _errors.New("user with this username or password is not registered as manager"))
 		return
 
 	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": _errors.New("user with this username or password is not registered as manager").Error(),
-		})
+		tools.ServErr(c, http.StatusNotFound, _errors.New("user with this username or password is not registered as manager"))
 		return
 	default:
 		tools.ServErr(c, http.StatusInternalServerError, err)
@@ -343,7 +346,7 @@ func (m *ModUsers) UserRefreshToken(c *gin.Context) {
 		}
 
 		// Создание новой пары токенов
-		ts, err := m.createToken(chatID, claims["username"].(string))
+		ts, err := m.createToken(chatID, claims["username"].(string), int(claims["role"].(float64)))
 		if err != nil {
 			c.JSON(http.StatusForbidden, gin.H{
 				"error": "error occurred",
@@ -378,7 +381,7 @@ func (m *ModUsers) UserRefreshToken(c *gin.Context) {
 	Метод генерации пользовательского набора токенов
 	на основе данных о пользователе
 */
-func (m *ModUsers) createToken(chatID int64, username string) (*models.TokenDetails, error) {
+func (m *ModUsers) createToken(chatID int64, username string, role int) (*models.TokenDetails, error) {
 	// Набор информации о пользовательских токенах и иж сроки действия
 	td := &models.TokenDetails{}
 	var err error
@@ -402,6 +405,7 @@ func (m *ModUsers) createToken(chatID int64, username string) (*models.TokenDeta
 	atClaims["access_uuid"] = td.AccessUuid
 	atClaims["chat_id"] = chatID
 	atClaims["username"] = username
+	atClaims["role"] = role
 	atClaims["exp"] = td.AtExpires
 
 	// Кодирую полезную нагрузку создавая ТОКЕН ДОСТУПА
@@ -416,6 +420,7 @@ func (m *ModUsers) createToken(chatID int64, username string) (*models.TokenDeta
 	rtClaims["refresh_uuid"] = td.RefreshUuid
 	rtClaims["chat_id"] = chatID
 	rtClaims["username"] = username
+	rtClaims["role"] = role
 	rtClaims["exp"] = td.RtExpires
 
 	// Кодирую полезную нагрузку создавая ТОКЕН ОБНОВЛЕНИЯ

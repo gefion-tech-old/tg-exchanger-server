@@ -4,6 +4,9 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,6 +40,29 @@ func (g *Guard) IsAuth() gin.HandlerFunc {
 		// Записываю в контекст структуру AccessDetails
 		c.Request = c.Request.WithContext(
 			context.WithValue(c.Request.Context(), CtxKeyToken, tokenAuth))
+
+		c.Next()
+	}
+}
+
+func (g *Guard) IsAdmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := g.extractTokenMetadata(c.Request)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": err.Error(),
+			})
+			c.Abort()
+			return
+		}
+
+		if token.Role != static.S__ROLE__ADMIN {
+			tools.ServErr(c, http.StatusForbidden, errors.ErrNotEnoughRights)
+		}
+
+		// Записываю в контекст структуру AccessDetails
+		c.Request = c.Request.WithContext(
+			context.WithValue(c.Request.Context(), CtxKeyToken, token))
 
 		c.Next()
 	}

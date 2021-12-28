@@ -13,6 +13,7 @@ type Guard struct {
 
 type GuardI interface {
 	IsAuth() gin.HandlerFunc
+	IsAdmin() gin.HandlerFunc
 	AuthTokenValidation() gin.HandlerFunc
 }
 

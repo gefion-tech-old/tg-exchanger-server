@@ -21,4 +21,5 @@ type AccessDetails struct {
 	AccessUuid string
 	ChatID     int64
 	Username   string
+	Role       int
 }

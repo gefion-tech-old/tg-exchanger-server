@@ -34,6 +34,7 @@ func InitTestConfig(t *testing.T) *Config {
 		Users: UsersConfig{
 			Managers:   []string{},
 			Developers: []string{"I0HuKc"},
+			Admins:     []string{},
 		},
 	}
 

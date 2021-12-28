@@ -113,6 +113,7 @@ func (g *Guard) extractTokenMetadata(r *http.Request) (*models.AccessDetails, er
 			AccessUuid: accessUuid,
 			ChatID:     chatID,
 			Username:   claims["username"].(string),
+			Role:       int(claims["role"].(float64)),
 		}, nil
 	}
 

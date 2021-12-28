@@ -29,7 +29,7 @@ func Test_SQL_UserRepository(t *testing.T) {
 	assert.NotNil(t, u)
 
 	// Регистрация человека как менеджера
-	m, err := s.User().RegisterAsManager(u)
+	m, err := s.User().RegisterInAdminPanel(u)
 	assert.NoError(t, err)
 	assert.NotNil(t, m)
 

@@ -71,7 +71,7 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 
 	router.POST("/admin/notification", m.notifyMod.CreateNotificationHandler)
 	router.PUT("/admin/notification/:id", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.UpdateNotificationStatusHandler)
-	router.DELETE("/admin/notification/:id", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.DeleteNotificationHandler)
+	router.DELETE("/admin/notification/:id", g.AuthTokenValidation(), g.IsAuth(), g.IsAdmin(), m.notifyMod.DeleteNotificationHandler)
 	router.GET("/admin/notifications", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.GetNotificationsSelectionHandler)
 
 	router.POST("/admin/exchanger", g.AuthTokenValidation(), g.IsAuth(), m.exMod.CreateExchangerHandler)

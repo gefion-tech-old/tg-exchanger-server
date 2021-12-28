@@ -40,6 +40,7 @@ type NsqConfig struct {
 type UsersConfig struct {
 	Managers   []string `toml:"managers"`
 	Developers []string `toml:"developers"`
+	Admins     []string `toml:"admins"`
 }
 
 func Init() *Config {

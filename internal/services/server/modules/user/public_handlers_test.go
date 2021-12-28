@@ -7,7 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
+	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -276,4 +279,18 @@ func Test_Server_UserAdminHandler(t *testing.T) {
 
 		})
 	}
+}
+
+func Test_Server_Helper_Roledefine(t *testing.T) {
+
+	urs := config.UsersConfig{
+		Admins:     []string{"adminun"},
+		Developers: []string{"devun"},
+		Managers:   []string{"mngun"},
+	}
+
+	assert.Equal(t, tools.RoleDefine(urs.Admins[0], urs), static.S__ROLE__ADMIN)
+	assert.Equal(t, tools.RoleDefine(urs.Developers[0], urs), static.S__ROLE__ADMIN)
+	assert.Equal(t, tools.RoleDefine(urs.Managers[0], urs), static.S__ROLE__MANAGER)
+	assert.Equal(t, tools.RoleDefine("undefined", urs), static.S__ROLE__USER)
 }

@@ -25,7 +25,7 @@ func (r *UserRepository) Create(u *models.User) (*models.User, error) {
 	return r.users[u.ChatID], nil
 }
 
-func (r *UserRepository) RegisterAsManager(u *models.User) (*models.User, error) {
+func (r *UserRepository) RegisterInAdminPanel(u *models.User) (*models.User, error) {
 	for _, user := range r.users {
 		if u.Username == user.Username {
 			r.users[user.ChatID].Hash = u.Hash

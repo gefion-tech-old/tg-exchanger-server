@@ -50,7 +50,7 @@ func CreateUser(t *testing.T, s SQLStoreI) (*models.User, error) {
 	}
 
 	// Регистрация человека как менеджера
-	m, err := s.User().RegisterAsManager(u)
+	m, err := s.User().RegisterInAdminPanel(u)
 	if err != nil {
 		return nil, err
 	}
