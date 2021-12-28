@@ -76,7 +76,7 @@ func (m *ModBills) CreateBillHandler(c *gin.Context) {
 		return
 	}
 
-	bill, err := m.store.User().Bills().Create(req)
+	bill, err := m.store.AdminPanel().Bills().Create(req)
 	switch err {
 	case nil:
 		payload, err := json.Marshal(map[string]interface{}{

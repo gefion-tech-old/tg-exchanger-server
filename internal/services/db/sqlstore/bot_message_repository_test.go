@@ -31,23 +31,23 @@ func Test_SQL_BotMessagesRepository(t *testing.T) {
 	data.CreatedBy = mocks.MANAGER_IN_ADMIN_REQ["username"].(string)
 
 	// Создание сообщения
-	m, err := s.Manager().BotMessages().Create(data)
+	m, err := s.AdminPanel().BotMessages().Create(data)
 	assert.NoError(t, err)
 	assert.NotNil(t, m)
 
 	// Получить из БД
-	m2, err := s.Manager().BotMessages().Get(m)
+	m2, err := s.AdminPanel().BotMessages().Get(m)
 	assert.NoError(t, err)
 	assert.NotNil(t, m2)
 
 	// Обновление
 	m2.MessageText = "new text"
-	m3, err := s.Manager().BotMessages().Update(m2)
+	m3, err := s.AdminPanel().BotMessages().Update(m2)
 	assert.NoError(t, err)
 	assert.NotNil(t, m3)
 
 	// Удаление
-	m4, err := s.Manager().BotMessages().Delete(m)
+	m4, err := s.AdminPanel().BotMessages().Delete(m)
 	assert.NoError(t, err)
 	assert.NotNil(t, m4)
 }

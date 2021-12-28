@@ -24,7 +24,7 @@ import (
 */
 func (m *ModExchanger) GetExchangerByNameHandler(c *gin.Context) {
 	// Операция получения записи из БД
-	e, err := m.store.Manager().Exchanger().GetByName(&models.Exchanger{Name: c.Param("name")})
+	e, err := m.store.AdminPanel().Exchanger().GetByName(&models.Exchanger{Name: c.Param("name")})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, e)

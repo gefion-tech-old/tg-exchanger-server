@@ -28,7 +28,7 @@ func (pr *ModBills) GetAllBillsHandler(c *gin.Context) {
 		return
 	}
 
-	b, err := pr.store.User().Bills().All(int64(chatID))
+	b, err := pr.store.AdminPanel().Bills().All(int64(chatID))
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, b)
@@ -68,7 +68,7 @@ func (pr *ModBills) DeleteBillHandler(c *gin.Context) {
 		return
 	}
 
-	_, err := pr.store.User().Bills().Delete(req)
+	_, err := pr.store.AdminPanel().Bills().Delete(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, gin.H{})
@@ -105,7 +105,7 @@ func (pr *ModBills) GetBillHandler(c *gin.Context) {
 		return
 	}
 
-	b, err := pr.store.User().Bills().FindById(&models.Bill{ID: id})
+	b, err := pr.store.AdminPanel().Bills().FindById(&models.Bill{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, b)

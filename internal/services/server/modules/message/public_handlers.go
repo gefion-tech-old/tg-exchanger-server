@@ -19,7 +19,7 @@ import (
 	# TESTED
 */
 func (m *ModMessage) GetMessageHandler(c *gin.Context) {
-	msg, err := m.store.Manager().BotMessages().Get(&models.BotMessage{Connector: c.Param("connector")})
+	msg, err := m.store.AdminPanel().BotMessages().Get(&models.BotMessage{Connector: c.Param("connector")})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, msg)

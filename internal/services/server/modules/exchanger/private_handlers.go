@@ -43,7 +43,7 @@ func (m *ModExchanger) GetExchangersSelectionHandler(c *gin.Context) {
 	// Достаю из БД запрашиваемые записи
 	errs.Go(func() error {
 		defer close(cArrE)
-		arrE, err := m.store.Manager().Exchanger().Selection(page, limit)
+		arrE, err := m.store.AdminPanel().Exchanger().Selection(page, limit)
 		if err != nil {
 			return err
 		}
@@ -55,7 +55,7 @@ func (m *ModExchanger) GetExchangersSelectionHandler(c *gin.Context) {
 	// Подсчет кол-ва записей в таблице
 	errs.Go(func() error {
 		defer close(cCount)
-		c, err := m.store.Manager().Exchanger().Count()
+		c, err := m.store.AdminPanel().Exchanger().Count()
 		if err != nil {
 			return err
 		}
@@ -98,7 +98,7 @@ func (m *ModExchanger) DeleteExchangerHandler(c *gin.Context) {
 	}
 
 	// Операция удаления записи из БД
-	e, err := m.store.Manager().Exchanger().Delete(&models.Exchanger{ID: id})
+	e, err := m.store.AdminPanel().Exchanger().Delete(&models.Exchanger{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, e)
@@ -146,7 +146,7 @@ func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 	}
 
 	// Операция обновления записи в БД
-	e, err := m.store.Manager().Exchanger().Update(req)
+	e, err := m.store.AdminPanel().Exchanger().Update(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, e)
@@ -186,7 +186,7 @@ func (m *ModExchanger) CreateExchangerHandler(c *gin.Context) {
 	}
 
 	// Операция записи в БД
-	e, err := m.store.Manager().Exchanger().Create(req)
+	e, err := m.store.AdminPanel().Exchanger().Create(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusCreated, e)

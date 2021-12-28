@@ -5,30 +5,10 @@ import (
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 )
 
 type UserRepository struct {
-	store               *sql.DB
-	userBillsRepository *UserBillsRepository
-}
-
-/*
-	==========================================================================================
-	КОНСТРУКТОРЫ ВЛОЖЕННЫХ СТРУКТУР
-	==========================================================================================
-*/
-
-func (r *UserRepository) Bills() db.UserBillsRepository {
-	if r.userBillsRepository != nil {
-		return r.userBillsRepository
-	}
-
-	r.userBillsRepository = &UserBillsRepository{
-		store: r.store,
-	}
-
-	return r.userBillsRepository
+	store *sql.DB
 }
 
 /*

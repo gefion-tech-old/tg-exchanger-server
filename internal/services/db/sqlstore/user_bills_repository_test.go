@@ -29,7 +29,7 @@ func Test_SQL_UserBillsRepository(t *testing.T) {
 	assert.NotNil(t, u)
 
 	// Создание счета
-	nBill, err := s.User().Bills().Create(&models.Bill{
+	nBill, err := s.AdminPanel().Bills().Create(&models.Bill{
 		ChatID: int64(mocks.USER_BILL_REQ["chat_id"].(int)),
 		Bill:   mocks.USER_BILL_REQ["bill"].(string),
 	})
@@ -37,19 +37,19 @@ func Test_SQL_UserBillsRepository(t *testing.T) {
 	assert.NotNil(t, nBill)
 
 	// Получение одного счета
-	bill, err := s.User().Bills().FindById(&models.Bill{ID: nBill.ID})
+	bill, err := s.AdminPanel().Bills().FindById(&models.Bill{ID: nBill.ID})
 	assert.NoError(t, err)
 	assert.NotNil(t, bill)
 	assert.Equal(t, nBill.ID, bill.ID)
 
 	// Получение списка счетов
-	bList, err := s.User().Bills().All(u.ChatID)
+	bList, err := s.AdminPanel().Bills().All(u.ChatID)
 	assert.NoError(t, err)
 	assert.NotNil(t, bList)
 	assert.Len(t, bList, 1)
 
 	// Удаление счета
-	dBill, err := s.User().Bills().Delete(nBill)
+	dBill, err := s.AdminPanel().Bills().Delete(nBill)
 	assert.NoError(t, err)
 	assert.NotNil(t, dBill)
 

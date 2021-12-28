@@ -9,6 +9,19 @@ type ManagerRepository struct {
 	botMessagesRepository  *BotMessagesRepository
 	notificationRepository *NotificationRepository
 	exchangerRepository    *ExchangerRepository
+	userBillsRepository    *UserBillsRepository
+}
+
+func (r *ManagerRepository) Bills() db.UserBillsRepository {
+	if r.userBillsRepository != nil {
+		return r.userBillsRepository
+	}
+
+	r.userBillsRepository = &UserBillsRepository{
+		bills: make(map[int]*models.Bill),
+	}
+
+	return r.userBillsRepository
 }
 
 func (r *ManagerRepository) Exchanger() db.ExchangerRepository {

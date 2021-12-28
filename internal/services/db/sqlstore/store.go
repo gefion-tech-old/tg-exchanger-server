@@ -31,7 +31,7 @@ func (s *Store) User() db.UserRepository {
 	return s.userRepository
 }
 
-func (s *Store) Manager() db.ManagerRepository {
+func (s *Store) AdminPanel() db.AdminPanelRepository {
 	if s.managerRepository != nil {
 		return s.managerRepository
 	}

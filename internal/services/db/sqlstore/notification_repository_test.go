@@ -25,32 +25,32 @@ func Test_SQL_NotificationRepository(t *testing.T) {
 	mapstructure.Decode(mocks.ADMIN_NOTIFICATION_854, &data_854)
 
 	// Создание уведомления 854
-	n, err := s.Manager().Notification().Create(data_854)
+	n, err := s.AdminPanel().Notification().Create(data_854)
 	assert.NoError(t, err)
 	assert.NotNil(t, n)
 
 	// Поиск созданного уведомления
-	n2, err := s.Manager().Notification().Get(n)
+	n2, err := s.AdminPanel().Notification().Get(n)
 	assert.NoError(t, err)
 	assert.NotNil(t, n2)
 
 	// Получить уведомления из БД
-	arrN, err := s.Manager().Notification().Selection(1, 10)
+	arrN, err := s.AdminPanel().Notification().Selection(1, 10)
 	assert.NoError(t, err)
 	assert.NotNil(t, arrN)
 	assert.Len(t, arrN, 1)
 
 	// Подсчет кол-ва
-	c, err := s.Manager().Notification().Count()
+	c, err := s.AdminPanel().Notification().Count()
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 	assert.Equal(t, len(arrN), c)
 
 	// Удалить запись
-	d, err := s.Manager().Notification().Delete(n)
+	d, err := s.AdminPanel().Notification().Delete(n)
 	assert.NoError(t, err)
 	assert.NotNil(t, d)
-	_, dErr := s.Manager().Notification().Get(n)
+	_, dErr := s.AdminPanel().Notification().Get(n)
 	assert.Error(t, dErr)
 
 }

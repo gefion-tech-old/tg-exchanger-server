@@ -88,7 +88,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 		}
 	}
 
-	n, err := m.store.Manager().Notification().Create(req)
+	n, err := m.store.AdminPanel().Notification().Create(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusCreated, n)
@@ -131,7 +131,7 @@ func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 	// Достаю из БД запрашиваемые записи
 	errs.Go(func() error {
 		defer close(cArrN)
-		arrN, err := m.store.Manager().Notification().Selection(page, limit)
+		arrN, err := m.store.AdminPanel().Notification().Selection(page, limit)
 		if err != nil {
 			return err
 		}
@@ -143,7 +143,7 @@ func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 	// Подсчет кол-ва уведомлений в таблице
 	errs.Go(func() error {
 		defer close(cCount)
-		c, err := m.store.Manager().Notification().Count()
+		c, err := m.store.AdminPanel().Notification().Count()
 		if err != nil {
 			return err
 		}
@@ -198,7 +198,7 @@ func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 
 	req.ID = id
 
-	n, err := m.store.Manager().Notification().UpdateStatus(req)
+	n, err := m.store.AdminPanel().Notification().UpdateStatus(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, n)
@@ -229,7 +229,7 @@ func (m *ModNotification) DeleteNotificationHandler(c *gin.Context) {
 		return
 	}
 
-	n, err := m.store.Manager().Notification().Delete(&models.Notification{ID: id})
+	n, err := m.store.AdminPanel().Notification().Delete(&models.Notification{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, n)

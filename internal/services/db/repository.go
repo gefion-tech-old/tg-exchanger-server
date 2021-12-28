@@ -6,7 +6,6 @@ import "github.com/gefion-tech/tg-exchanger-server/internal/models"
 	Интерфейс репозитория для работы с таблицей users
 */
 type UserRepository interface {
-	Bills() UserBillsRepository
 	Create(u *models.User) (*models.User, error)
 	RegisterAsManager(u *models.User) (*models.User, error)
 	FindByUsername(username string) (*models.User, error)
@@ -20,7 +19,8 @@ type UserBillsRepository interface {
 	FindById(b *models.Bill) (*models.Bill, error)
 }
 
-type ManagerRepository interface {
+type AdminPanelRepository interface {
+	Bills() UserBillsRepository
 	BotMessages() BotMessagesRepository
 	Notification() NotificationRepository
 	Exchanger() ExchangerRepository

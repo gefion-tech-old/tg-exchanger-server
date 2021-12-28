@@ -10,5 +10,5 @@ type SQLStoreI interface {
 	*/
 	User() UserRepository
 
-	Manager() ManagerRepository
+	AdminPanel() AdminPanelRepository
 }

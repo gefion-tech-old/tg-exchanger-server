@@ -1,7 +1,6 @@
 package tools
 
 import (
-	"math"
 	"math/rand"
 	"time"
 
@@ -42,23 +41,7 @@ func VerificationCode(testing bool) int {
 	}
 }
 
-// Сделать срез запрашиваемых ресурсов
-// Необходимо для расчета, какие записи
-// отдавать для какой страницы
-func UpperThreshold(page, limit, count int) int {
-	if page*limit <= count {
-		return page * limit
-	}
-	return count
-}
-
-func LowerThreshold(page, limit, count int) int {
-	if math.Ceil(float64(count)/float64(limit)) <= float64(page) {
-		return int(math.Ceil(float64(count) / float64(limit)))
-	}
-	return page
-}
-
+// Определение порога запрашиваемых данных
 func OffsetThreshold(page, limit int) int {
 	if page > 1 {
 		return (page - 1) * limit

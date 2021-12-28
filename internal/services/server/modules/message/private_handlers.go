@@ -30,7 +30,7 @@ func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	msg, err := m.store.Manager().BotMessages().Delete(&models.BotMessage{ID: id})
+	msg, err := m.store.AdminPanel().BotMessages().Delete(&models.BotMessage{ID: id})
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, msg)
@@ -80,7 +80,7 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	msg, err := m.store.Manager().BotMessages().Update(req)
+	msg, err := m.store.AdminPanel().BotMessages().Update(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusOK, msg)
@@ -131,7 +131,7 @@ func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
 	// Подсчет кол-ва сообщений в таблице
 	errs.Go(func() error {
 		defer close(cCount)
-		c, err := m.store.Manager().BotMessages().Count()
+		c, err := m.store.AdminPanel().BotMessages().Count()
 		if err != nil {
 			return err
 		}
@@ -143,7 +143,7 @@ func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
 	// Достаю из БД запрашиваемые записи
 	errs.Go(func() error {
 		defer close(cArrM)
-		arrM, err := m.store.Manager().BotMessages().Selection(page, limit)
+		arrM, err := m.store.AdminPanel().BotMessages().Selection(page, limit)
 		if err != nil {
 			return err
 		}
@@ -194,7 +194,7 @@ func (m *ModMessage) CreateNewMessageHandler(c *gin.Context) {
 		return
 	}
 
-	msg, err := m.store.Manager().BotMessages().Create(req)
+	msg, err := m.store.AdminPanel().BotMessages().Create(req)
 	switch err {
 	case nil:
 		c.JSON(http.StatusCreated, msg)

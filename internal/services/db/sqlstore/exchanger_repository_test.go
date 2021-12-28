@@ -25,28 +25,28 @@ func Test_SQL_ExcangerRepository(t *testing.T) {
 	mapstructure.Decode(mocks.ADMIN_EXCHANGER, &data)
 
 	// Создание
-	e1, err := s.Manager().Exchanger().Create(data)
+	e1, err := s.AdminPanel().Exchanger().Create(data)
 	assert.NoError(t, err)
 	assert.NotNil(t, e1)
 
 	// Обновление
 	data.Name = "new"
-	e2, err := s.Manager().Exchanger().Update(data)
+	e2, err := s.AdminPanel().Exchanger().Update(data)
 	assert.NoError(t, err)
 	assert.NotNil(t, e2)
 
 	// Подсчет
-	c, err := s.Manager().Exchanger().Count()
+	c, err := s.AdminPanel().Exchanger().Count()
 	assert.NoError(t, err)
 	assert.Equal(t, 1, c)
 
 	// Получение среза
-	slice, err := s.Manager().Exchanger().GetSlice(10)
+	slice, err := s.AdminPanel().Exchanger().GetSlice(10)
 	assert.NoError(t, err)
 	assert.Len(t, slice, 1)
 
 	// Удаление
-	e3, err := s.Manager().Exchanger().Delete(data)
+	e3, err := s.AdminPanel().Exchanger().Delete(data)
 	assert.NoError(t, err)
 	assert.NotNil(t, e3)
 }
