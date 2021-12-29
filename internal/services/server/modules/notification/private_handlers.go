@@ -9,7 +9,6 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 )
@@ -33,12 +32,13 @@ func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+		return
 	}
 
 	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 	count := <-cCount
 
 	if arrN == nil || count == nil {
-		tools.ServErr(c, http.StatusInternalServerError, errs.Wait())
+		m.responser.Error(c, http.StatusInternalServerError, errs.Wait())
 		return
 	}
 
@@ -95,18 +95,18 @@ func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 	r := &models.Notification{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
-	if r.NotificationStatusValidation() != nil || r.NotificationTypeValidation() != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
-		return
-	}
+	m.responser.Error(c, http.StatusUnprocessableEntity,
+		r.NotificationStatusValidation(),
+		r.NotificationTypeValidation(),
+	)
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -128,7 +128,7 @@ func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 func (m *ModNotification) DeleteNotificationHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 

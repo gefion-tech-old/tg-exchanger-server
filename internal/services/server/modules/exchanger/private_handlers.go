@@ -7,7 +7,6 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 )
@@ -30,12 +29,13 @@ func (m *ModExchanger) GetExchangersSelectionHandler(c *gin.Context) {
 
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+		return
 	}
 
 	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (m *ModExchanger) GetExchangersSelectionHandler(c *gin.Context) {
 	count := <-cCount
 
 	if arrE == nil || count == nil {
-		tools.ServErr(c, http.StatusInternalServerError, errs.Wait())
+		m.responser.Error(c, http.StatusInternalServerError, errs.Wait())
 		return
 	}
 
@@ -92,7 +92,7 @@ func (m *ModExchanger) GetExchangersSelectionHandler(c *gin.Context) {
 func (m *ModExchanger) DeleteExchangerHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -114,24 +114,22 @@ func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 	// Декодирование
 	r := &models.Exchanger{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	r.ID = id
 
 	// Валидация
-	if err := r.ExchangerUpdateValidation(); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	m.responser.Error(c, http.StatusUnprocessableEntity, r.ExchangerUpdateValidation())
 
+	// Операция с БД
 	m.responser.Record(c, r, m.store.AdminPanel().Exchanger().Update(r))
 }
 
@@ -149,15 +147,12 @@ func (m *ModExchanger) CreateExchangerHandler(c *gin.Context) {
 	// Декодирование
 	r := &models.Exchanger{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	// Валидация
-	if err := r.ExchangerCreateValidation(); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	m.responser.Error(c, http.StatusUnprocessableEntity, r.ExchangerCreateValidation())
 
 	// Операция записи в БД
 	m.responser.NewRecord(c, r, m.store.AdminPanel().Exchanger().Create(r))

@@ -7,7 +7,6 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 )
@@ -25,7 +24,7 @@ import (
 func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -46,26 +45,21 @@ func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 	r := &models.BotMessage{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	r.ID = id
 
-	if err := r.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	m.responser.Error(c, http.StatusUnprocessableEntity,
+		r.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers),
+	)
 
 	m.responser.Record(c, r, m.store.AdminPanel().BotMessages().Update(r))
 }
@@ -88,12 +82,13 @@ func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
 
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+		return
 	}
 
 	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -125,7 +120,7 @@ func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
 	count := <-cCount
 
 	if arrM == nil || count == nil {
-		tools.ServErr(c, http.StatusInternalServerError, errs.Wait())
+		m.responser.Error(c, http.StatusUnprocessableEntity, errs.Wait())
 		return
 	}
 
@@ -150,18 +145,13 @@ func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
 func (m *ModMessage) CreateNewMessageHandler(c *gin.Context) {
 	r := &models.BotMessage{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
-	if err := r.CreateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	m.responser.Error(c, http.StatusUnprocessableEntity,
+		r.CreateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers),
+	)
 
 	m.responser.NewRecord(c, r, m.store.AdminPanel().BotMessages().Create(r))
 }

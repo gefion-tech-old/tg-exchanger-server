@@ -35,7 +35,7 @@ func (m *ModUsers) UserInBotRegistrationHandler(c *gin.Context) {
 
 	// Парсинг входящего тела запроса
 	if err := c.ShouldBindJSON(r); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
@@ -59,28 +59,21 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 	req := &models.UserFromAdminRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	// Валидирую полученные данные
-	if err := req.UserFromAdminRequestValidation(m.cnf.Users); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	m.responser.Error(c, http.StatusUnprocessableEntity, req.UserFromAdminRequestValidation(m.cnf.Users))
 
 	u, err := m.store.User().FindByUsername(req.Username)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"error": _errors.New("user with this username is not registered in bot").Error(),
-			})
+			m.responser.Error(c, http.StatusNotFound, errors.ErrNotRegistered)
 			return
 		default:
-			tools.ServErr(c, http.StatusInternalServerError, err)
+			m.responser.Error(c, http.StatusInternalServerError, err)
 			return
 		}
 	}
@@ -103,14 +96,14 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 
 	payload, err := json.Marshal(msg)
 	if err != nil {
-		tools.ServErr(c, http.StatusInternalServerError, err)
+		m.responser.Error(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Хеширую пароль
 	hash, err := tools.EncryptString(req.Password)
 	if err != nil {
-		tools.ServErr(c, http.StatusInternalServerError, err)
+		m.responser.Error(c, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -120,21 +113,19 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 		"hash":     hash,
 	})
 	if err != nil {
-		tools.ServErr(c, http.StatusInternalServerError, err)
+		m.responser.Error(c, http.StatusInternalServerError, err)
 		return
 	}
 
 	// Записываю в Redis
-	if err := m.redis.Registration.SaveVerificationCode(code, b); err != nil {
-		tools.ServErr(c, http.StatusInternalServerError, err)
-		return
-	}
+	m.responser.Error(c, http.StatusInternalServerError,
+		m.redis.Registration.SaveVerificationCode(code, b),
+	)
 
 	// Отправляю сообщение в NSQ
-	if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
-		tools.ServErr(c, http.StatusInternalServerError, err)
-		return
-	}
+	m.responser.Error(c, http.StatusInternalServerError,
+		m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload),
+	)
 
 	c.JSON(http.StatusOK, gin.H{})
 }
@@ -155,26 +146,25 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 
 	// Парсинг входящего тела запроса
 	if err := c.ShouldBindJSON(r); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	// Валидация
-	if err := r.UserCodeRequestValidation(); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	m.responser.Error(c, http.StatusUnprocessableEntity, r.UserCodeRequestValidation())
 
 	// Ищу данные по этому коду в Redis
 	data, err := m.redis.Registration.FetchVerificationCode(int(r.Code))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, _errors.New("activation period for this code has expired"))
+		m.responser.Error(c, http.StatusUnprocessableEntity,
+			_errors.New("activation period for this code has expired"),
+		)
 		return
 	}
 
 	u := &models.User{}
 	if err := json.Unmarshal([]byte(data), u); err != nil {
-		tools.ServErr(c, http.StatusInternalServerError, err)
+		m.responser.Error(c, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -182,7 +172,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 	if r := tools.RoleDefine(u.Username, m.cnf.Users); r != static.S__ROLE__USER {
 		u.Role = r
 	} else {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrNotEnoughRights)
+		m.responser.Error(c, http.StatusForbidden, errors.ErrNotEnoughRights)
 		return
 	}
 
@@ -205,7 +195,7 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 	req := &models.UserFromAdminRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
@@ -217,13 +207,13 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 			// Генерирую сборку токенов и сопутствующих деталей
 			td, err := m.createToken(u.ChatID, u.Username, u.Role)
 			if err != nil {
-				tools.ServErr(c, http.StatusInternalServerError, err)
+				m.responser.Error(c, http.StatusInternalServerError, err)
 				return
 			}
 
 			// Аутентифицирую пользователя
 			if err := m.createAuth(u.ChatID, td); err != nil {
-				tools.ServErr(c, http.StatusInternalServerError, err)
+				m.responser.Error(c, http.StatusInternalServerError, err)
 			}
 
 			c.JSON(http.StatusOK, gin.H{
@@ -233,14 +223,14 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 			return
 		}
 
-		tools.ServErr(c, http.StatusNotFound, _errors.New("user with this username or password is not registered as manager"))
+		m.responser.Error(c, http.StatusNotFound, errors.ErrNotRegistered)
 		return
 
 	case sql.ErrNoRows:
-		tools.ServErr(c, http.StatusNotFound, _errors.New("user with this username or password is not registered as manager"))
+		m.responser.Error(c, http.StatusNotFound, errors.ErrNotRegistered)
 		return
 	default:
-		tools.ServErr(c, http.StatusInternalServerError, err)
+		m.responser.Error(c, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -260,9 +250,7 @@ func (m *ModUsers) UserRefreshToken(c *gin.Context) {
 	mapToken := map[string]string{}
 
 	if err := c.ShouldBindJSON(&mapToken); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
@@ -280,15 +268,13 @@ func (m *ModUsers) UserRefreshToken(c *gin.Context) {
 
 	// Если возникла ошибка, значит токен просрочен
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "refresh token expired",
-		})
+		m.responser.Error(c, http.StatusUnauthorized, _errors.New("refresh token expired"))
 		return
 	}
 
 	// Проверка валидности токена
 	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
-		c.JSON(http.StatusUnauthorized, err)
+		m.responser.Error(c, http.StatusUnauthorized, err)
 		return
 	}
 
@@ -297,42 +283,34 @@ func (m *ModUsers) UserRefreshToken(c *gin.Context) {
 	if ok && token.Valid {
 		refreshUuid, ok := claims["refresh_uuid"].(string) // конвертация интерфейса в строку
 		if !ok {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"error": err,
-			})
+			m.responser.Error(c, http.StatusUnprocessableEntity, err)
 			return
 		}
 
 		// Извлекаю chat_id из полезной нагрузки токена
 		chatID, err := strconv.ParseInt(fmt.Sprintf("%.f", claims["chat_id"]), 0, 64)
 		if err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"error": "error occurred",
-			})
+			m.responser.Error(c, http.StatusInternalServerError, err)
 			return
 		}
 
 		// Удаляю предыдущий refresh токен
 		deleted, err := m.redis.Auth.DeleteAuth(refreshUuid)
 		if err != nil || deleted == 0 {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "unauthorized",
-			})
+			m.responser.Error(c, http.StatusUnauthorized, _errors.New("unauthorized"))
 			return
 		}
 
 		// Создание новой пары токенов
 		ts, err := m.createToken(chatID, claims["username"].(string), int(claims["role"].(float64)))
 		if err != nil {
-			c.JSON(http.StatusForbidden, gin.H{
-				"error": "error occurred",
-			})
+			m.responser.Error(c, http.StatusInternalServerError, err)
 			return
 		}
 
 		// Сохранение метаданных токенов в redis
 		if err := m.createAuth(chatID, ts); err != nil {
-			c.JSON(http.StatusForbidden, err.Error())
+			m.responser.Error(c, http.StatusInternalServerError, err)
 			return
 		}
 
@@ -343,7 +321,7 @@ func (m *ModUsers) UserRefreshToken(c *gin.Context) {
 
 		c.JSON(http.StatusCreated, tokens)
 	} else {
-		c.JSON(http.StatusUnauthorized, "refresh expired")
+		m.responser.Error(c, http.StatusUnauthorized, _errors.New("refresh expired"))
 	}
 }
 

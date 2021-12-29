@@ -6,7 +6,6 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/guard"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,7 +27,7 @@ func (m *ModUsers) LogoutHandler(c *gin.Context) {
 	// Удаляю токен
 	deleted, err := m.redis.Auth.DeleteAuth(ctxToken.AccessUuid)
 	if err != nil || deleted == 0 {
-		tools.ServErr(c, http.StatusUnauthorized, errors.ErrUnauthorized)
+		m.responser.Error(c, http.StatusUnauthorized, errors.ErrUnauthorized)
 		return
 	}
 

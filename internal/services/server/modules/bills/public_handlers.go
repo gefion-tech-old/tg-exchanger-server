@@ -45,19 +45,14 @@ func (m *ModBills) GetAllBillsHandler(c *gin.Context) {
 func (m *ModBills) DeleteBillHandler(c *gin.Context) {
 	r := &models.Bill{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": errors.ErrInvalidBody.Error(),
-		})
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
-	if err := r.BillValidation(); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	// Валидация
+	m.responser.Error(c, http.StatusUnprocessableEntity, r.BillValidation())
 
+	// Операция с БД
 	m.responser.Record(c, r, m.store.AdminPanel().Bills().Delete(r))
 }
 
@@ -69,14 +64,12 @@ func (m *ModBills) DeleteBillHandler(c *gin.Context) {
 
 	Получить запись из таблицы `bills`
 
-
 	# TESTED
 */
 func (m *ModBills) GetBillHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 	}
 
 	r := &models.Bill{ID: id}

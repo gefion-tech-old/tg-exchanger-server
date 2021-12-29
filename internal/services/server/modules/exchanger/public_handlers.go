@@ -31,7 +31,7 @@ func (m *ModExchanger) GetExchangerDocumentHandler(c *gin.Context) {
 	req.SetRequestURI("https://1obmen.net/request-exportxml.xml")
 	res := fasthttp.AcquireResponse()
 	if err := fasthttp.Do(req, res); err != nil {
-		tools.ServErr(c, http.StatusInternalServerError, err)
+		m.responser.Error(c, http.StatusInternalServerError, err)
 	}
 
 	defer fasthttp.ReleaseRequest(req)
@@ -39,7 +39,7 @@ func (m *ModExchanger) GetExchangerDocumentHandler(c *gin.Context) {
 
 	data := models.OneObmen{}
 	if err := xml.Unmarshal(res.Body(), &data); err != nil {
-		tools.ServErr(c, http.StatusInternalServerError, err)
+		m.responser.Error(c, http.StatusInternalServerError, err)
 	}
 
 	c.JSON(http.StatusOK, gin.H{

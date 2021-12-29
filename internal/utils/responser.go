@@ -13,7 +13,7 @@ type Responser struct{}
 type ResponserI interface {
 	NewRecord(c *gin.Context, data interface{}, err error)
 	Record(c *gin.Context, data interface{}, err error)
-	Error(c *gin.Context, code int, err error)
+	Error(c *gin.Context, code int, err ...error)
 }
 
 func InitResponser() ResponserI {
@@ -52,9 +52,13 @@ func (u *Responser) Record(c *gin.Context, data interface{}, err error) {
 	}
 }
 
-func (u *Responser) Error(c *gin.Context, code int, err error) {
-	c.JSON(code, gin.H{
-		"error": err.Error(),
-	})
-	c.Abort()
+func (u *Responser) Error(c *gin.Context, code int, errs ...error) {
+	for _, err := range errs {
+		if err != nil {
+			c.JSON(code, gin.H{
+				"error": err.Error(),
+			})
+			c.Abort()
+		}
+	}
 }
