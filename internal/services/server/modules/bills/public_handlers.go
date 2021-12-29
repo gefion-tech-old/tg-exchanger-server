@@ -1,7 +1,6 @@
 package bills
 
 import (
-	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -21,24 +20,15 @@ import (
 
 	# TESTED
 */
-func (pr *ModBills) GetAllBillsHandler(c *gin.Context) {
+func (m *ModBills) GetAllBillsHandler(c *gin.Context) {
 	chatID, err := strconv.Atoi(c.Param("chat_id"))
 	if err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
 		return
 	}
 
-	b, err := pr.store.AdminPanel().Bills().All(int64(chatID))
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, b)
-	case sql.ErrNoRows:
-		tools.ServErr(c, http.StatusNotFound, errors.ErrRecordNotFound)
-		return
-	default:
-		tools.ServErr(c, http.StatusInternalServerError, err)
-		return
-	}
+	b, err := m.store.AdminPanel().Bills().All(int64(chatID))
+	m.responser.Record(c, b, err)
 }
 
 /*

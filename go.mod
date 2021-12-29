@@ -6,7 +6,6 @@ require (
 	github.com/I0HuKc/go-excel v0.0.0-20210914120215-5f051907b995
 	github.com/lib/pq v1.10.4
 	github.com/nsqio/go-nsq v1.1.0
-	github.com/sirupsen/logrus v1.8.1
 )
 
 require (

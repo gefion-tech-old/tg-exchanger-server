@@ -36,6 +36,9 @@ func (u *Responser) NewRecord(c *gin.Context, data interface{}, err error) {
 	}
 }
 
+/*
+	Метод действия с записью в БД и автоматической обработкой результата
+*/
 func (u *Responser) Record(c *gin.Context, data interface{}, err error) {
 	switch err {
 	case nil:
