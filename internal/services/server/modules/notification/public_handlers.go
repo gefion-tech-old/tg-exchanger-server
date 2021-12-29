@@ -24,14 +24,14 @@ import (
 	# TESTED
 */
 func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
-	req := &models.Notification{}
-	if err := c.ShouldBindJSON(req); err != nil {
+	r := &models.Notification{}
+	if err := c.ShouldBindJSON(r); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	// Валидация типа уведомления
-	if err := req.NotificationTypeValidation(); err != nil {
+	if err := r.NotificationTypeValidation(); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
@@ -42,11 +42,11 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 		fmt.Println(err)
 	}
 
-	switch req.Type {
+	switch r.Type {
 	case static.NTF__T__VERIFICATION:
 		// Запись уведомления в очередь для всех менеджеров
 		for i := 0; i < len(uArr); i++ {
-			payload, err := json.Marshal(newVefificationNotify(uArr, i, req))
+			payload, err := json.Marshal(newVefificationNotify(uArr, i, r))
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -59,7 +59,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 	case static.NTF__T__EXCHANGE_ERROR:
 		// Запись уведомления в очередь для всех менеджеров
 		for i := 0; i < len(uArr); i++ {
-			payload, err := json.Marshal(newActionCancelNotify(uArr, i, req))
+			payload, err := json.Marshal(newActionCancelNotify(uArr, i, r))
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -72,7 +72,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 	case static.NTF__T__REQ_SUPPORT:
 		// Запись уведомления в очередь для всех менеджеров
 		for i := 0; i < len(uArr); i++ {
-			payload, err := json.Marshal(newSupportReqNotify(uArr, i, req))
+			payload, err := json.Marshal(newSupportReqNotify(uArr, i, r))
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -83,14 +83,5 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 		}
 	}
 
-	n, err := m.store.AdminPanel().Notification().Create(req)
-	switch err {
-	case nil:
-		c.JSON(http.StatusCreated, n)
-		return
-	default:
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
-
+	m.responser.NewRecord(c, r, m.store.AdminPanel().Notification().Create(r))
 }

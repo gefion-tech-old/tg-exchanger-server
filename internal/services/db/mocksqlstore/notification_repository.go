@@ -12,42 +12,42 @@ type NotificationRepository struct {
 	notification map[int]*models.Notification
 }
 
-func (r *NotificationRepository) Create(n *models.Notification) (*models.Notification, error) {
+func (r *NotificationRepository) Create(n *models.Notification) error {
 	n.ID = len(r.notification) + 1
 	n.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 	n.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 
 	r.notification[n.ID] = n
-	return r.notification[n.ID], nil
+	return nil
 }
 
-func (r *NotificationRepository) Get(n *models.Notification) (*models.Notification, error) {
+func (r *NotificationRepository) Get(n *models.Notification) error {
 	for i := 0; i < len(r.notification); i++ {
 		if r.notification[i].ID == n.ID {
-			return r.notification[i], nil
+			return nil
 		}
 	}
 
-	return nil, sql.ErrNoRows
+	return sql.ErrNoRows
 }
 
-func (r *NotificationRepository) Delete(n *models.Notification) (*models.Notification, error) {
+func (r *NotificationRepository) Delete(n *models.Notification) error {
 	if r.notification[n.ID] != nil {
 		defer delete(r.notification, r.notification[n.ID].ID)
-		return r.notification[n.ID], nil
+		return nil
 	}
 
-	return nil, sql.ErrNoRows
+	return sql.ErrNoRows
 }
 
-func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.Notification, error) {
+func (r *NotificationRepository) UpdateStatus(n *models.Notification) error {
 	if r.notification[n.ID] != nil {
 		r.notification[n.ID].Status = n.Status
 		r.notification[n.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
-		return r.notification[n.ID], nil
+		return nil
 	}
 
-	return nil, sql.ErrNoRows
+	return sql.ErrNoRows
 }
 
 func (r *NotificationRepository) Selection(page, limit int) ([]*models.Notification, error) {

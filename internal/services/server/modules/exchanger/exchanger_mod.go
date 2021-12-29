@@ -5,6 +5,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
+	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,6 +14,8 @@ type ModExchanger struct {
 	redis *redisstore.AppRedisDictionaries
 	nsq   nsqstore.NsqI
 	cnf   *config.Config
+
+	responser utils.ResponserI
 }
 
 type ModExchangerI interface {
@@ -24,11 +27,13 @@ type ModExchangerI interface {
 	GetExchangerDocumentHandler(c *gin.Context)
 }
 
-func InitModExchanger(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config) ModExchangerI {
+func InitModExchanger(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI) ModExchangerI {
 	return &ModExchanger{
 		store: store,
 		redis: redis,
 		nsq:   nsq,
 		cnf:   cnf,
+
+		responser: responser,
 	}
 }

@@ -12,44 +12,44 @@ type ExchangerRepository struct {
 	exchangers map[int]*models.Exchanger
 }
 
-func (r *ExchangerRepository) Create(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) Create(e *models.Exchanger) error {
 	e.ID = len(r.exchangers) + 1
 	e.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 	e.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 
 	r.exchangers[e.ID] = e
-	return r.exchangers[e.ID], nil
+	return nil
 }
 
-func (r *ExchangerRepository) Update(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) Update(e *models.Exchanger) error {
 	if r.exchangers[e.ID] != nil {
 		r.exchangers[e.ID].Name = e.Name
 		r.exchangers[e.ID].UrlToParse = e.UrlToParse
 		r.exchangers[e.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
-		return r.exchangers[e.ID], nil
+		return nil
 
 	}
 
-	return nil, sql.ErrNoRows
+	return sql.ErrNoRows
 }
 
-func (r *ExchangerRepository) GetByName(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) GetByName(e *models.Exchanger) error {
 	for _, ex := range r.exchangers {
 		if ex.Name == e.Name {
-			return ex, nil
+			return nil
 		}
 	}
 
-	return nil, sql.ErrNoRows
+	return sql.ErrNoRows
 }
 
-func (r *ExchangerRepository) Delete(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) Delete(e *models.Exchanger) error {
 	if r.exchangers[e.ID] != nil {
 		defer delete(r.exchangers, r.exchangers[e.ID].ID)
-		return r.exchangers[e.ID], nil
+		return nil
 	}
 
-	return nil, sql.ErrNoRows
+	return sql.ErrNoRows
 }
 
 func (r *ExchangerRepository) Count() (int, error) {

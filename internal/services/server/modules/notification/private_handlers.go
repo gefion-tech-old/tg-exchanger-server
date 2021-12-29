@@ -1,7 +1,6 @@
 package notification
 
 import (
-	"database/sql"
 	"fmt"
 	"math"
 	"net/http"
@@ -94,13 +93,13 @@ func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
-	req := &models.Notification{}
-	if err := c.ShouldBindJSON(req); err != nil {
+	r := &models.Notification{}
+	if err := c.ShouldBindJSON(r); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
-	if req.NotificationStatusValidation() != nil || req.NotificationTypeValidation() != nil {
+	if r.NotificationStatusValidation() != nil || r.NotificationTypeValidation() != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
@@ -111,20 +110,9 @@ func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 		return
 	}
 
-	req.ID = id
+	r.ID = id
 
-	n, err := m.store.AdminPanel().Notification().UpdateStatus(req)
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, n)
-		return
-	case sql.ErrNoRows:
-		tools.ServErr(c, http.StatusNotFound, errors.ErrRecordNotFound)
-		return
-	default:
-		tools.ServErr(c, http.StatusNotFound, err)
-		return
-	}
+	m.responser.Record(c, r, m.store.AdminPanel().Notification().UpdateStatus(r))
 }
 
 /*
@@ -144,18 +132,8 @@ func (m *ModNotification) DeleteNotificationHandler(c *gin.Context) {
 		return
 	}
 
-	n, err := m.store.AdminPanel().Notification().Delete(&models.Notification{ID: id})
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, n)
-		return
-	case sql.ErrNoRows:
-		tools.ServErr(c, http.StatusNotFound, errors.ErrRecordNotFound)
-		return
-	default:
-		tools.ServErr(c, http.StatusInternalServerError, err)
-		return
-	}
+	r := &models.Notification{ID: id}
+	m.responser.Record(c, r, m.store.AdminPanel().Notification().Delete(r))
 }
 
 func newSupportReqNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {

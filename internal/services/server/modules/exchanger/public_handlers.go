@@ -1,11 +1,9 @@
 package exchanger
 
 import (
-	"database/sql"
 	"encoding/xml"
 	"net/http"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
@@ -23,20 +21,8 @@ import (
 	# TESTED
 */
 func (m *ModExchanger) GetExchangerByNameHandler(c *gin.Context) {
-	// Операция получения записи из БД
-	e, err := m.store.AdminPanel().Exchanger().GetByName(&models.Exchanger{Name: c.Param("name")})
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, e)
-		return
-	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, errors.ErrRecordNotFound)
-		return
-
-	default:
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	r := &models.Exchanger{Name: c.Param("name")}
+	m.responser.Record(c, r, m.store.AdminPanel().Exchanger().GetByName(r))
 }
 
 func (m *ModExchanger) GetExchangerDocumentHandler(c *gin.Context) {

@@ -10,10 +10,11 @@ import (
 )
 
 type ModMessage struct {
-	store     db.SQLStoreI
-	redis     *redisstore.AppRedisDictionaries
-	nsq       nsqstore.NsqI
-	cnf       *config.Config
+	store db.SQLStoreI
+	redis *redisstore.AppRedisDictionaries
+	nsq   nsqstore.NsqI
+	cnf   *config.Config
+
 	responser utils.ResponserI
 }
 

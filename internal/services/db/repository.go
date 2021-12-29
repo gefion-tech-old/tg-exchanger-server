@@ -32,22 +32,21 @@ type LoggerRepository interface {
 }
 
 type ExchangerRepository interface {
-	Create(e *models.Exchanger) (*models.Exchanger, error)
-	Update(e *models.Exchanger) (*models.Exchanger, error)
+	Create(e *models.Exchanger) error
+	Delete(e *models.Exchanger) error
+	Update(e *models.Exchanger) error
+	GetByName(e *models.Exchanger) error
 	Count() (int, error)
-	GetByName(e *models.Exchanger) (*models.Exchanger, error)
-	Delete(e *models.Exchanger) (*models.Exchanger, error)
 	Selection(page, limit int) ([]*models.Exchanger, error)
-	GetSlice(limit int) ([]*models.Exchanger, error)
 }
 
 type NotificationRepository interface {
-	Create(n *models.Notification) (*models.Notification, error)
-	Delete(n *models.Notification) (*models.Notification, error)
-	Get(n *models.Notification) (*models.Notification, error)
-	Selection(page, limit int) ([]*models.Notification, error)
-	UpdateStatus(n *models.Notification) (*models.Notification, error)
+	Create(n *models.Notification) error
+	Delete(n *models.Notification) error
+	UpdateStatus(n *models.Notification) error
+	Get(n *models.Notification) error
 	Count() (int, error)
+	Selection(page, limit int) ([]*models.Notification, error)
 }
 
 type BotMessagesRepository interface {

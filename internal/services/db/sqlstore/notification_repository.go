@@ -17,7 +17,7 @@ type NotificationRepository struct {
 
 	# TESTED
 */
-func (r *NotificationRepository) Create(n *models.Notification) (*models.Notification, error) {
+func (r *NotificationRepository) Create(n *models.Notification) error {
 	if err := r.store.QueryRow(
 		`
 		INSERT INTO notifications(type, chat_id, username, code, user_card, img_path, ex_from, ex_to)
@@ -46,10 +46,10 @@ func (r *NotificationRepository) Create(n *models.Notification) (*models.Notific
 		&n.CreatedAt,
 		&n.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return n, nil
+	return nil
 }
 
 /*
@@ -57,7 +57,7 @@ func (r *NotificationRepository) Create(n *models.Notification) (*models.Notific
 
 	# TESTED
 */
-func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.Notification, error) {
+func (r *NotificationRepository) UpdateStatus(n *models.Notification) error {
 	if err := r.store.QueryRow(
 		`
 		UPDATE notifications
@@ -82,9 +82,9 @@ func (r *NotificationRepository) UpdateStatus(n *models.Notification) (*models.N
 		&n.CreatedAt,
 		&n.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
-	return n, nil
+	return nil
 }
 
 /*
@@ -162,7 +162,7 @@ func (r *NotificationRepository) Selection(page, limit int) ([]*models.Notificat
 
 	# TESTED
 */
-func (r *NotificationRepository) Get(n *models.Notification) (*models.Notification, error) {
+func (r *NotificationRepository) Get(n *models.Notification) error {
 	if err := r.store.QueryRow(
 		`
 		SELECT id, type, status, chat_id, username, code, user_card, img_path, ex_from, ex_to, created_at, updated_at
@@ -184,9 +184,9 @@ func (r *NotificationRepository) Get(n *models.Notification) (*models.Notificati
 		&n.CreatedAt,
 		&n.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
-	return n, nil
+	return nil
 }
 
 /*
@@ -194,7 +194,7 @@ func (r *NotificationRepository) Get(n *models.Notification) (*models.Notificati
 
 	# TESTED
 */
-func (r *NotificationRepository) Delete(n *models.Notification) (*models.Notification, error) {
+func (r *NotificationRepository) Delete(n *models.Notification) error {
 	if err := r.store.QueryRow(
 		`
 		DELETE FROM notifications
@@ -216,8 +216,8 @@ func (r *NotificationRepository) Delete(n *models.Notification) (*models.Notific
 		&n.CreatedAt,
 		&n.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return n, nil
+	return nil
 }

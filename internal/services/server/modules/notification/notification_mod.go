@@ -10,11 +10,13 @@ import (
 )
 
 type ModNotification struct {
-	store  db.SQLStoreI
-	redis  *redisstore.AppRedisDictionaries
-	nsq    nsqstore.NsqI
-	cnf    *config.Config
-	logger utils.LoggerI
+	store db.SQLStoreI
+	redis *redisstore.AppRedisDictionaries
+	nsq   nsqstore.NsqI
+	cnf   *config.Config
+
+	responser utils.ResponserI
+	logger    utils.LoggerI
 }
 
 type ModNotificationI interface {
@@ -24,12 +26,14 @@ type ModNotificationI interface {
 	DeleteNotificationHandler(c *gin.Context)
 }
 
-func InitModNotification(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, l utils.LoggerI) ModNotificationI {
+func InitModNotification(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, l utils.LoggerI, responser utils.ResponserI) ModNotificationI {
 	return &ModNotification{
-		store:  store,
-		redis:  redis,
-		nsq:    nsq,
-		cnf:    cnf,
-		logger: l,
+		store: store,
+		redis: redis,
+		nsq:   nsq,
+		cnf:   cnf,
+
+		responser: responser,
+		logger:    l,
 	}
 }

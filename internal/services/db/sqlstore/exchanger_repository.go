@@ -23,7 +23,7 @@ type ExchangerRepository struct {
 
 	# TESTED
 */
-func (r *ExchangerRepository) Create(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) Create(e *models.Exchanger) error {
 	if err := r.store.QueryRow(
 		`
 		INSERT INTO exchangers(name, url, created_by)
@@ -41,10 +41,10 @@ func (r *ExchangerRepository) Create(e *models.Exchanger) (*models.Exchanger, er
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return e, nil
+	return nil
 }
 
 /*
@@ -52,7 +52,7 @@ func (r *ExchangerRepository) Create(e *models.Exchanger) (*models.Exchanger, er
 
 	# TESTED
 */
-func (r *ExchangerRepository) Update(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) Update(e *models.Exchanger) error {
 	if err := r.store.QueryRow(
 		`
 		UPDATE exchangers
@@ -72,10 +72,10 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) (*models.Exchanger, er
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return e, nil
+	return nil
 }
 
 /*
@@ -143,7 +143,7 @@ func (r *ExchangerRepository) Selection(page, limit int) ([]*models.Exchanger, e
 
 	# TESTED
 */
-func (r *ExchangerRepository) GetByName(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) GetByName(e *models.Exchanger) error {
 	if err := r.store.QueryRow(
 		`
 		SELECT id, name, url, created_by, created_at, updated_at
@@ -159,52 +159,10 @@ func (r *ExchangerRepository) GetByName(e *models.Exchanger) (*models.Exchanger,
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return e, nil
-}
-
-/*
-	Получить лдимитированный объем записей в таблице `exchangers`
-
-	# TESTED
-*/
-func (r *ExchangerRepository) GetSlice(limit int) ([]*models.Exchanger, error) {
-	eArr := []*models.Exchanger{}
-
-	rows, err := r.store.Query(
-		`
-		SELECT id, name, url, created_by, created_at, updated_at
-		FROM exchangers
-		ORDER BY id DESC
-		LIMIT $1
-		`,
-		limit,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		e := models.Exchanger{}
-		if err := rows.Scan(
-			&e.ID,
-			&e.Name,
-			&e.UrlToParse,
-			&e.CreatedBy,
-			&e.CreatedAt,
-			&e.UpdatedAt,
-		); err != nil {
-			continue
-		}
-
-		eArr = append(eArr, &e)
-
-	}
-
-	return eArr, nil
+	return nil
 }
 
 /*
@@ -212,7 +170,7 @@ func (r *ExchangerRepository) GetSlice(limit int) ([]*models.Exchanger, error) {
 
 	# TESTED
 */
-func (r *ExchangerRepository) Delete(e *models.Exchanger) (*models.Exchanger, error) {
+func (r *ExchangerRepository) Delete(e *models.Exchanger) error {
 	if err := r.store.QueryRow(
 		`
 		DELETE FROM exchangers
@@ -228,8 +186,8 @@ func (r *ExchangerRepository) Delete(e *models.Exchanger) (*models.Exchanger, er
 		&e.CreatedAt,
 		&e.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return e, nil
+	return nil
 }

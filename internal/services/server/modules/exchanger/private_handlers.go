@@ -1,7 +1,6 @@
 package exchanger
 
 import (
-	"database/sql"
 	"math"
 	"net/http"
 	"strconv"
@@ -97,20 +96,8 @@ func (m *ModExchanger) DeleteExchangerHandler(c *gin.Context) {
 		return
 	}
 
-	// Операция удаления записи из БД
-	e, err := m.store.AdminPanel().Exchanger().Delete(&models.Exchanger{ID: id})
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, e)
-		return
-	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, errors.ErrRecordNotFound)
-		return
-
-	default:
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	r := &models.Exchanger{ID: id}
+	m.responser.Record(c, r, m.store.AdminPanel().Exchanger().Delete(r))
 }
 
 /*
@@ -125,8 +112,8 @@ func (m *ModExchanger) DeleteExchangerHandler(c *gin.Context) {
 */
 func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 	// Декодирование
-	req := &models.Exchanger{}
-	if err := c.ShouldBindJSON(req); err != nil {
+	r := &models.Exchanger{}
+	if err := c.ShouldBindJSON(r); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
@@ -137,28 +124,15 @@ func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 		return
 	}
 
-	req.ID = id
+	r.ID = id
 
 	// Валидация
-	if err := req.ExchangerUpdateValidation(); err != nil {
+	if err := r.ExchangerUpdateValidation(); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	// Операция обновления записи в БД
-	e, err := m.store.AdminPanel().Exchanger().Update(req)
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, e)
-		return
-	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, errors.ErrRecordNotFound)
-		return
-
-	default:
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	m.responser.Record(c, r, m.store.AdminPanel().Exchanger().Update(r))
 }
 
 /*
@@ -173,26 +147,18 @@ func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 */
 func (m *ModExchanger) CreateExchangerHandler(c *gin.Context) {
 	// Декодирование
-	req := &models.Exchanger{}
-	if err := c.ShouldBindJSON(req); err != nil {
+	r := &models.Exchanger{}
+	if err := c.ShouldBindJSON(r); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	// Валидация
-	if err := req.ExchangerCreateValidation(); err != nil {
+	if err := r.ExchangerCreateValidation(); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	// Операция записи в БД
-	e, err := m.store.AdminPanel().Exchanger().Create(req)
-	switch err {
-	case nil:
-		c.JSON(http.StatusCreated, e)
-		return
-	default:
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	m.responser.NewRecord(c, r, m.store.AdminPanel().Exchanger().Create(r))
 }

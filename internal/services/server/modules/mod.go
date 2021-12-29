@@ -39,8 +39,8 @@ func InitServerModules(
 	responser utils.ResponserI,
 ) ServerModulesI {
 	return &ServerModules{
-		exMod:     exchanger.InitModExchanger(store, redis, nsq, cnf),
-		notifyMod: notification.InitModNotification(store, redis, nsq, cnf, logger),
+		exMod:     exchanger.InitModExchanger(store, redis, nsq, cnf, responser),
+		notifyMod: notification.InitModNotification(store, redis, nsq, cnf, logger, responser),
 		msgMod:    message.InitModMessage(store, redis, nsq, cnf, responser),
 		userMod:   user.InitModUsers(store, redis, nsq, cnf, responser),
 		billsMod:  bills.InitModBills(store, redis, nsq, cnf, responser),
