@@ -25,29 +25,25 @@ func Test_SQL_BotMessagesRepository(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
-	var data *models.BotMessage
-	mapstructure.Decode(mocks.BOT_MESSAGE_REQ, &data)
-	data.MessageText = "some text"
-	data.CreatedBy = mocks.MANAGER_IN_ADMIN_REQ["username"].(string)
+	var m *models.BotMessage
+	mapstructure.Decode(mocks.BOT_MESSAGE_REQ, &m)
+	m.MessageText = "some text"
+	m.CreatedBy = mocks.MANAGER_IN_ADMIN_REQ["username"].(string)
 
 	// Создание сообщения
-	m, err := s.AdminPanel().BotMessages().Create(data)
-	assert.NoError(t, err)
+	assert.NoError(t, s.AdminPanel().BotMessages().Create(m))
 	assert.NotNil(t, m)
 
 	// Получить из БД
-	m2, err := s.AdminPanel().BotMessages().Get(m)
-	assert.NoError(t, err)
-	assert.NotNil(t, m2)
+	assert.NoError(t, s.AdminPanel().BotMessages().Get(m))
+	assert.NotNil(t, m)
 
 	// Обновление
-	m2.MessageText = "new text"
-	m3, err := s.AdminPanel().BotMessages().Update(m2)
-	assert.NoError(t, err)
-	assert.NotNil(t, m3)
+	m.MessageText = "new text"
+	assert.NoError(t, s.AdminPanel().BotMessages().Update(m))
+	assert.NotNil(t, m)
 
 	// Удаление
-	m4, err := s.AdminPanel().BotMessages().Delete(m)
-	assert.NoError(t, err)
-	assert.NotNil(t, m4)
+	assert.NoError(t, s.AdminPanel().BotMessages().Delete(m))
+	assert.NotNil(t, m)
 }

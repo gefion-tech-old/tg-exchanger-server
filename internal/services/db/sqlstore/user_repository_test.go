@@ -20,18 +20,18 @@ func Test_SQL_UserRepository(t *testing.T) {
 	// Вызываю создание хранилища
 	s := sqlstore.Init(db)
 
-	// Регистрация человека как пользователя бота
-	u, err := s.User().Create(&models.User{
+	u := &models.User{
 		ChatID:   int64(mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"].(int)),
 		Username: mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string),
-	})
+	}
+
+	// Регистрация человека как пользователя бота
+	err := s.User().Create(u)
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
 	// Регистрация человека как менеджера
-	m, err := s.User().RegisterInAdminPanel(u)
-	assert.NoError(t, err)
-	assert.NotNil(t, m)
+	assert.NoError(t, s.User().RegisterInAdminPanel(u))
 
 	// Поиск пользователя по его username
 	uUsername, err := s.User().FindByUsername(u.Username)

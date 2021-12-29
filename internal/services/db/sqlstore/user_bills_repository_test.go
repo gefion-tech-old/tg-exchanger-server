@@ -20,27 +20,28 @@ func Test_SQL_UserBillsRepository(t *testing.T) {
 	// Вызываю создание хранилища
 	s := sqlstore.Init(db)
 
-	// Регистрация человека как пользователя бота
-	u, err := s.User().Create(&models.User{
+	u := models.User{
 		ChatID:   int64(mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"].(int)),
 		Username: mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string),
-	})
+	}
+
+	// Регистрация человека как пользователя бота
+	err := s.User().Create(&u)
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
-	// Создание счета
-	nBill, err := s.AdminPanel().Bills().Create(&models.Bill{
+	b := &models.Bill{
 		ChatID: int64(mocks.USER_BILL_REQ["chat_id"].(int)),
 		Bill:   mocks.USER_BILL_REQ["bill"].(string),
-	})
-	assert.NoError(t, err)
-	assert.NotNil(t, nBill)
+	}
+
+	// Создание счета
+	assert.NoError(t, s.AdminPanel().Bills().Create(b))
+	assert.NotNil(t, b)
 
 	// Получение одного счета
-	bill, err := s.AdminPanel().Bills().FindById(&models.Bill{ID: nBill.ID})
-	assert.NoError(t, err)
-	assert.NotNil(t, bill)
-	assert.Equal(t, nBill.ID, bill.ID)
+	assert.NoError(t, s.AdminPanel().Bills().FindById(&models.Bill{ID: b.ID}))
+	assert.NotNil(t, b)
 
 	// Получение списка счетов
 	bList, err := s.AdminPanel().Bills().All(u.ChatID)
@@ -49,8 +50,5 @@ func Test_SQL_UserBillsRepository(t *testing.T) {
 	assert.Len(t, bList, 1)
 
 	// Удаление счета
-	dBill, err := s.AdminPanel().Bills().Delete(nBill)
-	assert.NoError(t, err)
-	assert.NotNil(t, dBill)
-
+	assert.NoError(t, s.AdminPanel().Bills().Delete(b))
 }

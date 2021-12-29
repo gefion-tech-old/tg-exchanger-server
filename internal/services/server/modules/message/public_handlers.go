@@ -1,9 +1,6 @@
 package message
 
 import (
-	"database/sql"
-	"net/http"
-
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -19,23 +16,6 @@ import (
 	# TESTED
 */
 func (m *ModMessage) GetMessageHandler(c *gin.Context) {
-	msg, err := m.store.AdminPanel().BotMessages().Get(&models.BotMessage{Connector: c.Param("connector")})
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, msg)
-		return
-
-	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "message with current connector is not found",
-		})
-		return
-
-	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
+	r := &models.BotMessage{Connector: c.Param("connector")}
+	m.responser.Record(c, r, m.store.AdminPanel().BotMessages().Get(r))
 }

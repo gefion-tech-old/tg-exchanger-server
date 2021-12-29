@@ -59,7 +59,7 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 		config:     c,
 		guard:      guard,
 		middleware: m,
-		mods:       modules.InitServerModules(s, r, nsq, c, l),
+		mods:       modules.InitServerModules(s, r, nsq, c, l, utils.InitResponser()),
 	}
 
 	gin.ForceConsoleColor()

@@ -31,29 +31,16 @@ import (
 	# TESTED
 */
 func (m *ModUsers) UserInBotRegistrationHandler(c *gin.Context) {
-	req := &models.User{}
+	r := &models.User{}
 
 	// Парсинг входящего тела запроса
-	if err := c.ShouldBindJSON(req); err != nil {
+	if err := c.ShouldBindJSON(r); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	// Выполнение операции с БД
-	u, err := m.store.User().Create(req)
-	switch err {
-	case nil:
-		c.JSON(http.StatusCreated, u)
-		return
-	case sql.ErrNoRows:
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrAlreadyRegistered)
-		return
-	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	m.responser.NewRecord(c, r, m.store.User().Create(r))
 }
 
 /*
@@ -164,29 +151,29 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
-	req := &models.UserCodeRequest{}
+	r := &models.UserCodeRequest{}
 
 	// Парсинг входящего тела запроса
-	if err := c.ShouldBindJSON(req); err != nil {
+	if err := c.ShouldBindJSON(r); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	// Валидация
-	if err := req.UserCodeRequestValidation(); err != nil {
+	if err := r.UserCodeRequestValidation(); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	// Ищу данные по этому коду в Redis
-	data, err := m.redis.Registration.FetchVerificationCode(int(req.Code))
+	data, err := m.redis.Registration.FetchVerificationCode(int(r.Code))
 	if err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, _errors.New("activation period for this code has expired"))
 		return
 	}
 
-	u := models.User{}
-	if err := json.Unmarshal([]byte(data), &u); err != nil {
+	u := &models.User{}
+	if err := json.Unmarshal([]byte(data), u); err != nil {
 		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
@@ -199,18 +186,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 		return
 	}
 
-	user, err := m.store.User().RegisterInAdminPanel(&u)
-	switch err {
-	case nil:
-		c.JSON(http.StatusCreated, user)
-		return
-	case sql.ErrNoRows:
-		tools.ServErr(c, http.StatusNotFound, errors.ErrNotRegistered)
-		return
-	default:
-		tools.ServErr(c, http.StatusInternalServerError, err)
-		return
-	}
+	m.responser.NewRecord(c, u, m.store.User().RegisterInAdminPanel(u))
 }
 
 /*

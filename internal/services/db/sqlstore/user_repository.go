@@ -20,7 +20,7 @@ type UserRepository struct {
 /*
 	Метод создания новой записи пользователя в таблице users
 */
-func (r *UserRepository) Create(u *models.User) (*models.User, error) {
+func (r *UserRepository) Create(u *models.User) error {
 	if err := r.store.QueryRow(
 		`
 		INSERT INTO users (chat_id, username) 
@@ -39,16 +39,16 @@ func (r *UserRepository) Create(u *models.User) (*models.User, error) {
 		&u.CreatedAt,
 		&u.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return u, nil
+	return nil
 }
 
 /*
 	Метод регистрации человека как менеджера для доступа к админке
 */
-func (r *UserRepository) RegisterInAdminPanel(u *models.User) (*models.User, error) {
+func (r *UserRepository) RegisterInAdminPanel(u *models.User) error {
 	if err := r.store.QueryRow(
 		`
 		UPDATE users
@@ -68,10 +68,10 @@ func (r *UserRepository) RegisterInAdminPanel(u *models.User) (*models.User, err
 		&u.CreatedAt,
 		&u.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return u, nil
+	return nil
 }
 
 /*

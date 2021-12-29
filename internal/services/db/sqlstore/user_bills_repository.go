@@ -13,7 +13,7 @@ type UserBillsRepository struct {
 /*
 	Добавить банковский счет пользователю
 */
-func (r *UserBillsRepository) Create(b *models.Bill) (*models.Bill, error) {
+func (r *UserBillsRepository) Create(b *models.Bill) error {
 	if err := r.store.QueryRow(
 		`
 		INSERT INTO bills(chat_id, bill)
@@ -31,15 +31,15 @@ func (r *UserBillsRepository) Create(b *models.Bill) (*models.Bill, error) {
 		&b.Bill,
 		&b.CreatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
-	return b, nil
+	return nil
 }
 
 /*
 	Удалить банковский счет пользователя
 */
-func (r *UserBillsRepository) Delete(b *models.Bill) (*models.Bill, error) {
+func (r *UserBillsRepository) Delete(b *models.Bill) error {
 	if err := r.store.QueryRow(
 		`
 		DELETE FROM bills
@@ -54,12 +54,12 @@ func (r *UserBillsRepository) Delete(b *models.Bill) (*models.Bill, error) {
 		&b.Bill,
 		&b.CreatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
-	return b, nil
+	return nil
 }
 
-func (r *UserBillsRepository) FindById(b *models.Bill) (*models.Bill, error) {
+func (r *UserBillsRepository) FindById(b *models.Bill) error {
 	if err := r.store.QueryRow(
 		`
 		SELECT id, chat_id, bill, created_at 
@@ -72,10 +72,10 @@ func (r *UserBillsRepository) FindById(b *models.Bill) (*models.Bill, error) {
 		&b.Bill,
 		&b.CreatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return b, nil
+	return nil
 }
 
 /*

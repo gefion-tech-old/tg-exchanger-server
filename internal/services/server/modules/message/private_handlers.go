@@ -1,7 +1,6 @@
 package message
 
 import (
-	"database/sql"
 	"math"
 	"net/http"
 	"strconv"
@@ -30,20 +29,8 @@ func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	msg, err := m.store.AdminPanel().BotMessages().Delete(&models.BotMessage{ID: id})
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, msg)
-		return
-
-	case sql.ErrNoRows:
-		tools.ServErr(c, http.StatusNotFound, errors.ErrRecordNotFound)
-		return
-
-	default:
-		tools.ServErr(c, http.StatusInternalServerError, err)
-		return
-	}
+	r := &models.BotMessage{ID: id}
+	m.responser.Record(c, r, m.store.AdminPanel().BotMessages().Delete(r))
 }
 
 /*
@@ -57,8 +44,8 @@ func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
-	req := &models.BotMessage{}
-	if err := c.ShouldBindJSON(req); err != nil {
+	r := &models.BotMessage{}
+	if err := c.ShouldBindJSON(r); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": errors.ErrInvalidBody.Error(),
 		})
@@ -71,34 +58,16 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	req.ID = id
+	r.ID = id
 
-	if err := req.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
+	if err := r.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	msg, err := m.store.AdminPanel().BotMessages().Update(req)
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, msg)
-		return
-
-	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": errors.ErrRecordNotFound,
-		})
-		return
-
-	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-
+	m.responser.Record(c, r, m.store.AdminPanel().BotMessages().Update(r))
 }
 
 /*
@@ -179,37 +148,20 @@ func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModMessage) CreateNewMessageHandler(c *gin.Context) {
-	req := &models.BotMessage{}
-	if err := c.ShouldBindJSON(req); err != nil {
+	r := &models.BotMessage{}
+	if err := c.ShouldBindJSON(r); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": errors.ErrInvalidBody.Error(),
 		})
 		return
 	}
 
-	if err := req.CreateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
+	if err := r.CreateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	msg, err := m.store.AdminPanel().BotMessages().Create(req)
-	switch err {
-	case nil:
-		c.JSON(http.StatusCreated, msg)
-		return
-
-	case sql.ErrNoRows:
-		c.JSON(http.StatusConflict, gin.H{
-			"error": "message with current connector already created",
-		})
-		return
-
-	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	m.responser.NewRecord(c, r, m.store.AdminPanel().BotMessages().Create(r))
 }

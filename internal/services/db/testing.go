@@ -40,20 +40,21 @@ func TestDB(t *testing.T, config *config.DatabaseConfig) (*sql.DB, func(...strin
 func CreateUser(t *testing.T, s SQLStoreI) (*models.User, error) {
 	t.Helper()
 
-	// Регистрация человека как пользователя бота
-	u, err := s.User().Create(&models.User{
+	u := &models.User{
 		ChatID:   int64(mocks.USER_IN_BOT_REGISTRATION_REQ["chat_id"].(int)),
 		Username: mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string),
-	})
+	}
+
+	// Регистрация человека как пользователя бота
+	err := s.User().Create(u)
 	if err != nil {
 		return nil, err
 	}
 
 	// Регистрация человека как менеджера
-	m, err := s.User().RegisterInAdminPanel(u)
-	if err != nil {
+	if err := s.User().RegisterInAdminPanel(u); err != nil {
 		return nil, err
 	}
 
-	return m, nil
+	return u, nil
 }

@@ -30,14 +30,21 @@ type ServerModulesI interface {
 	ModulesConfigure(router *gin.RouterGroup, g guard.GuardI, mdl middleware.MiddlewareI)
 }
 
-func InitServerModules(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, logger utils.LoggerI) ServerModulesI {
+func InitServerModules(
+	store db.SQLStoreI,
+	redis *redisstore.AppRedisDictionaries,
+	nsq nsqstore.NsqI,
+	cnf *config.Config,
+	logger utils.LoggerI,
+	responser utils.ResponserI,
+) ServerModulesI {
 	return &ServerModules{
 		exMod:     exchanger.InitModExchanger(store, redis, nsq, cnf),
 		notifyMod: notification.InitModNotification(store, redis, nsq, cnf, logger),
-		msgMod:    message.InitModMessage(store, redis, nsq, cnf),
-		userMod:   user.InitModUsers(store, redis, nsq, cnf),
-		billsMod:  bills.InitModBills(store, redis, nsq, cnf),
-		logsMod:   logs.InitModLogs(store.AdminPanel().Logs(), cnf),
+		msgMod:    message.InitModMessage(store, redis, nsq, cnf, responser),
+		userMod:   user.InitModUsers(store, redis, nsq, cnf, responser),
+		billsMod:  bills.InitModBills(store, redis, nsq, cnf, responser),
+		logsMod:   logs.InitModLogs(store.AdminPanel().Logs(), cnf, responser),
 	}
 }
 

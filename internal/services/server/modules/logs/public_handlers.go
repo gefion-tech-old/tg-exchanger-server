@@ -37,10 +37,5 @@ func (m *ModLogs) CreateLogRecordHandler(c *gin.Context) {
 		return
 	}
 
-	if err := m.repository.Create(r); err != nil {
-		tools.ServErr(c, http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusCreated, r)
+	m.responser.NewRecord(c, r, m.repository.Create(r))
 }

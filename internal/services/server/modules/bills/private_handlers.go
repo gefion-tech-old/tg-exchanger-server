@@ -65,27 +65,27 @@ func (m *ModBills) RejectBillHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModBills) CreateBillHandler(c *gin.Context) {
-	req := &models.Bill{}
-	if err := c.ShouldBindJSON(req); err != nil {
+	r := &models.Bill{}
+	if err := c.ShouldBindJSON(r); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
-	if err := req.BillValidation(); err != nil {
+	if err := r.BillValidation(); err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	bill, err := m.store.AdminPanel().Bills().Create(req)
+	err := m.store.AdminPanel().Bills().Create(r)
 	switch err {
 	case nil:
 		payload, err := json.Marshal(map[string]interface{}{
 			"to": map[string]interface{}{
-				"chat_id": bill.ChatID,
+				"chat_id": r.ChatID,
 			},
 			"message": map[string]interface{}{
 				"type": "confirmation_successful",
-				"text": fmt.Sprintf("🟢 Успех! 🟢\n\nКарта `%s` успешно верифицирован.", bill.Bill),
+				"text": fmt.Sprintf("🟢 Успех! 🟢\n\nКарта `%s` успешно верифицирован.", r.Bill),
 			},
 			"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
 		})
@@ -96,7 +96,7 @@ func (m *ModBills) CreateBillHandler(c *gin.Context) {
 		if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 			fmt.Println(err)
 		}
-		c.JSON(http.StatusCreated, bill)
+		c.JSON(http.StatusCreated, r)
 	case sql.ErrNoRows:
 		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrAlreadyExists)
 		return

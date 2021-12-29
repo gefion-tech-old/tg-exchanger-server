@@ -2,29 +2,26 @@ package db
 
 import "github.com/gefion-tech/tg-exchanger-server/internal/models"
 
-/*
-	Интерфейс репозитория для работы с таблицей users
-*/
-type UserRepository interface {
-	Create(u *models.User) (*models.User, error)
-	RegisterInAdminPanel(u *models.User) (*models.User, error)
-	FindByUsername(username string) (*models.User, error)
-	GetAllManagers() ([]*models.User, error)
-}
-
-type UserBillsRepository interface {
-	Create(b *models.Bill) (*models.Bill, error)
-	Delete(b *models.Bill) (*models.Bill, error)
-	All(chatID int64) ([]*models.Bill, error)
-	FindById(b *models.Bill) (*models.Bill, error)
-}
-
 type AdminPanelRepository interface {
 	Logs() LoggerRepository
 	Bills() UserBillsRepository
 	BotMessages() BotMessagesRepository
 	Notification() NotificationRepository
 	Exchanger() ExchangerRepository
+}
+
+type UserRepository interface {
+	Create(u *models.User) error
+	RegisterInAdminPanel(u *models.User) error
+	FindByUsername(username string) (*models.User, error)
+	GetAllManagers() ([]*models.User, error)
+}
+
+type UserBillsRepository interface {
+	Create(b *models.Bill) error
+	Delete(b *models.Bill) error
+	All(chatID int64) ([]*models.Bill, error)
+	FindById(b *models.Bill) error
 }
 
 type LoggerRepository interface {
@@ -54,10 +51,10 @@ type NotificationRepository interface {
 }
 
 type BotMessagesRepository interface {
-	Create(m *models.BotMessage) (*models.BotMessage, error)
-	Get(m *models.BotMessage) (*models.BotMessage, error)
-	Selection(page, limit int) ([]*models.BotMessage, error)
-	Update(m *models.BotMessage) (*models.BotMessage, error)
-	Delete(m *models.BotMessage) (*models.BotMessage, error)
+	Create(m *models.BotMessage) error
+	Update(m *models.BotMessage) error
+	Delete(m *models.BotMessage) error
+	Get(m *models.BotMessage) error
 	Count() (int, error)
+	Selection(page, limit int) ([]*models.BotMessage, error)
 }

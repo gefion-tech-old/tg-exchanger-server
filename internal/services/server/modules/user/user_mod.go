@@ -5,14 +5,16 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
+	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type ModUsers struct {
-	store db.SQLStoreI
-	redis *redisstore.AppRedisDictionaries
-	nsq   nsqstore.NsqI
-	cnf   *config.Config
+	store     db.SQLStoreI
+	redis     *redisstore.AppRedisDictionaries
+	nsq       nsqstore.NsqI
+	cnf       *config.Config
+	responser utils.ResponserI
 }
 
 type ModUsersI interface {
@@ -25,11 +27,12 @@ type ModUsersI interface {
 	LogoutHandler(c *gin.Context)
 }
 
-func InitModUsers(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config) ModUsersI {
+func InitModUsers(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI) ModUsersI {
 	return &ModUsers{
-		store: store,
-		redis: redis,
-		nsq:   nsq,
-		cnf:   cnf,
+		store:     store,
+		redis:     redis,
+		nsq:       nsq,
+		cnf:       cnf,
+		responser: responser,
 	}
 }

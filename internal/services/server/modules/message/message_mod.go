@@ -5,14 +5,16 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
+	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type ModMessage struct {
-	store db.SQLStoreI
-	redis *redisstore.AppRedisDictionaries
-	nsq   nsqstore.NsqI
-	cnf   *config.Config
+	store     db.SQLStoreI
+	redis     *redisstore.AppRedisDictionaries
+	nsq       nsqstore.NsqI
+	cnf       *config.Config
+	responser utils.ResponserI
 }
 
 type ModMessageI interface {
@@ -24,11 +26,12 @@ type ModMessageI interface {
 	GetMessageHandler(c *gin.Context)
 }
 
-func InitModMessage(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config) ModMessageI {
+func InitModMessage(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI) ModMessageI {
 	return &ModMessage{
-		store: store,
-		redis: redis,
-		nsq:   nsq,
-		cnf:   cnf,
+		store:     store,
+		redis:     redis,
+		nsq:       nsq,
+		cnf:       cnf,
+		responser: responser,
 	}
 }

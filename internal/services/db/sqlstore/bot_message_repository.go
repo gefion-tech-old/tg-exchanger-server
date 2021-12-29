@@ -17,7 +17,7 @@ type BotMessagesRepository struct {
 
 	# TESTED
 */
-func (r *BotMessagesRepository) Create(m *models.BotMessage) (*models.BotMessage, error) {
+func (r *BotMessagesRepository) Create(m *models.BotMessage) error {
 	if err := r.store.QueryRow(
 		`
 		INSERT INTO bot_messages (connector, message_text, created_by)
@@ -37,10 +37,10 @@ func (r *BotMessagesRepository) Create(m *models.BotMessage) (*models.BotMessage
 		&m.CreatedAt,
 		&m.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return m, nil
+	return nil
 }
 
 func (r *BotMessagesRepository) Count() (int, error) {
@@ -64,7 +64,7 @@ func (r *BotMessagesRepository) Count() (int, error) {
 
 	# TESTED
 */
-func (r *BotMessagesRepository) Get(m *models.BotMessage) (*models.BotMessage, error) {
+func (r *BotMessagesRepository) Get(m *models.BotMessage) error {
 	if err := r.store.QueryRow(
 		`
 		SELECT id, connector, message_text, created_by, created_at, updated_at
@@ -79,10 +79,10 @@ func (r *BotMessagesRepository) Get(m *models.BotMessage) (*models.BotMessage, e
 		&m.CreatedAt,
 		&m.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return m, nil
+	return nil
 }
 
 /*
@@ -131,7 +131,7 @@ func (r *BotMessagesRepository) Selection(page, limit int) ([]*models.BotMessage
 
 	# TESTED
 */
-func (r *BotMessagesRepository) Update(m *models.BotMessage) (*models.BotMessage, error) {
+func (r *BotMessagesRepository) Update(m *models.BotMessage) error {
 	if err := r.store.QueryRow(
 		`
 		UPDATE bot_messages
@@ -150,16 +150,16 @@ func (r *BotMessagesRepository) Update(m *models.BotMessage) (*models.BotMessage
 		&m.CreatedAt,
 		&m.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return m, nil
+	return nil
 }
 
 /*
 	Удалить конкретное сообщение в таблице `bot_messages`
 */
-func (r *BotMessagesRepository) Delete(m *models.BotMessage) (*models.BotMessage, error) {
+func (r *BotMessagesRepository) Delete(m *models.BotMessage) error {
 	if err := r.store.QueryRow(
 		`
 		DELETE FROM bot_messages
@@ -175,8 +175,8 @@ func (r *BotMessagesRepository) Delete(m *models.BotMessage) (*models.BotMessage
 		&m.CreatedAt,
 		&m.UpdatedAt,
 	); err != nil {
-		return nil, err
+		return err
 	}
 
-	return m, nil
+	return nil
 }

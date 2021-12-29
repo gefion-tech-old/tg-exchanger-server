@@ -17,6 +17,6 @@ func InitLogger(s db.LoggerRepository) LoggerI {
 	}
 }
 
-func (l *Logger) NewRecord(r *models.LogRecord) {
-	l.store.Create(r)
+func (u *Logger) NewRecord(r *models.LogRecord) {
+	u.store.Create(r)
 }

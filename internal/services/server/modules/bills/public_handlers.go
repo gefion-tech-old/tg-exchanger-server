@@ -52,39 +52,23 @@ func (pr *ModBills) GetAllBillsHandler(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *ModBills) DeleteBillHandler(c *gin.Context) {
-	req := &models.Bill{}
-	if err := c.ShouldBindJSON(req); err != nil {
+func (m *ModBills) DeleteBillHandler(c *gin.Context) {
+	r := &models.Bill{}
+	if err := c.ShouldBindJSON(r); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": errors.ErrInvalidBody.Error(),
 		})
 		return
 	}
 
-	if err := req.BillValidation(); err != nil {
+	if err := r.BillValidation(); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})
 		return
 	}
 
-	_, err := pr.store.AdminPanel().Bills().Delete(req)
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, gin.H{})
-
-	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": errors.ErrRecordNotFound.Error(),
-		})
-		return
-
-	default:
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
+	m.responser.Record(c, r, m.store.AdminPanel().Bills().Delete(r))
 }
 
 /*
@@ -98,25 +82,13 @@ func (pr *ModBills) DeleteBillHandler(c *gin.Context) {
 
 	# TESTED
 */
-func (pr *ModBills) GetBillHandler(c *gin.Context) {
+func (m *ModBills) GetBillHandler(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		tools.ServErr(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	b, err := pr.store.AdminPanel().Bills().FindById(&models.Bill{ID: id})
-	switch err {
-	case nil:
-		c.JSON(http.StatusOK, b)
-		return
-
-	case sql.ErrNoRows:
-		c.JSON(http.StatusNotFound, errors.ErrRecordNotFound)
-		return
-
-	default:
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	r := &models.Bill{ID: id}
+	m.responser.Record(c, r, m.store.AdminPanel().Bills().FindById(r))
 }

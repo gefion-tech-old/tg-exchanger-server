@@ -17,23 +17,23 @@ type UserRepository struct {
 	==========================================================================================
 */
 
-func (r *UserRepository) Create(u *models.User) (*models.User, error) {
+func (r *UserRepository) Create(u *models.User) error {
 	u.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 	u.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 
 	r.users[u.ChatID] = u
-	return r.users[u.ChatID], nil
+	return nil
 }
 
-func (r *UserRepository) RegisterInAdminPanel(u *models.User) (*models.User, error) {
+func (r *UserRepository) RegisterInAdminPanel(u *models.User) error {
 	for _, user := range r.users {
 		if u.Username == user.Username {
 			r.users[user.ChatID].Hash = u.Hash
 			r.users[user.ChatID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
-			return r.users[user.ChatID], nil
+			return nil
 		}
 	}
-	return nil, sql.ErrNoRows
+	return sql.ErrNoRows
 }
 
 func (r *UserRepository) FindByUsername(username string) (*models.User, error) {

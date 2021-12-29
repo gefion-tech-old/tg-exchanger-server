@@ -5,14 +5,16 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
+	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type ModBills struct {
-	store db.SQLStoreI
-	redis *redisstore.AppRedisDictionaries
-	nsq   nsqstore.NsqI
-	cnf   *config.Config
+	store     db.SQLStoreI
+	redis     *redisstore.AppRedisDictionaries
+	nsq       nsqstore.NsqI
+	cnf       *config.Config
+	responser utils.ResponserI
 }
 
 type ModBillsI interface {
@@ -24,11 +26,12 @@ type ModBillsI interface {
 	CreateBillHandler(c *gin.Context)
 }
 
-func InitModBills(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config) ModBillsI {
+func InitModBills(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI) ModBillsI {
 	return &ModBills{
-		store: store,
-		redis: redis,
-		nsq:   nsq,
-		cnf:   cnf,
+		store:     store,
+		redis:     redis,
+		nsq:       nsq,
+		cnf:       cnf,
+		responser: responser,
 	}
 }
