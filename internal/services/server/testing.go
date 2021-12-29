@@ -15,6 +15,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/mocksqlstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
+	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -45,7 +46,9 @@ func TestServer(t *testing.T) (*Server, *redisstore.AppRedisDictionaries, func(*
 	producer, err := db.InitNSQ(&config.NSQ)
 	assert.NoError(t, err)
 
-	return root(mocksqlstore.Init(), nsqstore.Init(producer), AppRedis, config), AppRedis, func(appRedis *redisstore.AppRedisDictionaries) {
+	logger := utils.InitLogger(mocksqlstore.Init().AdminPanel().Logs())
+
+	return root(mocksqlstore.Init(), nsqstore.Init(producer), AppRedis, logger, config), AppRedis, func(appRedis *redisstore.AppRedisDictionaries) {
 		appRedis.Registration.Clear()
 		appRedis.Registration.Close()
 

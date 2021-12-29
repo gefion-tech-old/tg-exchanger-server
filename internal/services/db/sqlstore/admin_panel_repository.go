@@ -6,12 +6,13 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 )
 
-type ManagerRepository struct {
+type AdminPanelRepository struct {
 	store                  *sql.DB
 	botMessagesRepository  *BotMessagesRepository
 	notificationRepository *NotificationRepository
 	exchangerRepository    *ExchangerRepository
 	userBillsRepository    *UserBillsRepository
+	logsRepository         *LoggerRepository
 }
 
 /*
@@ -20,7 +21,19 @@ type ManagerRepository struct {
 	==========================================================================================
 */
 
-func (r *ManagerRepository) Bills() db.UserBillsRepository {
+func (r *AdminPanelRepository) Logs() db.LoggerRepository {
+	if r.logsRepository != nil {
+		return r.logsRepository
+	}
+
+	r.logsRepository = &LoggerRepository{
+		store: r.store,
+	}
+
+	return r.logsRepository
+}
+
+func (r *AdminPanelRepository) Bills() db.UserBillsRepository {
 	if r.userBillsRepository != nil {
 		return r.userBillsRepository
 	}
@@ -32,7 +45,7 @@ func (r *ManagerRepository) Bills() db.UserBillsRepository {
 	return r.userBillsRepository
 }
 
-func (r *ManagerRepository) Exchanger() db.ExchangerRepository {
+func (r *AdminPanelRepository) Exchanger() db.ExchangerRepository {
 	if r.exchangerRepository != nil {
 		return r.exchangerRepository
 	}
@@ -44,7 +57,7 @@ func (r *ManagerRepository) Exchanger() db.ExchangerRepository {
 	return r.exchangerRepository
 }
 
-func (r *ManagerRepository) Notification() db.NotificationRepository {
+func (r *AdminPanelRepository) Notification() db.NotificationRepository {
 	if r.notificationRepository != nil {
 		return r.notificationRepository
 	}
@@ -56,7 +69,7 @@ func (r *ManagerRepository) Notification() db.NotificationRepository {
 	return r.notificationRepository
 }
 
-func (r *ManagerRepository) BotMessages() db.BotMessagesRepository {
+func (r *AdminPanelRepository) BotMessages() db.BotMessagesRepository {
 	if r.botMessagesRepository != nil {
 		return r.botMessagesRepository
 	}

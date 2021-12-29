@@ -9,41 +9,35 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/middleware"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/bills"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/exchanger"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/logs"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/message"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/notification"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/user"
+	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
 type ServerModules struct {
-	store db.SQLStoreI
-	redis *redisstore.AppRedisDictionaries
-	nsq   nsqstore.NsqI
-	cnf   *config.Config
-
 	exMod     exchanger.ModExchangerI
 	notifyMod notification.ModNotificationI
 	userMod   user.ModUsersI
 	msgMod    message.ModMessageI
 	billsMod  bills.ModBillsI
+	logsMod   logs.ModLogsI
 }
 
 type ServerModulesI interface {
 	ModulesConfigure(router *gin.RouterGroup, g guard.GuardI, mdl middleware.MiddlewareI)
 }
 
-func InitServerModules(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config) ServerModulesI {
+func InitServerModules(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, logger utils.LoggerI) ServerModulesI {
 	return &ServerModules{
-		store: store,
-		redis: redis,
-		nsq:   nsq,
-		cnf:   cnf,
-
 		exMod:     exchanger.InitModExchanger(store, redis, nsq, cnf),
-		notifyMod: notification.InitModNotification(store, redis, nsq, cnf),
+		notifyMod: notification.InitModNotification(store, redis, nsq, cnf, logger),
 		msgMod:    message.InitModMessage(store, redis, nsq, cnf),
 		userMod:   user.InitModUsers(store, redis, nsq, cnf),
 		billsMod:  bills.InitModBills(store, redis, nsq, cnf),
+		logsMod:   logs.InitModLogs(store.AdminPanel().Logs(), cnf),
 	}
 }
 
@@ -80,4 +74,6 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 	router.GET("/admin/exchanger/:name", m.exMod.GetExchangerByNameHandler)
 	router.GET("/admin/exchanger/document", g.AuthTokenValidation(), g.IsAuth(), m.exMod.GetExchangerDocumentHandler)
 	router.GET("/admin/exchangers", g.AuthTokenValidation(), g.IsAuth(), m.exMod.GetExchangersSelectionHandler)
+
+	router.POST("/log", m.logsMod.CreateLogRecordHandler)
 }

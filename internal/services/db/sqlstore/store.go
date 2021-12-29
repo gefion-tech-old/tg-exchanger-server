@@ -8,9 +8,9 @@ import (
 
 // SQL хранилище
 type Store struct {
-	db                *sql.DB
-	userRepository    *UserRepository
-	managerRepository *ManagerRepository
+	db                   *sql.DB
+	userRepository       *UserRepository
+	adminPanelRepository *AdminPanelRepository
 }
 
 func Init(db *sql.DB) db.SQLStoreI {
@@ -32,13 +32,13 @@ func (s *Store) User() db.UserRepository {
 }
 
 func (s *Store) AdminPanel() db.AdminPanelRepository {
-	if s.managerRepository != nil {
-		return s.managerRepository
+	if s.adminPanelRepository != nil {
+		return s.adminPanelRepository
 	}
 
-	s.managerRepository = &ManagerRepository{
+	s.adminPanelRepository = &AdminPanelRepository{
 		store: s.db,
 	}
 
-	return s.managerRepository
+	return s.adminPanelRepository
 }

@@ -1,11 +1,17 @@
 package static
 
 // Роли
-
 const (
 	S__ROLE__ADMIN   = 2
 	S__ROLE__MANAGER = 1
 	S__ROLE__USER    = 0
+)
+
+// Типы логов
+const (
+	L__SERVER = 100
+	L__BOT    = 200
+	L__ADMIN  = 300
 )
 
 // Нобор статусов уведомлений

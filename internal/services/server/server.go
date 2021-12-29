@@ -1,9 +1,6 @@
 package server
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
@@ -11,15 +8,14 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/guard"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/middleware"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules"
+	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type Server struct {
 	store  db.SQLStoreI
 	Router *gin.Engine
 	config *config.Config
-	logger *logrus.Logger
 
 	guard      guard.GuardI
 	middleware middleware.MiddlewareI
@@ -30,8 +26,8 @@ type ServerI interface {
 	Run() error
 }
 
-func Init(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, c *config.Config) ServerI {
-	return root(s, nsq, r, c)
+func Init(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, l utils.LoggerI, c *config.Config) ServerI {
+	return root(s, nsq, r, l, c)
 }
 
 // Метод запуска сервера
@@ -48,39 +44,22 @@ func (s *Server) configure() {
 	s.mods.ModulesConfigure(v1, s.guard, s.middleware)
 }
 
-func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, c *config.Config) *Server {
-	// Настрока логгера
-	log := logrus.New()
-	f, err := os.OpenFile("logs/test.log", os.O_WRONLY|os.O_CREATE, 0755)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	log.SetOutput(f)
-	log.SetLevel(logrus.ErrorLevel)
-
-	log.WithFields(logrus.Fields{
-		"animal": "walrus",
-		"size":   10,
-	}).Error("A group of walrus emerges from the ocean")
-
+func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, l utils.LoggerI, c *config.Config) *Server {
 	// Инициализация роутера
 	router := gin.New()
 
-	m := middleware.InitMiddleware()
-	router.Use(m.CORSMiddleware())
-
-	// Инициализация охранников маршрутов
 	guard := guard.Init(r, &c.Secrets)
+	m := middleware.InitMiddleware()
+
+	router.Use(m.CORSMiddleware())
 
 	server := &Server{
 		store:      s,
 		Router:     router,
 		config:     c,
-		logger:     log,
 		guard:      guard,
 		middleware: m,
-		mods:       modules.InitServerModules(s, r, nsq, c),
+		mods:       modules.InitServerModules(s, r, nsq, c, l),
 	}
 
 	gin.ForceConsoleColor()

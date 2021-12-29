@@ -153,7 +153,7 @@ func (m *ModNotification) DeleteNotificationHandler(c *gin.Context) {
 		tools.ServErr(c, http.StatusNotFound, errors.ErrRecordNotFound)
 		return
 	default:
-		tools.ServErr(c, http.StatusNotFound, err)
+		tools.ServErr(c, http.StatusInternalServerError, err)
 		return
 	}
 }

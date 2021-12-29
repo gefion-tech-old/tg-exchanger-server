@@ -20,10 +20,18 @@ type UserBillsRepository interface {
 }
 
 type AdminPanelRepository interface {
+	Logs() LoggerRepository
 	Bills() UserBillsRepository
 	BotMessages() BotMessagesRepository
 	Notification() NotificationRepository
 	Exchanger() ExchangerRepository
+}
+
+type LoggerRepository interface {
+	Create(lr *models.LogRecord) error
+	Delete(lr *models.LogRecord) error
+	Count() (int, error)
+	Selection(page, limit int) ([]*models.LogRecord, error)
 }
 
 type ExchangerRepository interface {

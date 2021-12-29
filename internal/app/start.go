@@ -10,6 +10,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/sqlstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
+	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/nsqio/go-nsq"
 )
 
@@ -58,7 +59,9 @@ func (a *App) Start(ctx context.Context) error {
 		Auth:         redisstore.InitAuthClient(rAuth),
 	}
 
+	logger := utils.InitLogger(sqlStore.AdminPanel().Logs())
+
 	// Инициализация сервера
-	server := server.Init(sqlStore, nsqStore, a.redis, a.config)
+	server := server.Init(sqlStore, nsqStore, a.redis, logger, a.config)
 	return server.Run()
 }
