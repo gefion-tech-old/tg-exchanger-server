@@ -25,12 +25,13 @@ func (r *UserRepository) Create(u *models.User) error {
 		`
 		INSERT INTO users (chat_id, username) 
 		SELECT $1, $2
-		WHERE NOT EXISTS (SELECT chat_id FROM users WHERE chat_id=$3)
+		WHERE NOT EXISTS (SELECT chat_id FROM users WHERE chat_id=$3 OR username=$4)
 		RETURNING chat_id, username, hash, role, created_at, updated_at
 		`,
 		u.ChatID,
 		u.Username,
 		u.ChatID,
+		u.Username,
 	).Scan(
 		&u.ChatID,
 		&u.Username,
