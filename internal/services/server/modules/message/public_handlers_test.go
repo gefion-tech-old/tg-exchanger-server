@@ -1,12 +1,14 @@
 package message_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
 	"github.com/stretchr/testify/assert"
 )
@@ -48,7 +50,15 @@ func Test_Server_GetMessageHandler(t *testing.T) {
 			s.Router.ServeHTTP(rec, req)
 
 			assert.Equal(t, tc.expectedCode, rec.Code)
+
+			if rec.Code == http.StatusOK {
+				t.Run("response_validation", func(t *testing.T) {
+					var body models.BotMessage
+					assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+					assert.NotNil(t, body)
+					assert.NoError(t, body.StructFullness())
+				})
+			}
 		})
 	}
-
 }

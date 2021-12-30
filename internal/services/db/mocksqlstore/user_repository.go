@@ -30,6 +30,11 @@ func (r *UserRepository) RegisterInAdminPanel(u *models.User) error {
 		if u.Username == user.Username {
 			r.users[user.ChatID].Hash = u.Hash
 			r.users[user.ChatID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+
+			u.CreatedAt = r.users[user.ChatID].CreatedAt
+			u.UpdatedAt = r.users[user.ChatID].UpdatedAt
+			u.ChatID = r.users[user.ChatID].ChatID
+			u.Username = r.users[user.ChatID].Username
 			return nil
 		}
 	}

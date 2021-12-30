@@ -26,6 +26,16 @@ type RejectBill struct {
 	==========================================================================================
 */
 
+func (b *Bill) StructFullness() error {
+	return validation.ValidateStruct(
+		b,
+		validation.Field(&b.ID, validation.Required),
+		validation.Field(&b.ChatID, validation.Required),
+		validation.Field(&b.Bill, validation.Required),
+		validation.Field(&b.CreatedAt, validation.Required),
+	)
+}
+
 func (rb *RejectBill) RejectBillValidation() error {
 	return validation.ValidateStruct(
 		rb,

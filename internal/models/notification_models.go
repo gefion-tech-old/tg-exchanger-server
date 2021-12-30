@@ -37,6 +37,19 @@ type Notification struct {
 	==========================================================================================
 */
 
+func (n *Notification) StructFullness() error {
+	return validation.ValidateStruct(
+		n,
+		validation.Field(&n.ID, validation.Required),
+		validation.Field(&n.Type, validation.Required),
+		validation.Field(&n.Status, validation.Required),
+		validation.Field(&n.MetaData, validation.Required),
+		validation.Field(&n.User, validation.Required),
+		validation.Field(&n.CreatedAt, validation.Required),
+		validation.Field(&n.UpdatedAt, validation.Required),
+	)
+}
+
 func (n *Notification) NotificationTypeValidation() error {
 	return validation.ValidateStruct(
 		n,

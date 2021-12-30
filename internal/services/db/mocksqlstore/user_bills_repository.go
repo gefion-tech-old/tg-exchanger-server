@@ -2,7 +2,6 @@ package mocksqlstore
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
@@ -21,10 +20,9 @@ func (r *UserBillsRepository) Create(b *models.Bill) error {
 }
 
 func (r *UserBillsRepository) FindById(b *models.Bill) error {
-	fmt.Println(len(r.bills))
-
 	for _, v := range r.bills {
 		if v.ID != b.ID {
+
 			return nil
 		}
 	}
@@ -33,12 +31,10 @@ func (r *UserBillsRepository) FindById(b *models.Bill) error {
 }
 
 func (r *UserBillsRepository) Delete(b *models.Bill) error {
-	for _, bill := range r.bills {
+	for i, bill := range r.bills {
 		if bill.Bill == b.Bill && bill.ChatID == b.ChatID {
+			r.rewrite(i, b)
 			delete(r.bills, bill.ID)
-
-			b.ID = bill.ID
-			b.CreatedAt = bill.CreatedAt
 			return nil
 		}
 	}
@@ -55,4 +51,11 @@ func (r *UserBillsRepository) All(chatID int64) ([]*models.Bill, error) {
 	}
 
 	return arr, nil
+}
+
+func (r *UserBillsRepository) rewrite(id int, to *models.Bill) {
+	to.ID = r.bills[id].ID
+	to.Bill = r.bills[id].Bill
+	to.ChatID = r.bills[id].ChatID
+	to.CreatedAt = r.bills[id].CreatedAt
 }

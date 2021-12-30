@@ -56,6 +56,15 @@ func Test_Server_DeleteMessageHandler(t *testing.T) {
 			s.Router.ServeHTTP(rec, req)
 
 			assert.Equal(t, tc.expectedCode, rec.Code)
+
+			if rec.Code == http.StatusOK {
+				t.Run("response_validation", func(t *testing.T) {
+					var body models.BotMessage
+					assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+					assert.NotNil(t, body)
+					assert.NoError(t, body.StructFullness())
+				})
+			}
 		})
 	}
 
@@ -133,11 +142,18 @@ func Test_Server_UpdateMessageHandler(t *testing.T) {
 			assert.Equal(t, tc.expectedCode, rec.Code)
 
 			if rec.Code == http.StatusOK {
+				var body models.BotMessage
+				assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+
 				// Проверяю обновился ли текст
-				body := models.BotMessage{}
-				decodeErr := json.NewDecoder(rec.Body).Decode(&body)
-				assert.NoError(t, decodeErr)
-				assert.Equal(t, "new text", body.MessageText)
+				t.Run("check_update", func(t *testing.T) {
+					assert.Equal(t, "new text", body.MessageText)
+				})
+
+				t.Run("response_validation", func(t *testing.T) {
+					assert.NotNil(t, body)
+					assert.NoError(t, body.StructFullness())
+				})
 			}
 		})
 	}
@@ -257,6 +273,15 @@ func Test_Server_CreateNewMessageHandler(t *testing.T) {
 			s.Router.ServeHTTP(rec, req)
 
 			assert.Equal(t, tc.expectedCode, rec.Code)
+
+			if rec.Code == http.StatusCreated {
+				t.Run("response_validation", func(t *testing.T) {
+					var body models.BotMessage
+					assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+					assert.NotNil(t, body)
+					assert.NoError(t, body.StructFullness())
+				})
+			}
 		})
 	}
 }

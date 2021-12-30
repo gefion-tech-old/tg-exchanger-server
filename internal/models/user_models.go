@@ -5,6 +5,7 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -61,6 +62,22 @@ func (req *UserFromAdminRequest) UserFromAdminRequestValidation(urs config.Users
 			&req.Password,
 			validation.Length(8, 15),
 		),
+	)
+}
+
+/*
+	Функция для тестов
+	Валидации заполненность структуры
+*/
+func (u *User) StructFullness() error {
+	return validation.ValidateStruct(
+		u,
+		validation.Field(&u.ChatID, validation.Required),
+		validation.Field(&u.Username, validation.Required),
+		validation.Field(&u.Hash, validation.NilOrNotEmpty),
+		validation.Field(&u.Role, validation.In(static.S__ROLE__MANAGER, static.S__ROLE__USER, static.S__ROLE__ADMIN)),
+		validation.Field(&u.CreatedAt, validation.Required),
+		validation.Field(&u.UpdatedAt, validation.Required),
 	)
 }
 

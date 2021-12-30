@@ -28,7 +28,7 @@ func (u *Responser) NewRecord(c *gin.Context, data interface{}, err error) {
 	case nil:
 		c.JSON(http.StatusCreated, data)
 	case sql.ErrNoRows:
-		u.Error(c, http.StatusNotFound, err)
+		u.Error(c, http.StatusUnprocessableEntity, errors.ErrAlreadyExists)
 		return
 	default:
 		u.Error(c, http.StatusInternalServerError, err)

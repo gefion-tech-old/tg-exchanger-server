@@ -3,12 +3,14 @@ package user_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/stretchr/testify/assert"
@@ -73,6 +75,15 @@ func Test_Server_UserInBotRegistrationHandler(t *testing.T) {
 			s.Router.ServeHTTP(rec, req)
 
 			assert.Equal(t, tc.expectedCode, rec.Code)
+
+			if rec.Code == http.StatusCreated {
+				t.Run("response_validation", func(t *testing.T) {
+					var body models.User
+					assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+					assert.NoError(t, body.StructFullness())
+					assert.Equal(t, body.Role, static.S__ROLE__USER)
+				})
+			}
 		})
 	}
 }
@@ -86,199 +97,224 @@ func Test_Server_UserAdminHandler(t *testing.T) {
 
 	/* Регистрация -> ШАГ 1 */
 
-	tcRegistrationStep1 := []struct {
-		name         string
-		payload      interface{}
-		expectedCode int
-	}{
-		{
-			name:         "invalid payload",
-			payload:      "invalid",
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "empty username",
-			payload: map[string]interface{}{
-				"username": "",
-				"password": "4tfgefhey75uh",
+	t.Run("registration_step_1", func(t *testing.T) {
+		tcRegistrationStep1 := []struct {
+			name         string
+			payload      interface{}
+			expectedCode int
+		}{
+			{
+				name:         "invalid payload",
+				payload:      "invalid",
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "outsider username",
-			payload: map[string]interface{}{
-				"username": "outsider",
-				"password": "4tfgefhey75uh",
+			{
+				name: "empty username",
+				payload: map[string]interface{}{
+					"username": "",
+					"password": "4tfgefhey75uh",
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "empty password",
-			payload: map[string]interface{}{
-				"username": "I0HuKc",
-				"password": "",
+			{
+				name: "outsider username",
+				payload: map[string]interface{}{
+					"username": "outsider",
+					"password": "4tfgefhey75uh",
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "short password",
-			payload: map[string]interface{}{
-				"username": "I0HuKc",
-				"password": "1235",
+			{
+				name: "empty password",
+				payload: map[string]interface{}{
+					"username": "I0HuKc",
+					"password": "",
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "to long password",
-			payload: map[string]interface{}{
-				"username": "I0HuKc",
-				"password": "1235678901234567890",
+			{
+				name: "short password",
+				payload: map[string]interface{}{
+					"username": "I0HuKc",
+					"password": "1235",
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "valid",
-			payload: map[string]interface{}{
-				"username": "I0HuKc",
-				"password": "4tfgefhey75uh",
-				"testing":  true,
+			{
+				name: "to long password",
+				payload: map[string]interface{}{
+					"username": "I0HuKc",
+					"password": "1235678901234567890",
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusOK,
-		},
-	}
+			{
+				name: "valid",
+				payload: map[string]interface{}{
+					"username": "I0HuKc",
+					"password": "4tfgefhey75uh",
+					"testing":  true,
+				},
+				expectedCode: http.StatusOK,
+			},
+		}
 
-	for _, tc := range tcRegistrationStep1 {
-		t.Run(tc.name, func(t *testing.T) {
-			// Кодирую тело запроса
-			b := &bytes.Buffer{}
-			json.NewEncoder(b).Encode(tc.payload)
+		for _, tc := range tcRegistrationStep1 {
+			t.Run(tc.name, func(t *testing.T) {
+				// Кодирую тело запроса
+				b := &bytes.Buffer{}
+				json.NewEncoder(b).Encode(tc.payload)
 
-			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/registration/code", b)
-			s.Router.ServeHTTP(rec, req)
+				rec := httptest.NewRecorder()
+				req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/registration/code", b)
+				s.Router.ServeHTTP(rec, req)
 
-			assert.Equal(t, tc.expectedCode, rec.Code)
-		})
-	}
+				assert.Equal(t, tc.expectedCode, rec.Code)
+			})
+		}
+	})
 
 	/* Регистрация -> ШАГ 2 */
 
-	tcRegistrationStep2 := []struct {
-		name         string
-		payload      interface{}
-		expectedCode int
-	}{
-		{
-			name:         "invalid payload",
-			payload:      "invalid",
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "empty code",
-			payload: map[string]interface{}{
-				"code": "",
+	t.Run("registration_step_2", func(t *testing.T) {
+		tcRegistrationStep2 := []struct {
+			name         string
+			payload      interface{}
+			expectedCode int
+		}{
+			{
+				name:         "invalid payload",
+				payload:      "invalid",
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "invalid code (short)",
-			payload: map[string]interface{}{
-				"code": 134,
+			{
+				name: "empty code",
+				payload: map[string]interface{}{
+					"code": "",
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "invalid code (long)",
-			payload: map[string]interface{}{
-				"code": 9764115,
+			{
+				name: "invalid code (short)",
+				payload: map[string]interface{}{
+					"code": 134,
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "valid",
-			payload: map[string]interface{}{
-				"code": 100000,
+			{
+				name: "invalid code (long)",
+				payload: map[string]interface{}{
+					"code": 9764115,
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusCreated,
-		},
-	}
+			{
+				name: "valid",
+				payload: map[string]interface{}{
+					"code": 100000,
+				},
+				expectedCode: http.StatusCreated,
+			},
+		}
 
-	for _, tc := range tcRegistrationStep2 {
-		t.Run(tc.name, func(t *testing.T) {
-			// Кодирую тело запроса
-			b := &bytes.Buffer{}
-			json.NewEncoder(b).Encode(tc.payload)
+		for _, tc := range tcRegistrationStep2 {
+			t.Run(tc.name, func(t *testing.T) {
+				// Кодирую тело запроса
+				b := &bytes.Buffer{}
+				json.NewEncoder(b).Encode(tc.payload)
 
-			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/registration", b)
-			s.Router.ServeHTTP(rec, req)
+				rec := httptest.NewRecorder()
+				req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/registration", b)
+				s.Router.ServeHTTP(rec, req)
 
-			assert.Equal(t, tc.expectedCode, rec.Code)
-		})
-	}
+				assert.Equal(t, tc.expectedCode, rec.Code)
+
+				if rec.Code == http.StatusCreated {
+					t.Run("response_validation", func(t *testing.T) {
+						var body models.User
+						assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+						assert.NoError(t, body.StructFullness())
+						fmt.Println(body.CreatedAt)
+						assert.Equal(t, body.Role, static.S__ROLE__ADMIN)
+					})
+				}
+			})
+		}
+	})
 
 	/* Авторизация */
 
-	tcAuth := []struct {
-		name         string
-		payload      interface{}
-		expectedCode int
-	}{
-		{
-			name: "empty username",
-			payload: map[string]interface{}{
-				"username": "",
-				"password": "4tfgefhey75uh",
+	t.Run("auth", func(t *testing.T) {
+		tcAuth := []struct {
+			name         string
+			payload      interface{}
+			expectedCode int
+		}{
+			{
+				name: "empty username",
+				payload: map[string]interface{}{
+					"username": "",
+					"password": "4tfgefhey75uh",
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "invalid username",
-			payload: map[string]interface{}{
-				"username": "invalid",
-				"password": "4tfgefhey75uh",
+			{
+				name: "invalid username",
+				payload: map[string]interface{}{
+					"username": "invalid",
+					"password": "4tfgefhey75uh",
+				},
+				expectedCode: http.StatusNotFound,
 			},
-			expectedCode: http.StatusNotFound,
-		},
-		{
-			name: "empty password",
-			payload: map[string]interface{}{
-				"username": "I0HuKc",
-				"password": "",
+			{
+				name: "empty password",
+				payload: map[string]interface{}{
+					"username": "I0HuKc",
+					"password": "",
+				},
+				expectedCode: http.StatusUnprocessableEntity,
 			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "invalid password",
-			payload: map[string]interface{}{
-				"username": "I0HuKc",
-				"password": "invalid",
+			{
+				name: "invalid password",
+				payload: map[string]interface{}{
+					"username": "I0HuKc",
+					"password": "invalid",
+				},
+				expectedCode: http.StatusNotFound,
 			},
-			expectedCode: http.StatusNotFound,
-		},
-		{
-			name: "valid",
-			payload: map[string]interface{}{
-				"username": "I0HuKc",
-				"password": "4tfgefhey75uh",
+			{
+				name: "valid",
+				payload: map[string]interface{}{
+					"username": "I0HuKc",
+					"password": "4tfgefhey75uh",
+				},
+				expectedCode: http.StatusOK,
 			},
-			expectedCode: http.StatusOK,
-		},
-	}
+		}
 
-	for _, tc := range tcAuth {
-		t.Run(tc.name, func(t *testing.T) {
-			// Кодирую тело запроса
-			b := &bytes.Buffer{}
-			json.NewEncoder(b).Encode(tc.payload)
+		for _, tc := range tcAuth {
+			t.Run(tc.name, func(t *testing.T) {
+				// Кодирую тело запроса
+				b := &bytes.Buffer{}
+				json.NewEncoder(b).Encode(tc.payload)
 
-			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/auth", b)
-			s.Router.ServeHTTP(rec, req)
-			assert.Equal(t, tc.expectedCode, rec.Code)
+				rec := httptest.NewRecorder()
+				req, _ := http.NewRequest(http.MethodPost, "/api/v1/admin/auth", b)
+				s.Router.ServeHTTP(rec, req)
+				assert.Equal(t, tc.expectedCode, rec.Code)
 
-		})
-	}
+				if rec.Code == http.StatusOK {
+					t.Run("response_validation", func(t *testing.T) {
+						var body map[string]interface{}
+						assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+						assert.NotNil(t, body)
+						assert.NotNil(t, body["access_token"])
+						assert.NotNil(t, body["refresh_token"])
+					})
+				}
+			})
+		}
+	})
 }
 
 func Test_Server_Helper_Roledefine(t *testing.T) {

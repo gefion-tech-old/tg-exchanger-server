@@ -21,10 +21,26 @@ type BotMessage struct {
 	==========================================================================================
 */
 
+func (b *BotMessage) StructFullness() error {
+	return validation.ValidateStruct(
+		b,
+		validation.Field(&b.ID, validation.Required),
+		validation.Field(&b.Connector, validation.Required),
+		validation.Field(&b.MessageText, validation.Required),
+		validation.Field(&b.CreatedBy, validation.Required),
+		validation.Field(&b.CreatedAt, validation.Required),
+		validation.Field(&b.UpdatedAt, validation.Required),
+	)
+}
+
 func (b *BotMessage) CreateBotMessageValidation(managers, developers []string) error {
 	return validation.ValidateStruct(
 		b,
-		validation.Field(&b.Connector, validation.Required, validation.Match(regexp.MustCompile(`^[^._ ](?:[\w-]|\.[\w-])+[^._ ]$`))),
+		validation.Field(
+			&b.Connector,
+			validation.Required,
+			validation.Match(regexp.MustCompile(`^[^._ ](?:[\w-]|\.[\w-])+[^._ ]$`)),
+		),
 		validation.Field(&b.MessageText, validation.Required),
 		validation.Field(&b.CreatedBy, validation.Required),
 	)
