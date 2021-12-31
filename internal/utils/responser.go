@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+	"fmt"
 	"math"
 	"net/http"
 	"reflect"
@@ -18,6 +19,8 @@ type ResponserI interface {
 	NewRecordResponse(c *gin.Context, data interface{}, err error)
 	RecordResponse(c *gin.Context, data interface{}, err error)
 	SelectionResponse(c *gin.Context, repository interface{})
+	DRRhelper(c *gin.Context, model interface{}) interface{}
+	DeleteRecordResponse(c *gin.Context, repository, model interface{})
 	Error(c *gin.Context, code int, err ...error)
 }
 
@@ -55,6 +58,61 @@ func (u *Responser) RecordResponse(c *gin.Context, data interface{}, err error) 
 		u.Error(c, http.StatusInternalServerError, err)
 		return
 	}
+}
+
+func (u *Responser) DeleteRecordResponse(c *gin.Context, repository, model interface{}) {
+	fn, err := GetReflectMethod(repository, "Delete")
+	if err != nil {
+		u.Error(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	// u.RecordResponse(c, model)
+
+	retv := fn.Call([]reflect.Value{
+		reflect.ValueOf(model),
+	})
+
+	if retv[0].Interface() != nil {
+		u.Error(c, http.StatusInternalServerError, retv[0].Interface().(error))
+		return
+	}
+
+	u.RecordResponse(c, model, nil)
+
+}
+
+func (u *Responser) DRRhelper(c *gin.Context, model interface{}) interface{} {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		u.Error(c, http.StatusUnprocessableEntity, err)
+		return nil
+	}
+
+	// может быть любым типом
+	val := reflect.ValueOf(model)
+
+	// если это указатель, разрешаю его значение
+	if val.Kind() == reflect.Ptr {
+		val = reflect.Indirect(val)
+	}
+
+	if val.Kind() != reflect.Struct {
+		u.Error(c, http.StatusInternalServerError,
+			fmt.Errorf("failed to process the struct %s", reflect.TypeOf(model).String()))
+		return nil
+	}
+
+	fID := val.FieldByName("ID")
+	if !fID.IsValid() && fID.Kind() != reflect.Int {
+		u.Error(c, http.StatusInternalServerError,
+			fmt.Errorf("in struct %s, field ID is invalid", reflect.TypeOf(model).String()))
+		return nil
+	}
+
+	fID.SetInt(int64(id))
+
+	return model
 }
 
 /*
