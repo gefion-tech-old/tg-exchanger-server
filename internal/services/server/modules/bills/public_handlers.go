@@ -28,7 +28,7 @@ func (m *ModBills) GetAllBillsHandler(c *gin.Context) {
 	}
 
 	b, err := m.store.AdminPanel().Bills().All(int64(chatID))
-	m.responser.Record(c, b, err)
+	m.responser.RecordResponse(c, b, err)
 }
 
 /*
@@ -53,7 +53,7 @@ func (m *ModBills) DeleteBillHandler(c *gin.Context) {
 	m.responser.Error(c, http.StatusUnprocessableEntity, r.BillValidation())
 
 	// Операция с БД
-	m.responser.Record(c, r, m.store.AdminPanel().Bills().Delete(r))
+	m.responser.RecordResponse(c, r, m.store.AdminPanel().Bills().Delete(r))
 }
 
 /*
@@ -73,5 +73,5 @@ func (m *ModBills) GetBillHandler(c *gin.Context) {
 	}
 
 	r := &models.Bill{ID: id}
-	m.responser.Record(c, r, m.store.AdminPanel().Bills().FindById(r))
+	m.responser.RecordResponse(c, r, m.store.AdminPanel().Bills().FindById(r))
 }

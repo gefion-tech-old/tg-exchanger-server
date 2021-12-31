@@ -83,4 +83,6 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 	router.GET("/admin/exchangers", g.AuthTokenValidation(), g.IsAuth(), m.exMod.GetExchangersSelectionHandler)
 
 	router.POST("/log", m.logsMod.CreateLogRecordHandler)
+	router.DELETE("/log/:id", m.logsMod.DeleteLogRecordHandler)
+	router.GET("/logs", m.logsMod.GetLogRecordsSelectionHandler)
 }

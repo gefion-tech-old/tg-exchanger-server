@@ -1,14 +1,12 @@
 package message
 
 import (
-	"math"
 	"net/http"
 	"strconv"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/sync/errgroup"
 )
 
 /*
@@ -29,7 +27,7 @@ func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 	}
 
 	r := &models.BotMessage{ID: id}
-	m.responser.Record(c, r, m.store.AdminPanel().BotMessages().Delete(r))
+	m.responser.RecordResponse(c, r, m.store.AdminPanel().BotMessages().Delete(r))
 }
 
 /*
@@ -61,7 +59,7 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 		r.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers),
 	)
 
-	m.responser.Record(c, r, m.store.AdminPanel().BotMessages().Update(r))
+	m.responser.RecordResponse(c, r, m.store.AdminPanel().BotMessages().Update(r))
 }
 
 /*
@@ -75,61 +73,7 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
-	errs, _ := errgroup.WithContext(c)
-
-	cArrM := make(chan []*models.BotMessage)
-	cCount := make(chan *int)
-
-	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
-		return
-	}
-
-	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
-		return
-	}
-
-	// Подсчет кол-ва сообщений в таблице
-	errs.Go(func() error {
-		defer close(cCount)
-		c, err := m.store.AdminPanel().BotMessages().Count()
-		if err != nil {
-			return err
-		}
-
-		cCount <- &c
-		return nil
-	})
-
-	// Достаю из БД запрашиваемые записи
-	errs.Go(func() error {
-		defer close(cArrM)
-		arrM, err := m.store.AdminPanel().BotMessages().Selection(page, limit)
-		if err != nil {
-			return err
-		}
-
-		cArrM <- arrM
-		return nil
-	})
-
-	arrM := <-cArrM
-	count := <-cCount
-
-	if arrM == nil || count == nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errs.Wait())
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"limit":        limit,
-		"current_page": page,
-		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"data":         arrM,
-	})
+	m.responser.SelectionResponse(c, m.store.AdminPanel().BotMessages())
 }
 
 /*
@@ -153,5 +97,5 @@ func (m *ModMessage) CreateNewMessageHandler(c *gin.Context) {
 		r.CreateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers),
 	)
 
-	m.responser.NewRecord(c, r, m.store.AdminPanel().BotMessages().Create(r))
+	m.responser.NewRecordResponse(c, r, m.store.AdminPanel().BotMessages().Create(r))
 }

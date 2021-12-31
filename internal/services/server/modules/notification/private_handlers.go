@@ -2,7 +2,6 @@ package notification
 
 import (
 	"fmt"
-	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -10,7 +9,6 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/sync/errgroup"
 )
 
 /*
@@ -25,61 +23,7 @@ import (
 
 */
 func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
-	errs, _ := errgroup.WithContext(c)
-
-	cArrN := make(chan []*models.Notification)
-	cCount := make(chan *int)
-
-	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
-		return
-	}
-
-	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
-		return
-	}
-
-	// Достаю из БД запрашиваемые записи
-	errs.Go(func() error {
-		defer close(cArrN)
-		arrN, err := m.store.AdminPanel().Notification().Selection(page, limit)
-		if err != nil {
-			return err
-		}
-
-		cArrN <- arrN
-		return nil
-	})
-
-	// Подсчет кол-ва уведомлений в таблице
-	errs.Go(func() error {
-		defer close(cCount)
-		c, err := m.store.AdminPanel().Notification().Count()
-		if err != nil {
-			return err
-		}
-
-		cCount <- &c
-		return nil
-	})
-
-	arrN := <-cArrN
-	count := <-cCount
-
-	if arrN == nil || count == nil {
-		m.responser.Error(c, http.StatusInternalServerError, errs.Wait())
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"limit":        limit,
-		"current_page": page,
-		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"data":         arrN,
-	})
+	m.responser.SelectionResponse(c, m.store.AdminPanel().Notification())
 }
 
 /*
@@ -112,7 +56,7 @@ func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 
 	r.ID = id
 
-	m.responser.Record(c, r, m.store.AdminPanel().Notification().UpdateStatus(r))
+	m.responser.RecordResponse(c, r, m.store.AdminPanel().Notification().UpdateStatus(r))
 }
 
 /*
@@ -133,7 +77,7 @@ func (m *ModNotification) DeleteNotificationHandler(c *gin.Context) {
 	}
 
 	r := &models.Notification{ID: id}
-	m.responser.Record(c, r, m.store.AdminPanel().Notification().Delete(r))
+	m.responser.RecordResponse(c, r, m.store.AdminPanel().Notification().Delete(r))
 }
 
 func newSupportReqNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {

@@ -16,7 +16,7 @@ func (m *ModLogs) DeleteLogRecordHandler(c *gin.Context) {
 	}
 
 	r := &models.LogRecord{ID: id}
-	m.responser.Record(c, r, m.repository.Delete(r))
+	m.responser.RecordResponse(c, r, m.repository.Delete(r))
 }
 
 func (m *ModLogs) GetLogRecordsSelectionHandler(c *gin.Context) {}

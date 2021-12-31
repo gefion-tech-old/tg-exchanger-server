@@ -28,5 +28,5 @@ func (m *ModLogs) CreateLogRecordHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.NewRecord(c, r, m.repository.Create(r))
+	m.responser.NewRecordResponse(c, r, m.repository.Create(r))
 }

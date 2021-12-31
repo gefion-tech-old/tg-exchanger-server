@@ -17,5 +17,5 @@ import (
 */
 func (m *ModMessage) GetMessageHandler(c *gin.Context) {
 	r := &models.BotMessage{Connector: c.Param("connector")}
-	m.responser.Record(c, r, m.store.AdminPanel().BotMessages().Get(r))
+	m.responser.RecordResponse(c, r, m.store.AdminPanel().BotMessages().Get(r))
 }

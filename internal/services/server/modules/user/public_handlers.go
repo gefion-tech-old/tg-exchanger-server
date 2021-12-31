@@ -40,7 +40,7 @@ func (m *ModUsers) UserInBotRegistrationHandler(c *gin.Context) {
 	}
 
 	// Выполнение операции с БД
-	m.responser.NewRecord(c, r, m.store.User().Create(r))
+	m.responser.NewRecordResponse(c, r, m.store.User().Create(r))
 }
 
 /*
@@ -176,7 +176,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.NewRecord(c, u, m.store.User().RegisterInAdminPanel(u))
+	m.responser.NewRecordResponse(c, u, m.store.User().RegisterInAdminPanel(u))
 }
 
 /*

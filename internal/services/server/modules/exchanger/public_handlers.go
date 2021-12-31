@@ -22,7 +22,7 @@ import (
 */
 func (m *ModExchanger) GetExchangerByNameHandler(c *gin.Context) {
 	r := &models.Exchanger{Name: c.Param("name")}
-	m.responser.Record(c, r, m.store.AdminPanel().Exchanger().GetByName(r))
+	m.responser.RecordResponse(c, r, m.store.AdminPanel().Exchanger().GetByName(r))
 }
 
 func (m *ModExchanger) GetExchangerDocumentHandler(c *gin.Context) {

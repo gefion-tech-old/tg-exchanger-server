@@ -79,5 +79,5 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 		}
 	}
 
-	m.responser.NewRecord(c, r, m.store.AdminPanel().Notification().Create(r))
+	m.responser.NewRecordResponse(c, r, m.store.AdminPanel().Notification().Create(r))
 }
