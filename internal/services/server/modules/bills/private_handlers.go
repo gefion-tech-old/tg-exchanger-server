@@ -1,16 +1,15 @@
 package bills
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,12 +24,12 @@ import (
 func (m *ModBills) RejectBillHandler(c *gin.Context) {
 	req := &models.RejectBill{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
 	if err := req.RejectBillValidation(); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
 
@@ -67,18 +66,16 @@ func (m *ModBills) RejectBillHandler(c *gin.Context) {
 func (m *ModBills) CreateBillHandler(c *gin.Context) {
 	r := &models.Bill{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return
 	}
 
-	if err := r.BillValidation(); err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, err)
-		return
-	}
+	if obj := m.responser.RecordHandler(c, r, r.BillValidation()); obj != nil {
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Bill{}) {
+			return
+		}
 
-	err := m.store.AdminPanel().Bills().Create(r)
-	switch err {
-	case nil:
+		m.responser.CreateRecordResponse(c, m.store.AdminPanel().Bills(), obj)
 		payload, err := json.Marshal(map[string]interface{}{
 			"to": map[string]interface{}{
 				"chat_id": r.ChatID,
@@ -96,12 +93,7 @@ func (m *ModBills) CreateBillHandler(c *gin.Context) {
 		if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 			fmt.Println(err)
 		}
-		c.JSON(http.StatusCreated, r)
-	case sql.ErrNoRows:
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrAlreadyExists)
-		return
-	default:
-		tools.ServErr(c, http.StatusInternalServerError, err)
+
 		return
 	}
 }

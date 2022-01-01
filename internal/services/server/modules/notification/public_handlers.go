@@ -2,7 +2,6 @@ package notification
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
@@ -30,54 +29,65 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 	}
 
 	// Валидация типа уведомления
-	m.responser.Error(c, http.StatusUnprocessableEntity, r.NotificationTypeValidation())
-
-	// Получаю всех менеджеров из БД
-	uArr, err := m.store.User().GetAllManagers()
-	if err != nil {
-		m.responser.Error(c, http.StatusInternalServerError, err)
+	if err := m.responser.Error(c, http.StatusUnprocessableEntity,
+		r.NotificationTypeValidation()); err != nil {
+		return
 	}
 
-	switch r.Type {
-	case static.NTF__T__VERIFICATION:
-		// Запись уведомления в очередь для всех менеджеров
-		for i := 0; i < len(uArr); i++ {
-			payload, err := json.Marshal(newVefificationNotify(uArr, i, r))
-			if err != nil {
-				fmt.Println(err)
-			}
+	if obj := m.responser.RecordHandler(c, r,
+		r.NotificationTypeValidation(),
+	); obj != nil {
+		m.responser.CreateRecordResponse(c, m.store.AdminPanel().Notification(), r,
+			func() error {
+				// Получаю всех менеджеров из БД
+				uArr, err := m.store.User().GetAllManagers()
+				if err != nil {
+					return err
+				}
 
-			if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
-				fmt.Println(err)
-			}
-		}
+				switch r.Type {
+				case static.NTF__T__VERIFICATION:
+					// Запись уведомления в очередь для всех менеджеров
+					for i := 0; i < len(uArr); i++ {
+						payload, err := json.Marshal(newVefificationNotify(uArr, i, r))
+						if err != nil {
+							return err
+						}
 
-	case static.NTF__T__EXCHANGE_ERROR:
-		// Запись уведомления в очередь для всех менеджеров
-		for i := 0; i < len(uArr); i++ {
-			payload, err := json.Marshal(newActionCancelNotify(uArr, i, r))
-			if err != nil {
-				fmt.Println(err)
-			}
+						if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+							return err
+						}
+					}
 
-			if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
-				fmt.Println(err)
-			}
-		}
+				case static.NTF__T__EXCHANGE_ERROR:
+					// Запись уведомления в очередь для всех менеджеров
+					for i := 0; i < len(uArr); i++ {
+						payload, err := json.Marshal(newActionCancelNotify(uArr, i, r))
+						if err != nil {
+							return err
+						}
 
-	case static.NTF__T__REQ_SUPPORT:
-		// Запись уведомления в очередь для всех менеджеров
-		for i := 0; i < len(uArr); i++ {
-			payload, err := json.Marshal(newSupportReqNotify(uArr, i, r))
-			if err != nil {
-				fmt.Println(err)
-			}
+						if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+							return err
+						}
+					}
 
-			if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
-				fmt.Println(err)
-			}
-		}
+				case static.NTF__T__REQ_SUPPORT:
+					// Запись уведомления в очередь для всех менеджеров
+					for i := 0; i < len(uArr); i++ {
+						payload, err := json.Marshal(newSupportReqNotify(uArr, i, r))
+						if err != nil {
+							return err
+						}
+
+						if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+							return err
+						}
+					}
+				}
+
+				return nil
+			},
+		)
 	}
-
-	m.responser.NewRecordResponse(c, r, m.store.AdminPanel().Notification().Create(r))
 }

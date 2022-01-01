@@ -226,11 +226,16 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 			assert.Equal(t, tc.expectedCode, rec.Code)
 
 			if rec.Code == http.StatusOK {
+				var body models.Notification
+				assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+
 				t.Run("response_validation", func(t *testing.T) {
-					var body models.Notification
-					assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
 					assert.NotNil(t, body)
 					assert.NoError(t, body.StructFullness())
+				})
+
+				t.Run("check update", func(t *testing.T) {
+					assert.Equal(t, 2, body.Status)
 				})
 			}
 		})

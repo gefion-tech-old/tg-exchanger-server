@@ -2,7 +2,7 @@ package exchanger
 
 import (
 	"net/http"
-	"strconv"
+	"reflect"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
@@ -34,14 +34,16 @@ func (m *ModExchanger) GetExchangersSelectionHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModExchanger) DeleteExchangerHandler(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
-		return
+	if obj := m.responser.RecordHandler(c, &models.Exchanger{}); obj != nil {
+		// Проверю, удалось ли записать структуру или была поймана ошибка
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Exchanger{}) {
+			return
+		}
+
+		m.responser.DeleteRecordResponse(c, m.store.AdminPanel().Exchanger(), obj)
 	}
 
-	r := &models.Exchanger{ID: id}
-	m.responser.RecordResponse(c, r, m.store.AdminPanel().Exchanger().Delete(r))
+	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -62,19 +64,17 @@ func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+	if obj := m.responser.RecordHandler(c, r, r.ExchangerUpdateValidation()); obj != nil {
+		// Проверю, удалось ли записать структуру или была поймана ошибка
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Exchanger{}) {
+			return
+		}
+
+		m.responser.UpdateRecordResponse(c, m.store.AdminPanel().Exchanger(), obj)
 		return
 	}
 
-	r.ID = id
-
-	// Валидация
-	m.responser.Error(c, http.StatusUnprocessableEntity, r.ExchangerUpdateValidation())
-
-	// Операция с БД
-	m.responser.RecordResponse(c, r, m.store.AdminPanel().Exchanger().Update(r))
+	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -95,9 +95,15 @@ func (m *ModExchanger) CreateExchangerHandler(c *gin.Context) {
 		return
 	}
 
-	// Валидация
-	m.responser.Error(c, http.StatusUnprocessableEntity, r.ExchangerCreateValidation())
+	if obj := m.responser.RecordHandler(c, r, r.ExchangerCreateValidation()); obj != nil {
+		// Проверю, удалось ли записать структуру или была поймана ошибка
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Exchanger{}) {
+			return
+		}
 
-	// Операция записи в БД
-	m.responser.NewRecordResponse(c, r, m.store.AdminPanel().Exchanger().Create(r))
+		m.responser.CreateRecordResponse(c, m.store.AdminPanel().Exchanger(), obj)
+		return
+	}
+
+	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }

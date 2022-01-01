@@ -2,11 +2,11 @@ package bills
 
 import (
 	"net/http"
+	"reflect"
 	"strconv"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +23,7 @@ import (
 func (m *ModBills) GetAllBillsHandler(c *gin.Context) {
 	chatID, err := strconv.Atoi(c.Param("chat_id"))
 	if err != nil {
-		tools.ServErr(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
 		return
 	}
 
@@ -43,17 +43,25 @@ func (m *ModBills) GetAllBillsHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModBills) DeleteBillHandler(c *gin.Context) {
-	r := &models.Bill{}
-	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+	if c.Param("chat_id") == "" {
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
 		return
 	}
 
-	// Валидация
-	m.responser.Error(c, http.StatusUnprocessableEntity, r.BillValidation())
+	chatID, err := strconv.Atoi(c.Param("chat_id"))
+	if err != nil {
+		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
+		return
+	}
 
-	// Операция с БД
-	m.responser.RecordResponse(c, r, m.store.AdminPanel().Bills().Delete(r))
+	if obj := m.responser.RecordHandler(c, &models.Bill{ChatID: int64(chatID)}); obj != nil {
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Bill{}) {
+			return
+		}
+
+		m.responser.DeleteRecordResponse(c, m.store.AdminPanel().Bills(), obj)
+		return
+	}
 }
 
 /*

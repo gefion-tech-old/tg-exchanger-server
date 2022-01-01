@@ -3,7 +3,6 @@ package tools
 import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
-	"github.com/gin-gonic/gin"
 )
 
 /*
@@ -29,11 +28,4 @@ func RoleDefine(uname string, urs config.UsersConfig) int {
 	}
 
 	return static.S__ROLE__USER
-}
-
-func ServErr(c *gin.Context, code int, err error) {
-	c.JSON(code, gin.H{
-		"error": err.Error(),
-	})
-	c.Abort()
 }

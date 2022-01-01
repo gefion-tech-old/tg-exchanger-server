@@ -154,7 +154,15 @@ func Test_Server_UpdateExchangerHandler(t *testing.T) {
 			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
 			s.Router.ServeHTTP(rec, req)
 
+			if tc.expectedCode != rec.Code {
+				fmt.Println(11111)
+				var body map[string]interface{}
+				assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+				fmt.Println(body["error"])
+			}
+
 			assert.Equal(t, tc.expectedCode, rec.Code)
+
 		})
 	}
 }

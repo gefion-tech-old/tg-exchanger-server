@@ -47,8 +47,9 @@ func (s *Server) configure() {
 func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, l utils.LoggerI, c *config.Config) *Server {
 	// Инициализация роутера
 	router := gin.New()
+	responser := utils.InitResponser()
 
-	guard := guard.Init(r, &c.Secrets)
+	guard := guard.Init(r, &c.Secrets, responser)
 	m := middleware.InitMiddleware()
 
 	router.Use(m.CORSMiddleware())
@@ -59,7 +60,7 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 		config:     c,
 		guard:      guard,
 		middleware: m,
-		mods:       modules.InitServerModules(s, r, nsq, c, l, utils.InitResponser()),
+		mods:       modules.InitServerModules(s, r, nsq, c, l, responser),
 	}
 
 	gin.ForceConsoleColor()

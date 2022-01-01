@@ -30,6 +30,17 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) error {
 
 	}
 
+	for _, ex := range r.exchangers {
+		if ex.ID == e.ID {
+			r.exchangers[e.ID].Name = e.Name
+			r.exchangers[e.ID].UrlToParse = e.UrlToParse
+			r.exchangers[e.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+
+			r.rewrite(ex.ID, e)
+			return nil
+		}
+	}
+
 	return sql.ErrNoRows
 }
 
@@ -77,4 +88,13 @@ func (r *ExchangerRepository) GetSlice(limit int) ([]*models.Exchanger, error) {
 	}
 
 	return eArr, nil
+}
+
+func (r *ExchangerRepository) rewrite(id int, to *models.Exchanger) {
+	to.ID = r.exchangers[id].ID
+	to.Name = r.exchangers[id].Name
+	to.UrlToParse = r.exchangers[id].UrlToParse
+	to.CreatedBy = r.exchangers[id].CreatedBy
+	to.CreatedAt = r.exchangers[id].CreatedAt
+	to.UpdatedAt = r.exchangers[id].UpdatedAt
 }

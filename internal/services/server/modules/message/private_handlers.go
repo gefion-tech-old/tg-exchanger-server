@@ -2,7 +2,7 @@ package message
 
 import (
 	"net/http"
-	"strconv"
+	"reflect"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
@@ -20,14 +20,16 @@ import (
 	# TESTED
 */
 func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+	if obj := m.responser.RecordHandler(c, &models.BotMessage{}); obj != nil {
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.BotMessage{}) {
+			return
+		}
+
+		m.responser.DeleteRecordResponse(c, m.store.AdminPanel().BotMessages(), obj)
 		return
 	}
 
-	r := &models.BotMessage{ID: id}
-	m.responser.RecordResponse(c, r, m.store.AdminPanel().BotMessages().Delete(r))
+	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -47,19 +49,18 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+	if obj := m.responser.RecordHandler(c, r,
+		r.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers),
+	); obj != nil {
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.BotMessage{}) {
+			return
+		}
+
+		m.responser.UpdateRecordResponse(c, m.store.AdminPanel().BotMessages(), obj)
 		return
 	}
 
-	r.ID = id
-
-	m.responser.Error(c, http.StatusUnprocessableEntity,
-		r.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers),
-	)
-
-	m.responser.RecordResponse(c, r, m.store.AdminPanel().BotMessages().Update(r))
+	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -93,9 +94,16 @@ func (m *ModMessage) CreateNewMessageHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusUnprocessableEntity,
+	if obj := m.responser.RecordHandler(c, r,
 		r.CreateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers),
-	)
+	); obj != nil {
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.BotMessage{}) {
+			return
+		}
 
-	m.responser.NewRecordResponse(c, r, m.store.AdminPanel().BotMessages().Create(r))
+		m.responser.CreateRecordResponse(c, m.store.AdminPanel().BotMessages(), obj)
+		return
+	}
+
+	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }

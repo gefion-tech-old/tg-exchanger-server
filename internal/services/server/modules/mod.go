@@ -53,7 +53,7 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 
 	router.GET("/bot/user/bill/:id", m.billsMod.GetBillHandler)
 	router.GET("/bot/user/:chat_id/bills", m.billsMod.GetAllBillsHandler)
-	router.DELETE("/bot/user/bill", m.billsMod.DeleteBillHandler)
+	router.DELETE("/bot/user/:chat_id/bill/:id", m.billsMod.DeleteBillHandler)
 
 	router.POST("/admin/bill", g.AuthTokenValidation(), g.IsAuth(), m.billsMod.CreateBillHandler)
 	router.POST("/admin/bill/reject", g.AuthTokenValidation(), g.IsAuth(), m.billsMod.RejectBillHandler)

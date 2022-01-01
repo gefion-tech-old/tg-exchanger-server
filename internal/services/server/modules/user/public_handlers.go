@@ -32,8 +32,6 @@ import (
 */
 func (m *ModUsers) UserInBotRegistrationHandler(c *gin.Context) {
 	r := &models.User{}
-
-	// Парсинг входящего тела запроса
 	if err := c.ShouldBindJSON(r); err != nil {
 		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
 		return

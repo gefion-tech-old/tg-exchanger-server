@@ -3,7 +3,7 @@ package notification
 import (
 	"fmt"
 	"net/http"
-	"strconv"
+	"reflect"
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
@@ -43,20 +43,19 @@ func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusUnprocessableEntity,
+	if obj := m.responser.RecordHandler(c, r,
 		r.NotificationStatusValidation(),
 		r.NotificationTypeValidation(),
-	)
+	); obj != nil {
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Notification{}) {
+			return
+		}
 
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+		m.responser.UpdateRecordResponse(c, m.store.AdminPanel().Notification(), obj)
 		return
 	}
 
-	r.ID = id
-
-	m.responser.RecordResponse(c, r, m.store.AdminPanel().Notification().UpdateStatus(r))
+	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -70,14 +69,16 @@ func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModNotification) DeleteNotificationHandler(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+	if obj := m.responser.RecordHandler(c, &models.Notification{}); obj != nil {
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Notification{}) {
+			return
+		}
+
+		m.responser.DeleteRecordResponse(c, m.store.AdminPanel().Notification(), obj)
 		return
 	}
 
-	r := &models.Notification{ID: id}
-	m.responser.RecordResponse(c, r, m.store.AdminPanel().Notification().Delete(r))
+	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
 func newSupportReqNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {

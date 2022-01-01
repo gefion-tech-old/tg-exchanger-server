@@ -19,9 +19,11 @@ type ResponserI interface {
 	NewRecordResponse(c *gin.Context, data interface{}, err error)
 	RecordResponse(c *gin.Context, data interface{}, err error)
 	SelectionResponse(c *gin.Context, repository interface{})
-	DRRhelper(c *gin.Context, model interface{}) interface{}
-	DeleteRecordResponse(c *gin.Context, repository, model interface{})
-	Error(c *gin.Context, code int, err ...error)
+	RecordHandler(c *gin.Context, model interface{}, validators ...error) interface{}
+	DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error)
+	UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error)
+	CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error)
+	Error(c *gin.Context, code int, err ...error) error
 }
 
 func InitResponser() ResponserI {
@@ -52,7 +54,7 @@ func (u *Responser) RecordResponse(c *gin.Context, data interface{}, err error) 
 	case nil:
 		c.JSON(http.StatusOK, data)
 	case sql.ErrNoRows:
-		u.Error(c, http.StatusNotFound, errors.ErrAlreadyExists)
+		u.Error(c, http.StatusNotFound, errors.ErrRecordNotFound)
 		return
 	default:
 		u.Error(c, http.StatusInternalServerError, err)
@@ -60,58 +62,129 @@ func (u *Responser) RecordResponse(c *gin.Context, data interface{}, err error) 
 	}
 }
 
-func (u *Responser) DeleteRecordResponse(c *gin.Context, repository, model interface{}) {
+/*
+	Метод для удаления записи любого ресурса, при условии
+	что репозиторий ресурса содержит метод Delete.
+
+	Автоматический HTTP ответ.
+*/
+func (u *Responser) DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) {
+	// Инициализация метода операции с БД
 	fn, err := GetReflectMethod(repository, "Delete")
 	if err != nil {
 		u.Error(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	// u.RecordResponse(c, model)
-
-	retv := fn.Call([]reflect.Value{
-		reflect.ValueOf(model),
-	})
-
-	if retv[0].Interface() != nil {
-		u.Error(c, http.StatusInternalServerError, retv[0].Interface().(error))
+	// Выполнение операции с БД
+	if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
+		u.RecordResponse(c, model, nil)
+		return
+	} else if err != nil {
+		u.RecordResponse(c, nil, err)
 		return
 	}
 
-	u.RecordResponse(c, model, nil)
-
+	u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
-func (u *Responser) DRRhelper(c *gin.Context, model interface{}) interface{} {
-	id, err := strconv.Atoi(c.Param("id"))
+/*
+	Метод для обновления записи любого ресурса, при условии
+	что репозиторий ресурса содержит метод Update.
+
+	Автоматический HTTP ответ.
+*/
+func (u *Responser) UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) {
+	// Инициализация метода операции с БД
+	fn, err := GetReflectMethod(repository, "Update")
 	if err != nil {
-		u.Error(c, http.StatusUnprocessableEntity, err)
-		return nil
+		u.Error(c, http.StatusInternalServerError, err)
+		return
 	}
 
-	// может быть любым типом
-	val := reflect.ValueOf(model)
-
-	// если это указатель, разрешаю его значение
-	if val.Kind() == reflect.Ptr {
-		val = reflect.Indirect(val)
+	// Выполнение операции с БД
+	if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
+		u.RecordResponse(c, model, nil)
+		return
+	} else if err != nil {
+		u.RecordResponse(c, nil, err)
+		return
 	}
 
-	if val.Kind() != reflect.Struct {
-		u.Error(c, http.StatusInternalServerError,
-			fmt.Errorf("failed to process the struct %s", reflect.TypeOf(model).String()))
-		return nil
+	u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+}
+
+/*
+	Метод для создания записи любого ресурса, при условии
+	что репозиторий ресурса содержит метод Create.
+
+	Автоматический HTTP ответ.
+*/
+func (u *Responser) CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) {
+	// Выполнение всех вложенных методов
+	for _, executor := range todo {
+		if err := executor(); err != nil {
+			u.Error(c, http.StatusInternalServerError, err)
+			return
+		}
 	}
 
-	fID := val.FieldByName("ID")
-	if !fID.IsValid() && fID.Kind() != reflect.Int {
-		u.Error(c, http.StatusInternalServerError,
-			fmt.Errorf("in struct %s, field ID is invalid", reflect.TypeOf(model).String()))
-		return nil
+	// Инициализация метода операции с БД
+	fn, err := GetReflectMethod(repository, "Create")
+	if err != nil {
+		u.Error(c, http.StatusInternalServerError, err)
+		return
 	}
 
-	fID.SetInt(int64(id))
+	// Выполнение операции с БД
+	if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
+		u.NewRecordResponse(c, model, nil)
+		return
+	} else if err != nil {
+		u.RecordResponse(c, nil, err)
+		return
+	}
 
+	u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+}
+
+func (u *Responser) RecordHandler(c *gin.Context, model interface{}, validators ...error) interface{} {
+	if c.Param("id") != "" {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			u.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
+			return err
+		}
+
+		// Может быть любым типом
+		val := reflect.ValueOf(model)
+
+		// Если это указатель
+		if val.Kind() == reflect.Ptr {
+			val = reflect.Indirect(val)
+		}
+
+		if val.Kind() != reflect.Struct {
+			err := fmt.Errorf("failed to process the struct %s", reflect.TypeOf(model).String())
+			u.Error(c, http.StatusInternalServerError, err)
+			return err
+		}
+
+		fID := val.FieldByName("ID")
+		if !fID.IsValid() && fID.Kind() != reflect.Int {
+			err := fmt.Errorf("in struct %s, field ID is invalid", reflect.TypeOf(model).String())
+			u.Error(c, http.StatusInternalServerError, err)
+			return err
+		}
+
+		fID.SetInt(int64(id))
+	}
+
+	if len(validators) > 0 {
+		if err := u.Error(c, http.StatusUnprocessableEntity, validators...); err != nil {
+			return err
+		}
+	}
 	return model
 }
 
@@ -197,13 +270,33 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}) {
 	})
 }
 
-func (u *Responser) Error(c *gin.Context, code int, errs ...error) {
+func (u *Responser) Error(c *gin.Context, code int, errs ...error) error {
 	for _, err := range errs {
 		if err != nil {
 			c.JSON(code, gin.H{
 				"error": err.Error(),
 			})
 			c.Abort()
+			return err
 		}
 	}
+	return nil
+}
+
+/*
+	==========================================================================================
+	ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+	==========================================================================================
+*/
+
+func (u *Responser) callReflectMethod(c *gin.Context, fn *reflect.Value, model interface{}) (interface{}, error) {
+	retv := fn.Call([]reflect.Value{
+		reflect.ValueOf(model),
+	})
+
+	if retv[0].Interface() != nil {
+		return nil, retv[0].Interface().(error)
+	}
+
+	return model, nil
 }
