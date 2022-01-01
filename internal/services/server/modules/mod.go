@@ -55,8 +55,8 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 	router.GET("/bot/user/:chat_id/bills", m.billsMod.GetAllBillsHandler)
 	router.DELETE("/bot/user/:chat_id/bill/:id", m.billsMod.DeleteBillHandler)
 
-	router.POST("/admin/bill", g.AuthTokenValidation(), g.IsAuth(), m.billsMod.CreateBillHandler)
-	router.POST("/admin/bill/reject", g.AuthTokenValidation(), g.IsAuth(), m.billsMod.RejectBillHandler)
+	router.POST("/admin/bill", g.AuthTokenValidation(), g.IsAuth(), g.Logger("bill", "create"), m.billsMod.CreateBillHandler)
+	router.POST("/admin/bill/reject", g.AuthTokenValidation(), g.IsAuth(), g.Logger("bill", "reject"), m.billsMod.RejectBillHandler)
 
 	router.POST("/admin/registration/code", m.userMod.UserGenerateCodeHandler)
 	router.POST("/admin/registration", m.userMod.UserInAdminRegistrationHandler)
@@ -65,19 +65,19 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 	router.POST("/admin/logout", g.AuthTokenValidation(), g.IsAuth(), m.userMod.LogoutHandler)
 
 	router.POST("/admin/message", g.AuthTokenValidation(), g.IsAuth(), m.msgMod.CreateNewMessageHandler)
-	router.PUT("/admin/message/:id", g.AuthTokenValidation(), g.IsAuth(), m.msgMod.UpdateBotMessageHandler)
-	router.DELETE("/admin/message/:id", g.AuthTokenValidation(), g.IsAuth(), m.msgMod.DeleteBotMessageHandler)
+	router.PUT("/admin/message/:id", g.AuthTokenValidation(), g.IsAuth(), g.Logger("message", "update"), m.msgMod.UpdateBotMessageHandler)
+	router.DELETE("/admin/message/:id", g.AuthTokenValidation(), g.IsAuth(), g.Logger("message", "delete"), m.msgMod.DeleteBotMessageHandler)
 	router.GET("/admin/message/:connector", m.msgMod.GetMessageHandler)
 	router.GET("/admin/messages", g.AuthTokenValidation(), g.IsAuth(), m.msgMod.GetMessagesSelectionHandler)
 
 	router.POST("/admin/notification", m.notifyMod.CreateNotificationHandler)
 	router.PUT("/admin/notification/:id", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.UpdateNotificationStatusHandler)
-	router.DELETE("/admin/notification/:id", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.DeleteNotificationHandler)
+	router.DELETE("/admin/notification/:id", g.AuthTokenValidation(), g.IsAuth(), g.Logger("notification", "delete"), m.notifyMod.DeleteNotificationHandler)
 	router.GET("/admin/notifications", g.AuthTokenValidation(), g.IsAuth(), m.notifyMod.GetNotificationsSelectionHandler)
 
 	router.POST("/admin/exchanger", g.AuthTokenValidation(), g.IsAuth(), m.exMod.CreateExchangerHandler)
-	router.PUT("/admin/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), m.exMod.UpdateExchangerHandler)
-	router.DELETE("/admin/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), m.exMod.DeleteExchangerHandler)
+	router.PUT("/admin/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), g.Logger("exchanger", "update"), m.exMod.UpdateExchangerHandler)
+	router.DELETE("/admin/exchanger/:id", g.AuthTokenValidation(), g.IsAuth(), g.Logger("exchanger", "delete"), m.exMod.DeleteExchangerHandler)
 	router.GET("/admin/exchanger/:name", m.exMod.GetExchangerByNameHandler)
 	router.GET("/admin/exchanger/document", g.AuthTokenValidation(), g.IsAuth(), m.exMod.GetExchangerDocumentHandler)
 	router.GET("/admin/exchangers", g.AuthTokenValidation(), g.IsAuth(), m.exMod.GetExchangersSelectionHandler)

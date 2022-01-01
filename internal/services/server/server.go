@@ -49,8 +49,8 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 	router := gin.New()
 	responser := utils.InitResponser(l)
 
-	guard := guard.Init(r, &c.Secrets, responser)
-	m := middleware.InitMiddleware()
+	guard := guard.Init(r, &c.Secrets, responser, l)
+	m := middleware.InitMiddleware(l)
 
 	router.Use(m.CORSMiddleware())
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -50,6 +51,13 @@ func (g *Guard) IsAdmin() gin.HandlerFunc {
 		}
 
 		if token.Role != static.S__ROLE__ADMIN {
+			go g.logger.NewRecord(&models.LogRecord{
+				Service:  static.L__ADMIN,
+				Module:   "GUARD",
+				Info:     "Unauthorized access attempt",
+				Username: &token.Username,
+			})
+
 			g.responser.Error(c, http.StatusForbidden, errors.ErrNotEnoughRights)
 			return
 		}
