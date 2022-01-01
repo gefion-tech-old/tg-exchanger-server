@@ -43,11 +43,11 @@ func (r *UserBillsRepository) Delete(b *models.Bill) error {
 	if err := r.store.QueryRow(
 		`
 		DELETE FROM bills
-		WHERE chat_id=$1 AND bill=$2
+		WHERE chat_id=$1 AND id=$2
 		RETURNING id, chat_id, bill, created_at
 		`,
 		b.ChatID,
-		b.Bill,
+		b.ID,
 	).Scan(
 		&b.ID,
 		&b.ChatID,

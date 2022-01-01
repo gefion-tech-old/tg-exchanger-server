@@ -32,7 +32,7 @@ func (r *UserBillsRepository) FindById(b *models.Bill) error {
 
 func (r *UserBillsRepository) Delete(b *models.Bill) error {
 	for i, bill := range r.bills {
-		if bill.Bill == b.Bill && bill.ChatID == b.ChatID {
+		if bill.ID == b.ID && bill.ChatID == b.ChatID {
 			r.rewrite(i, b)
 			delete(r.bills, bill.ID)
 			return nil

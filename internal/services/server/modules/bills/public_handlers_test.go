@@ -1,7 +1,6 @@
 package bills_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -100,68 +99,73 @@ func Test_Server_DeleteBillHandler(t *testing.T) {
 	assert.NoError(t, server.TestUserBill(t, s, tokens))
 
 	testCases := []struct {
-		name         string
-		payload      interface{}
+		name    string
+		payload struct {
+			chat_id string
+			bill_id string
+		}
 		expectedCode int
 	}{
 		{
-			name:         "invalid payload",
-			payload:      "invalid",
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
 			name: "empty chat_id",
-			payload: map[string]interface{}{
-				"chat_id": "",
-				"bill":    "5559493130410854",
+			payload: struct {
+				chat_id string
+				bill_id string
+			}{
+				bill_id: "1",
 			},
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name: "empty bill",
-			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
-				"bill":    "",
+			name: "invalid chat_id",
+			payload: struct {
+				chat_id string
+				bill_id string
+			}{
+				chat_id: "invalid",
+				bill_id: "1",
 			},
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name: "invalid bill format",
-			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
-				"bill":    "5559493 130410854",
-			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "invalid bill lenght (short)",
-			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
-				"bill":    "55594931304108",
-			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "invalid bill lenght (long)",
-			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
-				"bill":    "5559493130410854000",
-			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
-			name: "not found bill",
-			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
-				"bill":    "5559494130410829",
+			name: "empty bill_id",
+			payload: struct {
+				chat_id string
+				bill_id string
+			}{
+				chat_id: fmt.Sprintf("%d", mocks.USER_BILL_REQ["chat_id"]),
 			},
 			expectedCode: http.StatusNotFound,
 		},
 		{
+			name: "invalid bill_id",
+			payload: struct {
+				chat_id string
+				bill_id string
+			}{
+				chat_id: fmt.Sprintf("%d", mocks.USER_BILL_REQ["chat_id"]),
+				bill_id: "invalid",
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+
+		{
+			name: "empty payload",
+			payload: struct {
+				chat_id string
+				bill_id string
+			}{},
+			expectedCode: http.StatusNotFound,
+		},
+
+		{
 			name: "valid",
-			payload: map[string]interface{}{
-				"chat_id": mocks.USER_BILL_REQ["chat_id"],
-				"bill":    mocks.USER_BILL_REQ["bill"],
+			payload: struct {
+				chat_id string
+				bill_id string
+			}{
+				chat_id: fmt.Sprintf("%d", mocks.USER_BILL_REQ["chat_id"]),
+				bill_id: "1",
 			},
 			expectedCode: http.StatusOK,
 		},
@@ -169,12 +173,8 @@ func Test_Server_DeleteBillHandler(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			// Кодирую тело запроса
-			b := &bytes.Buffer{}
-			json.NewEncoder(b).Encode(tc.payload)
-
 			rec := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodDelete, "/api/v1/bot/user/bill", b)
+			req, _ := http.NewRequest(http.MethodDelete, fmt.Sprintf("/api/v1/bot/user/%s/bill/%s", tc.payload.chat_id, tc.payload.bill_id), nil)
 			s.Router.ServeHTTP(rec, req)
 
 			assert.Equal(t, tc.expectedCode, rec.Code)
