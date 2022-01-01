@@ -16,6 +16,7 @@ type ModExchanger struct {
 	cnf   *config.Config
 
 	responser utils.ResponserI
+	logger    utils.LoggerI
 }
 
 type ModExchangerI interface {
@@ -27,7 +28,7 @@ type ModExchangerI interface {
 	GetExchangerDocumentHandler(c *gin.Context)
 }
 
-func InitModExchanger(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI) ModExchangerI {
+func InitModExchanger(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI, l utils.LoggerI) ModExchangerI {
 	return &ModExchanger{
 		store: store,
 		redis: redis,
@@ -35,5 +36,6 @@ func InitModExchanger(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries
 		cnf:   cnf,
 
 		responser: responser,
+		logger:    l,
 	}
 }

@@ -75,23 +75,26 @@ func (m *ModBills) CreateBillHandler(c *gin.Context) {
 			return
 		}
 
-		m.responser.CreateRecordResponse(c, m.store.AdminPanel().Bills(), obj)
-		payload, err := json.Marshal(map[string]interface{}{
-			"to": map[string]interface{}{
-				"chat_id": r.ChatID,
-			},
-			"message": map[string]interface{}{
-				"type": "confirmation_successful",
-				"text": fmt.Sprintf("🟢 Успех! 🟢\n\nКарта `%s` успешно верифицирован.", r.Bill),
-			},
-			"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
-		})
-		if err != nil {
-			fmt.Println(err)
-		}
+		if err := m.responser.CreateRecordResponse(c, m.store.AdminPanel().Bills(), obj); err == nil {
+			payload, err := json.Marshal(map[string]interface{}{
+				"to": map[string]interface{}{
+					"chat_id": r.ChatID,
+				},
+				"message": map[string]interface{}{
+					"type": "confirmation_successful",
+					"text": fmt.Sprintf("🟢 Успех! 🟢\n\nКарта `%s` успешно верифицированa.", r.Bill),
+				},
+				"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+			})
+			if err != nil {
+				m.modlog(err)
+				return
+			}
 
-		if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
-			fmt.Println(err)
+			if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+				m.modlog(err)
+				return
+			}
 		}
 
 		return

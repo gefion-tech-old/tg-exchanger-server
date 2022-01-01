@@ -227,6 +227,7 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 	case sql.ErrNoRows:
 		m.responser.Error(c, http.StatusNotFound, errors.ErrNotRegistered)
 		return
+
 	default:
 		m.responser.Error(c, http.StatusInternalServerError, err)
 		return

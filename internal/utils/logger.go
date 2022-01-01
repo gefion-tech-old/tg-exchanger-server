@@ -9,14 +9,16 @@ type Logger struct {
 	store db.LoggerRepository
 }
 
-type LoggerI interface{}
+type LoggerI interface {
+	NewRecord(r *models.LogRecord) error
+}
 
 func InitLogger(s db.LoggerRepository) LoggerI {
-	return Logger{
+	return &Logger{
 		store: s,
 	}
 }
 
-func (u *Logger) NewRecord(r *models.LogRecord) {
-	u.store.Create(r)
+func (u *Logger) NewRecord(r *models.LogRecord) error {
+	return u.store.Create(r)
 }

@@ -47,7 +47,7 @@ func (s *Server) configure() {
 func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, l utils.LoggerI, c *config.Config) *Server {
 	// Инициализация роутера
 	router := gin.New()
-	responser := utils.InitResponser()
+	responser := utils.InitResponser(l)
 
 	guard := guard.Init(r, &c.Secrets, responser)
 	m := middleware.InitMiddleware()

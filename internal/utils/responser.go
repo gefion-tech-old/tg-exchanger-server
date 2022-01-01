@@ -9,25 +9,36 @@ import (
 	"strconv"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
 )
 
-type Responser struct{}
+type Responser struct {
+	logger   LoggerI
+	template models.LogRecord
+}
 
 type ResponserI interface {
 	NewRecordResponse(c *gin.Context, data interface{}, err error)
 	RecordResponse(c *gin.Context, data interface{}, err error)
 	SelectionResponse(c *gin.Context, repository interface{})
 	RecordHandler(c *gin.Context, model interface{}, validators ...error) interface{}
-	DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error)
-	UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error)
-	CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error)
+	DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
+	UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
+	CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
 	Error(c *gin.Context, code int, err ...error) error
 }
 
-func InitResponser() ResponserI {
-	return &Responser{}
+func InitResponser(l LoggerI) ResponserI {
+	return &Responser{
+		logger: l,
+		template: models.LogRecord{
+			Module:  "HTTP RESPONSER",
+			Service: static.L__SERVER,
+		},
+	}
 }
 
 /*
@@ -68,24 +79,23 @@ func (u *Responser) RecordResponse(c *gin.Context, data interface{}, err error) 
 
 	Автоматический HTTP ответ.
 */
-func (u *Responser) DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) {
+func (u *Responser) DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
 	// Инициализация метода операции с БД
 	fn, err := GetReflectMethod(repository, "Delete")
 	if err != nil {
-		u.Error(c, http.StatusInternalServerError, err)
-		return
+		return u.Error(c, http.StatusInternalServerError, err)
 	}
 
 	// Выполнение операции с БД
 	if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
 		u.RecordResponse(c, model, nil)
-		return
+		return nil
 	} else if err != nil {
 		u.RecordResponse(c, nil, err)
-		return
+		return err
 	}
 
-	u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	return u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -94,24 +104,23 @@ func (u *Responser) DeleteRecordResponse(c *gin.Context, repository, model inter
 
 	Автоматический HTTP ответ.
 */
-func (u *Responser) UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) {
+func (u *Responser) UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
 	// Инициализация метода операции с БД
 	fn, err := GetReflectMethod(repository, "Update")
 	if err != nil {
-		u.Error(c, http.StatusInternalServerError, err)
-		return
+		return u.Error(c, http.StatusInternalServerError, err)
 	}
 
 	// Выполнение операции с БД
 	if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
 		u.RecordResponse(c, model, nil)
-		return
+		return nil
 	} else if err != nil {
 		u.RecordResponse(c, nil, err)
-		return
+		return err
 	}
 
-	u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	return u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -120,40 +129,40 @@ func (u *Responser) UpdateRecordResponse(c *gin.Context, repository, model inter
 
 	Автоматический HTTP ответ.
 */
-func (u *Responser) CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) {
+func (u *Responser) CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
 	// Выполнение всех вложенных методов
 	for _, executor := range todo {
 		if err := executor(); err != nil {
-			u.Error(c, http.StatusInternalServerError, err)
-			return
+			return u.Error(c, http.StatusInternalServerError, err)
 		}
 	}
 
 	// Инициализация метода операции с БД
 	fn, err := GetReflectMethod(repository, "Create")
 	if err != nil {
-		u.Error(c, http.StatusInternalServerError, err)
-		return
+		return u.Error(c, http.StatusInternalServerError, err)
 	}
 
 	// Выполнение операции с БД
 	if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
 		u.NewRecordResponse(c, model, nil)
-		return
+		return nil
 	} else if err != nil {
-		u.RecordResponse(c, nil, err)
-		return
+		u.NewRecordResponse(c, nil, err)
+		return err
 	}
 
-	u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	return u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
+/*
+	Универсальный метод для подготовки и валидирования любой структуры.
+*/
 func (u *Responser) RecordHandler(c *gin.Context, model interface{}, validators ...error) interface{} {
 	if c.Param("id") != "" {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			u.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
-			return err
+			return u.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
 		}
 
 		// Может быть любым типом
@@ -166,15 +175,13 @@ func (u *Responser) RecordHandler(c *gin.Context, model interface{}, validators 
 
 		if val.Kind() != reflect.Struct {
 			err := fmt.Errorf("failed to process the struct %s", reflect.TypeOf(model).String())
-			u.Error(c, http.StatusInternalServerError, err)
-			return err
+			return u.Error(c, http.StatusInternalServerError, err)
 		}
 
 		fID := val.FieldByName("ID")
 		if !fID.IsValid() && fID.Kind() != reflect.Int {
 			err := fmt.Errorf("in struct %s, field ID is invalid", reflect.TypeOf(model).String())
-			u.Error(c, http.StatusInternalServerError, err)
-			return err
+			return u.Error(c, http.StatusInternalServerError, err)
 		}
 
 		fID.SetInt(int64(id))
@@ -270,9 +277,21 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}) {
 	})
 }
 
+/*
+	Универсальный метод обработки операций которые могут вернуть ошибки.
+	Если в результате выполнения операции получена ошибка, запрос автоматически прерывается.
+
+	Если ошибка произошла на стороне сервера, она записывается в логи.
+*/
 func (u *Responser) Error(c *gin.Context, code int, errs ...error) error {
 	for _, err := range errs {
 		if err != nil {
+			// Если 500 ошибка, записываю ее в логи
+			if code == http.StatusInternalServerError {
+				record := u.template
+				record.Info = err.Error()
+				u.logger.NewRecord(&record)
+			}
 			c.JSON(code, gin.H{
 				"error": err.Error(),
 			})

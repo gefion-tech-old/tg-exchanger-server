@@ -10,11 +10,13 @@ import (
 )
 
 type ModUsers struct {
-	store     db.SQLStoreI
-	redis     *redisstore.AppRedisDictionaries
-	nsq       nsqstore.NsqI
-	cnf       *config.Config
+	store db.SQLStoreI
+	redis *redisstore.AppRedisDictionaries
+	nsq   nsqstore.NsqI
+	cnf   *config.Config
+
 	responser utils.ResponserI
+	logger    utils.LoggerI
 }
 
 type ModUsersI interface {
@@ -27,12 +29,14 @@ type ModUsersI interface {
 	LogoutHandler(c *gin.Context)
 }
 
-func InitModUsers(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI) ModUsersI {
+func InitModUsers(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI, l utils.LoggerI) ModUsersI {
 	return &ModUsers{
-		store:     store,
-		redis:     redis,
-		nsq:       nsq,
-		cnf:       cnf,
+		store: store,
+		redis: redis,
+		nsq:   nsq,
+		cnf:   cnf,
+
 		responser: responser,
+		logger:    l,
 	}
 }

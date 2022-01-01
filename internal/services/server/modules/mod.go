@@ -39,11 +39,11 @@ func InitServerModules(
 	responser utils.ResponserI,
 ) ServerModulesI {
 	return &ServerModules{
-		exMod:     exchanger.InitModExchanger(store, redis, nsq, cnf, responser),
+		exMod:     exchanger.InitModExchanger(store, redis, nsq, cnf, responser, logger),
 		notifyMod: notification.InitModNotification(store, redis, nsq, cnf, logger, responser),
-		msgMod:    message.InitModMessage(store, redis, nsq, cnf, responser),
-		userMod:   user.InitModUsers(store, redis, nsq, cnf, responser),
-		billsMod:  bills.InitModBills(store, redis, nsq, cnf, responser),
+		msgMod:    message.InitModMessage(store, redis, nsq, cnf, responser, logger),
+		userMod:   user.InitModUsers(store, redis, nsq, cnf, responser, logger),
+		billsMod:  bills.InitModBills(store, redis, nsq, cnf, responser, logger),
 		logsMod:   logs.InitModLogs(store.AdminPanel().Logs(), cnf, responser),
 	}
 }
@@ -83,6 +83,6 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 	router.GET("/admin/exchangers", g.AuthTokenValidation(), g.IsAuth(), m.exMod.GetExchangersSelectionHandler)
 
 	router.POST("/log", m.logsMod.CreateLogRecordHandler)
-	router.DELETE("/log/:id", m.logsMod.DeleteLogRecordHandler)
-	router.GET("/logs", m.logsMod.GetLogRecordsSelectionHandler)
+	router.DELETE("/log/:id", g.AuthTokenValidation(), g.IsAuth(), g.IsAdmin(), m.logsMod.DeleteLogRecordHandler)
+	router.GET("/logs", g.AuthTokenValidation(), g.IsAuth(), g.IsAdmin(), m.logsMod.GetLogRecordsSelectionHandler)
 }

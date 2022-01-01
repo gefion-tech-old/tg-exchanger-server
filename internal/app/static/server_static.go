@@ -1,5 +1,7 @@
 package static
 
+//
+
 // Роли
 const (
 	S__ROLE__ADMIN   = 2

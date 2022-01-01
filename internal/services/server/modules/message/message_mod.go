@@ -16,6 +16,7 @@ type ModMessage struct {
 	cnf   *config.Config
 
 	responser utils.ResponserI
+	logger    utils.LoggerI
 }
 
 type ModMessageI interface {
@@ -27,12 +28,14 @@ type ModMessageI interface {
 	GetMessageHandler(c *gin.Context)
 }
 
-func InitModMessage(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI) ModMessageI {
+func InitModMessage(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI, l utils.LoggerI) ModMessageI {
 	return &ModMessage{
-		store:     store,
-		redis:     redis,
-		nsq:       nsq,
-		cnf:       cnf,
+		store: store,
+		redis: redis,
+		nsq:   nsq,
+		cnf:   cnf,
+
 		responser: responser,
+		logger:    l,
 	}
 }
