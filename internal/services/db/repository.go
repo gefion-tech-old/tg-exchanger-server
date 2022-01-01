@@ -43,7 +43,7 @@ type ExchangerRepository interface {
 type NotificationRepository interface {
 	Create(n *models.Notification) error
 	Delete(n *models.Notification) error
-	UpdateStatus(n *models.Notification) error
+	Update(n *models.Notification) error
 	Get(n *models.Notification) error
 	Count() (int, error)
 	Selection(page, limit int) ([]*models.Notification, error)

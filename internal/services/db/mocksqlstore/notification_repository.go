@@ -42,7 +42,7 @@ func (r *NotificationRepository) Delete(n *models.Notification) error {
 	return sql.ErrNoRows
 }
 
-func (r *NotificationRepository) UpdateStatus(n *models.Notification) error {
+func (r *NotificationRepository) Update(n *models.Notification) error {
 	if r.notification[n.ID] != nil {
 		r.notification[n.ID].Status = n.Status
 		r.notification[n.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")

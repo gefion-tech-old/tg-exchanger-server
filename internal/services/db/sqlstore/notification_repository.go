@@ -57,7 +57,7 @@ func (r *NotificationRepository) Create(n *models.Notification) error {
 
 	# TESTED
 */
-func (r *NotificationRepository) UpdateStatus(n *models.Notification) error {
+func (r *NotificationRepository) Update(n *models.Notification) error {
 	if err := r.store.QueryRow(
 		`
 		UPDATE notifications
