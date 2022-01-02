@@ -13,6 +13,25 @@ import (
 
 /*
 	@Method GET
+	@Path admin/notifications/check
+	@Type PRIVATE
+	@Documentation
+
+	Получить кол-во новых уведомлений `notifications`
+*/
+func (m *ModNotification) NewNotificationsCheckHandler(c *gin.Context) {
+	count, err := m.store.AdminPanel().Notification().CheckNew()
+	if err != nil {
+		m.responser.Error(c, http.StatusInternalServerError, err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"new_notifications": count,
+	})
+}
+
+/*
+	@Method GET
 	@Path admin/notifications?page=1&limit=15
 	@Type PRIVATE
 	@Documentation

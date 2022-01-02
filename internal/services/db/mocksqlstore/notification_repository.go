@@ -12,6 +12,10 @@ type NotificationRepository struct {
 	notification map[int]*models.Notification
 }
 
+func (r *NotificationRepository) CheckNew() (int, error) {
+	return 0, nil
+}
+
 func (r *NotificationRepository) Create(n *models.Notification) error {
 	n.ID = len(r.notification) + 1
 	n.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")

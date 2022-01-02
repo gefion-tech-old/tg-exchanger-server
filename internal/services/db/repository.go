@@ -45,6 +45,7 @@ type NotificationRepository interface {
 	Delete(n *models.Notification) error
 	Update(n *models.Notification) error
 	Get(n *models.Notification) error
+	CheckNew() (int, error)
 	Count() (int, error)
 	Selection(page, limit int) ([]*models.Notification, error)
 }

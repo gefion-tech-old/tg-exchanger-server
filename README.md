@@ -38,6 +38,7 @@
             - [Get Slice of Notifications](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__notification.md#get-slice-of-notifications)
             - [Update Status](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__notification.md#update-status) 
             - [Delete](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__notification.md#delete) 
+            - [Count New](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__notification.md#count_new)
         - [Exchanger](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__exchanger.md)
             - [Create](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__exchanger.md#create)
             - [Update](https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__exchanger.md#update)

@@ -12,6 +12,22 @@ type NotificationRepository struct {
 	store *sql.DB
 }
 
+func (r *NotificationRepository) CheckNew() (int, error) {
+	var c int
+	if err := r.store.QueryRow(
+		`
+		SELECT count(*)
+		FROM notifications
+		WHERE status=1
+		`,
+	).Scan(
+		&c,
+	); err != nil {
+		return 0, err
+	}
+	return c, nil
+}
+
 /*
 	Создать записи в таблице `notifications`
 

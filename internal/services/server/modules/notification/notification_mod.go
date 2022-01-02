@@ -24,6 +24,7 @@ type ModNotificationI interface {
 	GetNotificationsSelectionHandler(c *gin.Context)
 	UpdateNotificationStatusHandler(c *gin.Context)
 	DeleteNotificationHandler(c *gin.Context)
+	NewNotificationsCheckHandler(c *gin.Context)
 }
 
 func InitModNotification(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, l utils.LoggerI, responser utils.ResponserI) ModNotificationI {

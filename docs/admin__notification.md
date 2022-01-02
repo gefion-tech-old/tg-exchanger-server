@@ -245,3 +245,18 @@ API путь указан с значениями по умолчанию для
     "updated_at": "2021-12-13T10:16:59.499637Z"
 }
 ```
+
+<hr>
+
+### Count New
+
+- **[GET]** `/api/v1/admin/notifications/check` — получить количество новых уведомлений
+
+
+***Response***
+
+```json
+{
+    "new_notifications": 6
+}
+```
