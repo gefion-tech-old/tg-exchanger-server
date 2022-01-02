@@ -42,7 +42,7 @@ func (m *ModNotification) NewNotificationsCheckHandler(c *gin.Context) {
 
 */
 func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
-	m.responser.SelectionResponse(c, m.store.AdminPanel().Notification())
+	m.responser.SelectionResponse(c, m.store.AdminPanel().Notification(), nil)
 }
 
 /*

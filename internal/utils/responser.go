@@ -23,7 +23,7 @@ type Responser struct {
 type ResponserI interface {
 	NewRecordResponse(c *gin.Context, data interface{}, err error)
 	RecordResponse(c *gin.Context, data interface{}, err error)
-	SelectionResponse(c *gin.Context, repository interface{})
+	SelectionResponse(c *gin.Context, repository interface{}, filter func(arr interface{}) (interface{}, int))
 	RecordHandler(c *gin.Context, model interface{}, validators ...error) interface{}
 	DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
 	UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
@@ -202,7 +202,7 @@ func (u *Responser) RecordHandler(c *gin.Context, model interface{}, validators 
 	Для использования данного метода у передеваемого репозитория
 	должны быть реализованы методы Count и Selection.
 */
-func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}) {
+func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}, filter func(arr interface{}) (interface{}, int)) {
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
 		u.Error(c, http.StatusUnprocessableEntity, err)
@@ -269,10 +269,24 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}) {
 		return
 	}
 
+	// Выполняю фильтрацию если задана функция фильтрации
+	if filter != nil {
+		arr, count := filter(arr)
+		c.JSON(http.StatusOK, gin.H{
+			"limit":        limit,
+			"current_page": page,
+			"last_page":    math.Ceil(float64(count) / float64(limit)),
+			"total":        count,
+			"data":         arr,
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"limit":        limit,
 		"current_page": page,
 		"last_page":    math.Ceil(float64(*count) / float64(limit)),
+		"total":        *count,
 		"data":         arr,
 	})
 }
