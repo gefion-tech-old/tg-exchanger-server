@@ -18,6 +18,7 @@ type ModLogsI interface {
 	CreateLogRecordHandler(c *gin.Context)
 	DeleteLogRecordHandler(c *gin.Context)
 	GetLogRecordsSelectionHandler(c *gin.Context)
+	DeleteLogRecordsSelectionHandler(c *gin.Context)
 }
 
 func InitModLogs(r db.LoggerRepository, cnf *config.Config, responser utils.ResponserI) ModLogsI {

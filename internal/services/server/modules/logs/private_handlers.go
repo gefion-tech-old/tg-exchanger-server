@@ -1,16 +1,24 @@
 package logs
 
 import (
-	"fmt"
 	"net/http"
 	"reflect"
-	"time"
+	"strconv"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/sync/errgroup"
 )
 
+/*
+	@Method DELETE
+	@Path /log
+	@Type PRIVATE
+	@Documentation
+
+	Удаление записи из бд `logs`
+*/
 func (m *ModLogs) DeleteLogRecordHandler(c *gin.Context) {
 	if obj := m.responser.RecordHandler(c, &models.LogRecord{}).(*models.LogRecord); obj != nil {
 		if reflect.TypeOf(obj) != reflect.TypeOf(&models.LogRecord{}) {
@@ -24,38 +32,89 @@ func (m *ModLogs) DeleteLogRecordHandler(c *gin.Context) {
 	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
 }
 
+/*
+	@Method GET
+	@Path /logs
+	@Type PRIVATE
+	@Documentation
+
+	Выборка по условиям из таблицы `logs`
+*/
 func (m *ModLogs) GetLogRecordsSelectionHandler(c *gin.Context) {
-	m.responser.SelectionResponse(c, m.repository, func(arr interface{}) (interface{}, int) {
-		if c.Query("user") != "" {
-			newArr := []*models.LogRecord{}
-			for _, v := range arr.([]*models.LogRecord) {
-				if v.Username != nil {
-					if *v.Username == c.Query("user") {
-						newArr = append(newArr, v)
-					}
-				}
-			}
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil {
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+		return
+	}
 
-			arr = newArr
-		}
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
+	if err != nil {
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
+		return
+	}
 
-		dt := "2022-01-02"
-		dt1, err := time.Parse("2006-01-02", dt)
+	if err := m.responser.DateHandler(c, c.Query("from"), c.Query("to")); err != nil {
+		return
+	}
+
+	errs, _ := errgroup.WithContext(c)
+
+	cArr := make(chan []*models.LogRecord)
+	cCount := make(chan *int)
+
+	errs.Go(func() error {
+		defer close(cCount)
+
+		c, err := m.repository.CountWithCustomFilters(c.Query("user"), c.Query("from"), c.Query("to"))
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 
-		dt2 := "2022-01-01"
-		dt3, err := time.Parse("2006-01-02", dt2)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		dt3.Before(dt1)
-
-		return arr, len(arr.([]*models.LogRecord))
-
+		cCount <- &c
+		return nil
 	})
+
+	errs.Go(func() error {
+		defer close(cArr)
+
+		arr, err := m.repository.SelectionWithCustomFilters(page, limit, c.Query("user"), c.Query("from"), c.Query("to"))
+		if err != nil {
+			return err
+		}
+
+		cArr <- arr
+		return nil
+	})
+
+	arr := <-cArr
+	count := <-cCount
+
+	if arr == nil || count == nil {
+		m.responser.Error(c, http.StatusInternalServerError, errs.Wait())
+		return
+	}
+
+	m.responser.SelectionResponseObj(c, arr, page, limit, *count)
 }
 
-func (m *ModLogs) DeleteLogRecordsSelectionHandler(c *gin.Context) {}
+/*
+	@Method DELETE
+	@Path /logs
+	@Type PRIVATE
+	@Documentation
+
+	Удаление записей по условиям из таблицы `logs`
+*/
+func (m *ModLogs) DeleteLogRecordsSelectionHandler(c *gin.Context) {
+	if err := m.responser.DateHandler(c, c.Query("from"), c.Query("to")); err != nil {
+		return
+	}
+
+	arr, err := m.repository.DeleteSelection(c.Query("from"), c.Query("to"))
+	if err != nil {
+		m.responser.Error(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, arr)
+}

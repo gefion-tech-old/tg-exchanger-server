@@ -9,6 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/*
+	@Method POST
+	@Path /log
+	@Type PUBLIC
+	@Documentation
+
+	Создание записи в таблице `logs`
+*/
 func (m *ModLogs) CreateLogRecordHandler(c *gin.Context) {
 	r := &models.LogRecord{}
 	if err := c.ShouldBindJSON(r); err != nil {
@@ -17,6 +25,9 @@ func (m *ModLogs) CreateLogRecordHandler(c *gin.Context) {
 	}
 
 	switch r.Service {
+	case static.L__SERVER:
+		m.responser.Error(c, http.StatusUnprocessableEntity, r.InternalRecordValidation())
+
 	case static.L__BOT:
 		m.responser.Error(c, http.StatusUnprocessableEntity, r.InternalRecordValidation())
 

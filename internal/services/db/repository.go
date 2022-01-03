@@ -27,8 +27,9 @@ type UserBillsRepository interface {
 type LoggerRepository interface {
 	Create(lr *models.LogRecord) error
 	Delete(lr *models.LogRecord) error
-	Count() (int, error)
-	Selection(page, limit int) ([]*models.LogRecord, error)
+	CountWithCustomFilters(username, date_from, date_to string) (int, error)
+	SelectionWithCustomFilters(page, limit int, username, date_from, date_to string) ([]*models.LogRecord, error)
+	DeleteSelection(date_from, date_to string) ([]*models.LogRecord, error)
 }
 
 type ExchangerRepository interface {

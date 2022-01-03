@@ -86,4 +86,5 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 	router.POST("/log", m.logsMod.CreateLogRecordHandler)
 	router.DELETE("/log/:id", g.AuthTokenValidation(), g.IsAuth(), g.IsAdmin(), m.logsMod.DeleteLogRecordHandler)
 	router.GET("/logs", g.AuthTokenValidation(), g.IsAuth(), g.IsAdmin(), m.logsMod.GetLogRecordsSelectionHandler)
+	router.DELETE("/logs", g.AuthTokenValidation(), g.IsAuth(), g.IsAdmin(), m.logsMod.DeleteLogRecordsSelectionHandler)
 }

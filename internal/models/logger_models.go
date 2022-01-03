@@ -41,6 +41,10 @@ func (l *LogRecord) AdminRecordValidation() error {
 			validation.Required,
 		),
 		validation.Field(
+			&l.Username,
+			validation.Required,
+		),
+		validation.Field(
 			&l.Service,
 			validation.Required,
 			validation.In(static.L__ADMIN),

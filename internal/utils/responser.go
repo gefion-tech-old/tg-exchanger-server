@@ -12,6 +12,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
+	validation "github.com/go-ozzo/ozzo-validation"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -23,8 +24,10 @@ type Responser struct {
 type ResponserI interface {
 	NewRecordResponse(c *gin.Context, data interface{}, err error)
 	RecordResponse(c *gin.Context, data interface{}, err error)
-	SelectionResponse(c *gin.Context, repository interface{}, filter func(arr interface{}) (interface{}, int))
+	SelectionResponse(c *gin.Context, repository interface{})
+	SelectionResponseObj(c *gin.Context, arr interface{}, page, limit, count int)
 	RecordHandler(c *gin.Context, model interface{}, validators ...error) interface{}
+	DateHandler(c *gin.Context, date ...string) error
 	DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
 	UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
 	CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
@@ -195,6 +198,18 @@ func (u *Responser) RecordHandler(c *gin.Context, model interface{}, validators 
 	return model
 }
 
+func (u *Responser) DateHandler(c *gin.Context, date ...string) error {
+	for _, d := range date {
+		if d != "" {
+			if err := u.Error(c, http.StatusUnprocessableEntity,
+				validation.Validate(d, validation.Date("2006-01-01T00:00:00.00000000"))); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 /*
 	Метод для динамической разбивки данных из БД и
 	автоматическим HTTP ответом.
@@ -202,7 +217,7 @@ func (u *Responser) RecordHandler(c *gin.Context, model interface{}, validators 
 	Для использования данного метода у передеваемого репозитория
 	должны быть реализованы методы Count и Selection.
 */
-func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}, filter func(arr interface{}) (interface{}, int)) {
+func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}) {
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
 		u.Error(c, http.StatusUnprocessableEntity, err)
@@ -269,24 +284,15 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}, fi
 		return
 	}
 
-	// Выполняю фильтрацию если задана функция фильтрации
-	if filter != nil {
-		arr, count := filter(arr)
-		c.JSON(http.StatusOK, gin.H{
-			"limit":        limit,
-			"current_page": page,
-			"last_page":    math.Ceil(float64(count) / float64(limit)),
-			"total":        count,
-			"data":         arr,
-		})
-		return
-	}
+	u.SelectionResponseObj(c, arr, page, limit, *count)
+}
 
+func (u *Responser) SelectionResponseObj(c *gin.Context, arr interface{}, page, limit, count int) {
 	c.JSON(http.StatusOK, gin.H{
 		"limit":        limit,
 		"current_page": page,
-		"last_page":    math.Ceil(float64(*count) / float64(limit)),
-		"total":        *count,
+		"last_page":    math.Ceil(float64(count) / float64(limit)),
+		"total":        count,
 		"data":         arr,
 	})
 }
