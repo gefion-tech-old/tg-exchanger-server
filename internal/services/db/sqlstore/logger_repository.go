@@ -194,7 +194,7 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 		conditions = append(conditions, fmt.Sprintf("username='%s'", q.Username))
 	}
 
-	if q.Service != nil {
+	if len(q.Service) > 0 {
 		if q.Service[0] == "" {
 			q.Service = q.Service[:len(q.Service)-1]
 
