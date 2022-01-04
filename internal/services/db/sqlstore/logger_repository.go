@@ -73,7 +73,7 @@ func (r *LoggerRepository) Count(querys interface{}) (int, error) {
 	sb := fmt.Sprintf(`
 		SELECT count(*)
 		FROM logs
-		WHERE created_at >= $1 AND created_at < $2 AND %s
+		WHERE %s
 	`,
 		strings.Join(r.queryGeneration(q), " AND "),
 	)
@@ -95,7 +95,7 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 	sb := fmt.Sprintf(`
 		SELECT id, username, info, service, module, created_at
 		FROM logs
-		WHERE created_at >= $1 AND created_at < $2 AND %s
+		WHERE %s
 		ORDER BY id DESC
 		OFFSET %d
 		LIMIT %d
@@ -188,7 +188,7 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 		q.DateTo = time.Now().Add(27 * time.Hour).UTC().Format("2006-01-02T15:04:05.00000000")
 	}
 
-	conditions := []string{}
+	conditions := []string{"created_at >= $1 AND created_at < $2"}
 
 	if q.Username != "" {
 		conditions = append(conditions, fmt.Sprintf("username='%s'", q.Username))
@@ -203,8 +203,10 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 				strconv.Itoa(static.L__BOT),
 				strconv.Itoa(static.L__SERVER),
 			)
-		}
-	}
 
-	return append(conditions, fmt.Sprintf("service::int IN(%s)", strings.Join(q.Service, ", ")))
+			conditions = append(conditions, fmt.Sprintf("service::int IN(%s)", strings.Join(q.Service, ", ")))
+		}
+	}	
+
+	return conditions
 }
