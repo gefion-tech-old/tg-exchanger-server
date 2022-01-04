@@ -194,14 +194,16 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 		conditions = append(conditions, fmt.Sprintf("username='%s'", q.Username))
 	}
 
-	if q.Service[0] == "" {
-		q.Service = q.Service[:len(q.Service)-1]
+	if q.Service != nil {
+		if q.Service[0] == "" {
+			q.Service = q.Service[:len(q.Service)-1]
 
-		q.Service = append(q.Service,
-			strconv.Itoa(static.L__ADMIN),
-			strconv.Itoa(static.L__BOT),
-			strconv.Itoa(static.L__SERVER),
-		)
+			q.Service = append(q.Service,
+				strconv.Itoa(static.L__ADMIN),
+				strconv.Itoa(static.L__BOT),
+				strconv.Itoa(static.L__SERVER),
+			)
+		}
 	}
 
 	return append(conditions, fmt.Sprintf("service::int IN(%s)", strings.Join(q.Service, ", ")))

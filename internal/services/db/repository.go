@@ -46,9 +46,9 @@ type NotificationRepository interface {
 	Delete(n *models.Notification) error
 	Update(n *models.Notification) error
 	Get(n *models.Notification) error
-	CheckNew() (int, error)
 	Count(querys interface{}) (int, error)
 	Selection(querys interface{}) ([]*models.Notification, error)
+	CheckNew() (int, error)
 }
 
 type BotMessagesRepository interface {
