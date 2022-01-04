@@ -105,6 +105,8 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 		q.Limit,
 	)
 
+	fmt.Println(sb)
+
 	rows, err := r.store.Query(sb, q.DateFrom, q.DateTo)
 	if err != nil {
 		return nil, err
@@ -194,6 +196,8 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 		conditions = append(conditions, fmt.Sprintf("username='%s'", q.Username))
 	}
 
+	
+
 	if len(q.Service) > 0 {
 		if q.Service[0] == "" {
 			q.Service = q.Service[:len(q.Service)-1]
@@ -202,10 +206,10 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 				strconv.Itoa(static.L__ADMIN),
 				strconv.Itoa(static.L__BOT),
 				strconv.Itoa(static.L__SERVER),
-			)
-
-			conditions = append(conditions, fmt.Sprintf("service::int IN(%s)", strings.Join(q.Service, ", ")))
+			)			
 		}
+
+		conditions = append(conditions, fmt.Sprintf("service::int IN(%s)", strings.Join(q.Service, ", ")))
 	}	
 
 	return conditions
