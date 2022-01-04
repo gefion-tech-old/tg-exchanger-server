@@ -105,8 +105,6 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 		q.Limit,
 	)
 
-	fmt.Println(sb)
-
 	rows, err := r.store.Query(sb, q.DateFrom, q.DateTo)
 	if err != nil {
 		return nil, err
