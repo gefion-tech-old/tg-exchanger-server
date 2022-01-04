@@ -58,11 +58,12 @@ func (r *NotificationRepository) Update(n *models.Notification) error {
 	return sql.ErrNoRows
 }
 
-func (r *NotificationRepository) Selection(page, limit int) ([]*models.Notification, error) {
+func (r *NotificationRepository) Selection(querys interface{}) ([]*models.Notification, error) {
+	q := querys.(*models.NotificationSelection)
 	arr := []*models.Notification{}
 
 	for i, v := range r.notification {
-		if i > tools.OffsetThreshold(page, limit) && i <= tools.OffsetThreshold(page, limit)+limit {
+		if i > tools.OffsetThreshold(q.Page, q.Limit) && i <= tools.OffsetThreshold(q.Page, q.Limit)+q.Limit {
 			arr = append(arr, v)
 		}
 		i++
@@ -71,7 +72,7 @@ func (r *NotificationRepository) Selection(page, limit int) ([]*models.Notificat
 	return arr, nil
 }
 
-func (r *NotificationRepository) Count() (int, error) {
+func (r *NotificationRepository) Count(querys interface{}) (int, error) {
 	return len(r.notification), nil
 }
 

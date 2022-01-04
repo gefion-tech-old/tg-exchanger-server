@@ -27,8 +27,8 @@ type UserBillsRepository interface {
 type LoggerRepository interface {
 	Create(lr *models.LogRecord) error
 	Delete(lr *models.LogRecord) error
-	CountWithCustomFilters(username, date_from, date_to string) (int, error)
-	SelectionWithCustomFilters(page, limit int, username, date_from, date_to string) ([]*models.LogRecord, error)
+	Count(querys interface{}) (int, error)
+	Selection(querys interface{}) ([]*models.LogRecord, error)
 	DeleteSelection(date_from, date_to string) ([]*models.LogRecord, error)
 }
 
@@ -37,8 +37,8 @@ type ExchangerRepository interface {
 	Delete(e *models.Exchanger) error
 	Update(e *models.Exchanger) error
 	GetByName(e *models.Exchanger) error
-	Count() (int, error)
-	Selection(page, limit int) ([]*models.Exchanger, error)
+	Count(querys interface{}) (int, error)
+	Selection(querys interface{}) ([]*models.Exchanger, error)
 }
 
 type NotificationRepository interface {
@@ -47,8 +47,8 @@ type NotificationRepository interface {
 	Update(n *models.Notification) error
 	Get(n *models.Notification) error
 	CheckNew() (int, error)
-	Count() (int, error)
-	Selection(page, limit int) ([]*models.Notification, error)
+	Count(querys interface{}) (int, error)
+	Selection(querys interface{}) ([]*models.Notification, error)
 }
 
 type BotMessagesRepository interface {
@@ -56,6 +56,6 @@ type BotMessagesRepository interface {
 	Update(m *models.BotMessage) error
 	Delete(m *models.BotMessage) error
 	Get(m *models.BotMessage) error
-	Count() (int, error)
-	Selection(page, limit int) ([]*models.BotMessage, error)
+	Count(querys interface{}) (int, error)
+	Selection(querys interface{}) ([]*models.BotMessage, error)
 }

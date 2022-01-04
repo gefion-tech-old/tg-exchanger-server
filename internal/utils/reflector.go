@@ -2,8 +2,32 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 )
+
+func SetReflectIntValue(obj interface{}, field string, valueToSet int) (interface{}, error) {
+	// Заполнение объекта querys
+	// Может быть любым типом
+	val := reflect.ValueOf(obj)
+
+	// Если это указатель
+	if val.Kind() == reflect.Ptr {
+		val = reflect.Indirect(val)
+	}
+
+	if val.Kind() != reflect.Struct {
+		return nil, fmt.Errorf("failed to process the struct %s", reflect.TypeOf(obj).String())
+	}
+
+	f := val.FieldByName(field)
+	if !f.IsValid() && f.Kind() != reflect.Int {
+		return nil, fmt.Errorf("in struct %s, field %s is invalid", reflect.TypeOf(obj).String(), field)
+	}
+
+	f.SetInt(int64(valueToSet))
+	return obj, nil
+}
 
 /*
 	Метод для получение функции рефлектора, если она существует

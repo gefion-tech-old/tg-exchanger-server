@@ -83,7 +83,7 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) error {
 
 	# TESTED
 */
-func (r *ExchangerRepository) Count() (int, error) {
+func (r *ExchangerRepository) Count(querys interface{}) (int, error) {
 	var c int
 	if err := r.store.QueryRow(
 		`
@@ -99,8 +99,9 @@ func (r *ExchangerRepository) Count() (int, error) {
 	return c, nil
 }
 
-func (r *ExchangerRepository) Selection(page, limit int) ([]*models.Exchanger, error) {
+func (r *ExchangerRepository) Selection(querys interface{}) ([]*models.Exchanger, error) {
 	arr := []*models.Exchanger{}
+	q := querys.(*models.ExchangerSelection)
 
 	rows, err := r.store.Query(
 		`
@@ -110,8 +111,8 @@ func (r *ExchangerRepository) Selection(page, limit int) ([]*models.Exchanger, e
 		OFFSET $1
 		LIMIT $2
 		`,
-		tools.OffsetThreshold(page, limit),
-		limit,
+		tools.OffsetThreshold(q.Page, q.Limit),
+		q.Limit,
 	)
 	if err != nil {
 		return nil, err

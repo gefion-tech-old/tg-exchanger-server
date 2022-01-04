@@ -26,11 +26,11 @@ func (r *LoggerRepository) Delete(lr *models.LogRecord) error {
 	return nil
 }
 
-func (r *LoggerRepository) CountWithCustomFilters(username, date_from, date_to string) (int, error) {
+func (r *LoggerRepository) Count(querys interface{}) (int, error) {
 	return len(r.logs), nil
 }
 
-func (r *LoggerRepository) SelectionWithCustomFilters(page, limit int, username, date_from, date_to string) ([]*models.LogRecord, error) {
+func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, error) {
 	arr := []*models.LogRecord{}
 	for _, lr := range r.logs {
 		arr = append(arr, lr)

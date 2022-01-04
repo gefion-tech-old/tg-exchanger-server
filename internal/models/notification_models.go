@@ -31,6 +31,11 @@ type Notification struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+type NotificationSelection struct {
+	Page  int
+	Limit int
+}
+
 /*
 	==========================================================================================
 	ВАЛИДАЦИЯ ДАННЫХ

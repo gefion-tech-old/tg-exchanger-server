@@ -74,9 +74,18 @@ func Test_SQL_LoggerRepository(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+		q := &models.LogRecordSelection{
+			Page:     1,
+			Limit:    15,
+			Username: tc.username,
+			Service:  []string{""},
+			DateFrom: tc.from,
+			DateTo:   tc.to,
+		}
+
 		t.Run("count", func(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
-				c, err := s.AdminPanel().Logs().CountWithCustomFilters(tc.username, tc.from, tc.to)
+				c, err := s.AdminPanel().Logs().Count(q)
 				assert.NoError(t, err)
 				assert.Equal(t, tc.expectedArrLength, c)
 			})
@@ -84,7 +93,7 @@ func Test_SQL_LoggerRepository(t *testing.T) {
 
 		t.Run("selection", func(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
-				arr, err := s.AdminPanel().Logs().SelectionWithCustomFilters(1, 15, tc.username, tc.from, tc.to)
+				arr, err := s.AdminPanel().Logs().Selection(q)
 				assert.NoError(t, err)
 				assert.Equal(t, tc.expectedArrLength, len(arr))
 			})

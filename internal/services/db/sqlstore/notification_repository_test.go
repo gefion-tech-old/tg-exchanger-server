@@ -30,14 +30,19 @@ func Test_SQL_NotificationRepository(t *testing.T) {
 	// Поиск созданного уведомления
 	assert.NoError(t, s.AdminPanel().Notification().Get(data_854))
 
+	q := &models.NotificationSelection{
+		Page:  1,
+		Limit: 10,
+	}
+
 	// Получить уведомления из БД
-	arrN, err := s.AdminPanel().Notification().Selection(1, 10)
+	arrN, err := s.AdminPanel().Notification().Selection(q)
 	assert.NoError(t, err)
 	assert.NotNil(t, arrN)
 	assert.Len(t, arrN, 1)
 
 	// Подсчет кол-ва
-	c, err := s.AdminPanel().Notification().Count()
+	c, err := s.AdminPanel().Notification().Count(nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
 	assert.Equal(t, len(arrN), c)

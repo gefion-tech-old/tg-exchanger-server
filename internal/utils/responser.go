@@ -24,7 +24,7 @@ type Responser struct {
 type ResponserI interface {
 	NewRecordResponse(c *gin.Context, data interface{}, err error)
 	RecordResponse(c *gin.Context, data interface{}, err error)
-	SelectionResponse(c *gin.Context, repository interface{})
+	SelectionResponse(c *gin.Context, repository, querys interface{}) error
 	SelectionResponseObj(c *gin.Context, arr interface{}, page, limit, count int)
 	RecordHandler(c *gin.Context, model interface{}, validators ...error) interface{}
 	DateHandler(c *gin.Context, date ...string) error
@@ -217,23 +217,51 @@ func (u *Responser) DateHandler(c *gin.Context, date ...string) error {
 	Для использования данного метода у передеваемого репозитория
 	должны быть реализованы методы Count и Selection.
 */
-func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}) {
+func (u *Responser) SelectionResponse(c *gin.Context, repository, querys interface{}) error {
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
-		u.Error(c, http.StatusUnprocessableEntity, err)
-		return
+		return u.Error(c, http.StatusUnprocessableEntity, err)
 	}
 
 	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
 	if err != nil {
-		u.Error(c, http.StatusUnprocessableEntity, err)
-		return
+		return u.Error(c, http.StatusUnprocessableEntity, err)
 	}
 
 	errs, _ := errgroup.WithContext(c)
 
 	cArr := make(chan interface{})
 	cCount := make(chan *int)
+
+	// Заполнение объекта querys
+	// Может быть любым типом
+	val := reflect.ValueOf(querys)
+
+	// Если это указатель
+	if val.Kind() == reflect.Ptr {
+		val = reflect.Indirect(val)
+	}
+
+	if val.Kind() != reflect.Struct {
+		err := fmt.Errorf("failed to process the struct %s", reflect.TypeOf(querys).String())
+		return u.Error(c, http.StatusInternalServerError, err)
+	}
+
+	fPage := val.FieldByName("Page")
+	if !fPage.IsValid() && fPage.Kind() != reflect.Int {
+		err := fmt.Errorf("in struct %s, field ID is invalid", reflect.TypeOf(querys).String())
+		return u.Error(c, http.StatusInternalServerError, err)
+	}
+
+	fPage.SetInt(int64(page))
+
+	fLimit := val.FieldByName("Limit")
+	if !fLimit.IsValid() && fLimit.Kind() != reflect.Int {
+		err := fmt.Errorf("in struct %s, field ID is invalid", reflect.TypeOf(querys).String())
+		return u.Error(c, http.StatusInternalServerError, err)
+	}
+
+	fLimit.SetInt(int64(limit))
 
 	// Подсчет кол-ва записей в таблице
 	errs.Go(func() error {
@@ -244,7 +272,9 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}) {
 			return err
 		}
 
-		retv := fn.Call([]reflect.Value{})
+		retv := fn.Call([]reflect.Value{
+			reflect.ValueOf(querys),
+		})
 		c := int(retv[0].Int())
 		if retv[1].Interface() != nil {
 			return retv[1].Interface().(error)
@@ -264,8 +294,7 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}) {
 		}
 
 		retv := fn.Call([]reflect.Value{
-			reflect.ValueOf(page),
-			reflect.ValueOf(limit),
+			reflect.ValueOf(querys),
 		})
 
 		if retv[1].Interface() != nil {
@@ -280,11 +309,11 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository interface{}) {
 	count := <-cCount
 
 	if arr == nil || count == nil {
-		u.Error(c, http.StatusInternalServerError, errs.Wait())
-		return
+		return u.Error(c, http.StatusInternalServerError, errs.Wait())
 	}
 
 	u.SelectionResponseObj(c, arr, page, limit, *count)
+	return nil
 }
 
 func (u *Responser) SelectionResponseObj(c *gin.Context, arr interface{}, page, limit, count int) {

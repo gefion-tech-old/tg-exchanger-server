@@ -17,6 +17,11 @@ type Exchanger struct {
 	UpdatedAt  string `json:"updated_at"`
 }
 
+type ExchangerSelection struct {
+	Page  int
+	Limit int
+}
+
 type OneObmen struct {
 	XMLName xml.Name       `xml:"rates"`
 	Rates   []OneObmenItem `xml:"item"`

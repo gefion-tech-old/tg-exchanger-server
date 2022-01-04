@@ -63,15 +63,16 @@ func (r *ExchangerRepository) Delete(e *models.Exchanger) error {
 	return sql.ErrNoRows
 }
 
-func (r *ExchangerRepository) Count() (int, error) {
+func (r *ExchangerRepository) Count(querys interface{}) (int, error) {
 	return len(r.exchangers), nil
 }
 
-func (r *ExchangerRepository) Selection(page, limit int) ([]*models.Exchanger, error) {
+func (r *ExchangerRepository) Selection(querys interface{}) ([]*models.Exchanger, error) {
 	arr := []*models.Exchanger{}
+	q := querys.(*models.ExchangerSelection)
 
 	for i, v := range r.exchangers {
-		if i > tools.OffsetThreshold(page, limit) && i <= tools.OffsetThreshold(page, limit)+limit {
+		if i > tools.OffsetThreshold(q.Page, q.Limit) && i <= tools.OffsetThreshold(q.Page, q.Limit)+q.Limit {
 			arr = append(arr, v)
 		}
 		i++

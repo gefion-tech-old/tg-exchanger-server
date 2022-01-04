@@ -32,11 +32,12 @@ func (r *BotMessagesRepository) Get(m *models.BotMessage) error {
 	return sql.ErrNoRows
 }
 
-func (r *BotMessagesRepository) Selection(page, limit int) ([]*models.BotMessage, error) {
+func (r *BotMessagesRepository) Selection(querys interface{}) ([]*models.BotMessage, error) {
 	arr := []*models.BotMessage{}
+	q := querys.(*models.BotMessageSelection)
 
 	for i, v := range r.messages {
-		if i > tools.OffsetThreshold(page, limit) && i <= tools.OffsetThreshold(page, limit)+limit {
+		if i > tools.OffsetThreshold(q.Page, q.Limit) && i <= tools.OffsetThreshold(q.Page, q.Limit)+q.Limit {
 			arr = append(arr, v)
 		}
 		i++
@@ -71,7 +72,7 @@ func (r *BotMessagesRepository) Delete(m *models.BotMessage) error {
 	return sql.ErrNoRows
 }
 
-func (r *BotMessagesRepository) Count() (int, error) {
+func (r *BotMessagesRepository) Count(querys interface{}) (int, error) {
 	return len(r.messages), nil
 }
 

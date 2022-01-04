@@ -31,13 +31,18 @@ func Test_SQL_ExcangerRepository(t *testing.T) {
 	data.Name = "new"
 	assert.NoError(t, s.AdminPanel().Exchanger().Update(data))
 
+	q := &models.ExchangerSelection{
+		Page:  1,
+		Limit: 10,
+	}
+
 	// Подсчет
-	c, err := s.AdminPanel().Exchanger().Count()
+	c, err := s.AdminPanel().Exchanger().Count(q)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, c)
 
 	// Получение среза
-	slice, err := s.AdminPanel().Exchanger().Selection(1, 10)
+	slice, err := s.AdminPanel().Exchanger().Selection(q)
 	assert.NoError(t, err)
 	assert.Len(t, slice, 1)
 

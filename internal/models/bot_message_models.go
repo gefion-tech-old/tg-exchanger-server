@@ -15,6 +15,11 @@ type BotMessage struct {
 	UpdatedAt   string `json:"updated_at"`
 }
 
+type BotMessageSelection struct {
+	Page  int
+	Limit int
+}
+
 /*
 	==========================================================================================
 	ВАЛИДАЦИЯ ДАННЫХ

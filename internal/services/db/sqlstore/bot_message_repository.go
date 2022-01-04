@@ -43,7 +43,7 @@ func (r *BotMessagesRepository) Create(m *models.BotMessage) error {
 	return nil
 }
 
-func (r *BotMessagesRepository) Count() (int, error) {
+func (r *BotMessagesRepository) Count(querys interface{}) (int, error) {
 	var c int
 	if err := r.store.QueryRow(
 		`
@@ -88,8 +88,9 @@ func (r *BotMessagesRepository) Get(m *models.BotMessage) error {
 /*
 	Получить выборку из таблицы `bot_messages`
 */
-func (r *BotMessagesRepository) Selection(page, limit int) ([]*models.BotMessage, error) {
+func (r *BotMessagesRepository) Selection(querys interface{}) ([]*models.BotMessage, error) {
 	bmArr := []*models.BotMessage{}
+	q := querys.(*models.BotMessageSelection)
 
 	rows, err := r.store.Query(
 		`
@@ -99,8 +100,8 @@ func (r *BotMessagesRepository) Selection(page, limit int) ([]*models.BotMessage
 		OFFSET $1
 		LIMIT $2
 		`,
-		tools.OffsetThreshold(page, limit),
-		limit,
+		tools.OffsetThreshold(q.Page, q.Limit),
+		q.Limit,
 	)
 	if err != nil {
 		return nil, err

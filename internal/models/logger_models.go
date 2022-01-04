@@ -14,6 +14,15 @@ type LogRecord struct {
 	CreatedAt string  `json:"created_at"`
 }
 
+type LogRecordSelection struct {
+	Page     int
+	Limit    int
+	Service  []string
+	Username string
+	DateFrom string
+	DateTo   string
+}
+
 func (l *LogRecord) InternalRecordValidation() error {
 	return validation.ValidateStruct(
 		l,

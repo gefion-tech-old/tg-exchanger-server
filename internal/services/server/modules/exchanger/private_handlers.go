@@ -20,7 +20,10 @@ import (
 	# TESTED
 */
 func (m *ModExchanger) GetExchangersSelectionHandler(c *gin.Context) {
-	m.responser.SelectionResponse(c, m.store.AdminPanel().Exchanger())
+	m.responser.SelectionResponse(c,
+		m.store.AdminPanel().Exchanger(),
+		&models.ExchangerSelection{},
+	)
 }
 
 /*

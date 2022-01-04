@@ -108,7 +108,7 @@ func (r *NotificationRepository) Update(n *models.Notification) error {
 
 	# TESTED
 */
-func (r *NotificationRepository) Count() (int, error) {
+func (r *NotificationRepository) Count(querys interface{}) (int, error) {
 	var c int
 	if err := r.store.QueryRow(
 		`
@@ -129,7 +129,8 @@ func (r *NotificationRepository) Count() (int, error) {
 
 	# TESTED
 */
-func (r *NotificationRepository) Selection(page, limit int) ([]*models.Notification, error) {
+func (r *NotificationRepository) Selection(querys interface{}) ([]*models.Notification, error) {
+	q := querys.(*models.NotificationSelection)
 	nArr := []*models.Notification{}
 
 	rows, err := r.store.Query(
@@ -140,8 +141,8 @@ func (r *NotificationRepository) Selection(page, limit int) ([]*models.Notificat
 		OFFSET $1
 		LIMIT $2
 		`,
-		tools.OffsetThreshold(page, limit),
-		limit,
+		tools.OffsetThreshold(q.Page, q.Limit),
+		q.Limit,
 	)
 	if err != nil {
 		return nil, err

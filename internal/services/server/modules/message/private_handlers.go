@@ -74,7 +74,7 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
-	m.responser.SelectionResponse(c, m.store.AdminPanel().BotMessages())
+	m.responser.SelectionResponse(c, m.store.AdminPanel().BotMessages(), &models.BotMessageSelection{})
 }
 
 /*
