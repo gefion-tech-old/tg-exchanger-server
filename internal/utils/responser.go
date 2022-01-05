@@ -2,6 +2,7 @@ package utils
 
 import (
 	"database/sql"
+	_errors "errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -226,6 +227,14 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository, querys interfa
 	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
 	if err != nil {
 		return u.Error(c, http.StatusUnprocessableEntity, err)
+	}
+
+	if limit > 30 {
+		return u.Error(c, http.StatusUnprocessableEntity, _errors.New("limit is too larges"))
+	}
+
+	if page < 1 {
+		return u.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
 	}
 
 	errs, _ := errgroup.WithContext(c)
