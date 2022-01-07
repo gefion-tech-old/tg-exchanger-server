@@ -1,6 +1,7 @@
 package mocksqlstore
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
@@ -22,8 +23,10 @@ func (r *LoggerRepository) Delete(lr *models.LogRecord) error {
 	if r.logs[lr.ID] != nil {
 		r.rewrite(lr.ID, lr)
 		defer delete(r.logs, r.logs[lr.ID].ID)
+		return nil
 	}
-	return nil
+
+	return sql.ErrNoRows
 }
 
 func (r *LoggerRepository) Count(querys interface{}) (int, error) {
@@ -35,6 +38,7 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 	for _, lr := range r.logs {
 		arr = append(arr, lr)
 	}
+
 	return arr, nil
 }
 
@@ -43,6 +47,7 @@ func (r *LoggerRepository) DeleteSelection(date_from, date_to string) ([]*models
 	for _, lr := range r.logs {
 		arr = append(arr, lr)
 	}
+
 	return arr, nil
 }
 

@@ -179,6 +179,12 @@ func (r *LoggerRepository) DeleteSelection(date_from, date_to string) ([]*models
 	return arr, nil
 }
 
+/*
+	==========================================================================================
+	ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+	==========================================================================================
+*/
+
 func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []string {
 	if q.DateFrom == "" {
 		q.DateFrom = "2020-01-01T00:00:00.00000000"
@@ -194,8 +200,6 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 		conditions = append(conditions, fmt.Sprintf("username='%s'", q.Username))
 	}
 
-	
-
 	if len(q.Service) > 0 {
 		if q.Service[0] == "" {
 			q.Service = q.Service[:len(q.Service)-1]
@@ -204,11 +208,11 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 				strconv.Itoa(static.L__ADMIN),
 				strconv.Itoa(static.L__BOT),
 				strconv.Itoa(static.L__SERVER),
-			)			
+			)
 		}
 
 		conditions = append(conditions, fmt.Sprintf("service::int IN(%s)", strings.Join(q.Service, ", ")))
-	}	
+	}
 
 	return conditions
 }

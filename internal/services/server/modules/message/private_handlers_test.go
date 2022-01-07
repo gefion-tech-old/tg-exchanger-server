@@ -179,11 +179,14 @@ func Test_Server_GetAllMessageHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	body := map[string]interface{}{}
-	decodeErr := json.NewDecoder(rec.Body).Decode(&body)
-	assert.NoError(t, decodeErr)
-	assert.Len(t, body["data"], 1)
-
+	if rec.Code == http.StatusOK {
+		t.Run("checking returned array length", func(t *testing.T) {
+			body := map[string]interface{}{}
+			decodeErr := json.NewDecoder(rec.Body).Decode(&body)
+			assert.NoError(t, decodeErr)
+			assert.Len(t, body["data"], 1)
+		})
+	}
 }
 
 func Test_Server_CreateNewMessageHandler(t *testing.T) {

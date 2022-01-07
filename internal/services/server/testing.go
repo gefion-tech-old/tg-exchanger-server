@@ -78,6 +78,36 @@ func TestGetErrorText(t *testing.T, recBody *bytes.Buffer) (string, error) {
 	==========================================================================================
 */
 
+func TestLogRecord(t *testing.T, s *Server) error {
+	t.Helper()
+
+	// Кодирую тело запроса
+	b := &bytes.Buffer{}
+	if err := json.NewEncoder(b).Encode(mocks.LOG_RECORD__ADMIN); err != nil {
+		return err
+	}
+
+	rec := httptest.NewRecorder()
+	req, err := http.NewRequest(http.MethodPost, "/api/v1/log", b)
+	if err != nil {
+		return err
+	}
+
+	s.Router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		return errors.New("не удалось создать тестовую лог запись")
+	}
+
+	var body map[string]interface{}
+
+	if err := json.NewDecoder(rec.Body).Decode(&body); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func TestNotification854(t *testing.T, s *Server, tokens map[string]interface{}) error {
 	t.Helper()
 

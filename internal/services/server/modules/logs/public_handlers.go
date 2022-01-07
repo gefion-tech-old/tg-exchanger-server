@@ -16,6 +16,8 @@ import (
 	@Documentation
 
 	Создание записи в таблице `logs`
+
+	# TESTED
 */
 func (m *ModLogs) CreateLogRecordHandler(c *gin.Context) {
 	r := &models.LogRecord{}
