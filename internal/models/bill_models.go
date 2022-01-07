@@ -4,7 +4,7 @@ import (
 	"regexp"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
-	validation "github.com/go-ozzo/ozzo-validation"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type Bill struct {
@@ -26,17 +26,7 @@ type RejectBill struct {
 	==========================================================================================
 */
 
-func (b *Bill) StructFullness() error {
-	return validation.ValidateStruct(
-		b,
-		validation.Field(&b.ID, validation.Required),
-		validation.Field(&b.ChatID, validation.Required),
-		validation.Field(&b.Bill, validation.Required),
-		validation.Field(&b.CreatedAt, validation.Required),
-	)
-}
-
-func (rb *RejectBill) RejectBillValidation() error {
+func (rb *RejectBill) Validation() error {
 	return validation.ValidateStruct(
 		rb,
 		validation.Field(&rb.ChatID, validation.Required),
@@ -50,15 +40,27 @@ func (rb *RejectBill) RejectBillValidation() error {
 	)
 }
 
-func (b *Bill) BillValidation() error {
+func (b *Bill) Validation() error {
 	return validation.ValidateStruct(
 		b,
+		validation.Field(&b.ID,
+			validation.When(b.CreatedAt != "",
+				validation.Required,
+				validation.Min(1),
+			),
+		),
+
 		validation.Field(&b.ChatID, validation.Required),
-		validation.Field(
-			&b.Bill,
+
+		validation.Field(&b.Bill,
 			validation.Required,
 			validation.Length(16, 16),
 			validation.Match(regexp.MustCompile(static.REGEX__CARD)),
+		),
+
+		validation.Field(&b.CreatedAt, validation.When(b.ID > 0,
+			validation.Required,
+			validation.By(DateValidation(b.CreatedAt))),
 		),
 	)
 }

@@ -28,7 +28,7 @@ func (m *ModBills) RejectBillHandler(c *gin.Context) {
 		return
 	}
 
-	if err := req.RejectBillValidation(); err != nil {
+	if err := req.Validation(); err != nil {
 		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 		return
 	}
@@ -44,11 +44,11 @@ func (m *ModBills) RejectBillHandler(c *gin.Context) {
 		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
 	})
 	if err != nil {
-		fmt.Println(err)
+		m.modlog(err)
 	}
 
 	if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
-		fmt.Println(err)
+		m.modlog(err)
 	}
 	c.JSON(http.StatusOK, gin.H{})
 }
@@ -70,7 +70,7 @@ func (m *ModBills) CreateBillHandler(c *gin.Context) {
 		return
 	}
 
-	if obj := m.responser.RecordHandler(c, r, r.BillValidation()); obj != nil {
+	if obj := m.responser.RecordHandler(c, r, r.Validation()); obj != nil {
 		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Bill{}) {
 			return
 		}

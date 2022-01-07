@@ -63,7 +63,7 @@ func Test_Server_DeleteNotification(t *testing.T) {
 					var body models.Notification
 					assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
 					assert.NotNil(t, body)
-					assert.NoError(t, body.StructFullness())
+					assert.NoError(t, body.Validation())
 				})
 			}
 		})
@@ -231,7 +231,7 @@ func Test_Server_UpdateNotificationStatus(t *testing.T) {
 
 				t.Run("response_validation", func(t *testing.T) {
 					assert.NotNil(t, body)
-					assert.NoError(t, body.StructFullness())
+					assert.NoError(t, body.Validation())
 				})
 
 				t.Run("check update", func(t *testing.T) {

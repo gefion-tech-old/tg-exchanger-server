@@ -56,7 +56,7 @@ func Test_Server_GetMessageHandler(t *testing.T) {
 					var body models.BotMessage
 					assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
 					assert.NotNil(t, body)
-					assert.NoError(t, body.StructFullness())
+					assert.NoError(t, body.Validation())
 				})
 			}
 		})

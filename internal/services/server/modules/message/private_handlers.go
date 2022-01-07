@@ -49,9 +49,7 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	if obj := m.responser.RecordHandler(c, r,
-		r.UpdateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers),
-	); obj != nil {
+	if obj := m.responser.RecordHandler(c, r, r.Validation()); obj != nil {
 		if reflect.TypeOf(obj) != reflect.TypeOf(&models.BotMessage{}) {
 			return
 		}
@@ -94,9 +92,7 @@ func (m *ModMessage) CreateNewMessageHandler(c *gin.Context) {
 		return
 	}
 
-	if obj := m.responser.RecordHandler(c, r,
-		r.CreateBotMessageValidation(m.cnf.Users.Managers, m.cnf.Users.Developers),
-	); obj != nil {
+	if obj := m.responser.RecordHandler(c, r, r.Validation()); obj != nil {
 		if reflect.TypeOf(obj) != reflect.TypeOf(&models.BotMessage{}) {
 			return
 		}

@@ -3,7 +3,8 @@ package models
 import (
 	"regexp"
 
-	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type BotMessage struct {
@@ -26,34 +27,42 @@ type BotMessageSelection struct {
 	==========================================================================================
 */
 
-func (b *BotMessage) StructFullness() error {
+func (b *BotMessage) Validation() error {
 	return validation.ValidateStruct(
 		b,
-		validation.Field(&b.ID, validation.Required),
-		validation.Field(&b.Connector, validation.Required),
-		validation.Field(&b.MessageText, validation.Required),
-		validation.Field(&b.CreatedBy, validation.Required),
-		validation.Field(&b.CreatedAt, validation.Required),
-		validation.Field(&b.UpdatedAt, validation.Required),
-	)
-}
-
-func (b *BotMessage) CreateBotMessageValidation(managers, developers []string) error {
-	return validation.ValidateStruct(
-		b,
-		validation.Field(
-			&b.Connector,
-			validation.Required,
-			validation.Match(regexp.MustCompile(`^[^._ ](?:[\w-]|\.[\w-])+[^._ ]$`)),
+		validation.Field(&b.ID,
+			validation.When(b.CreatedAt != "" && b.UpdatedAt != "",
+				validation.Required),
 		),
-		validation.Field(&b.MessageText, validation.Required),
-		validation.Field(&b.CreatedBy, validation.Required),
-	)
-}
 
-func (b *BotMessage) UpdateBotMessageValidation(managers, developers []string) error {
-	return validation.ValidateStruct(
-		b,
+		validation.Field(&b.Connector,
+			validation.When(b.CreatedBy != "",
+				validation.Required,
+				validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+			).Else(validation.Empty),
+		),
+
 		validation.Field(&b.MessageText, validation.Required),
+
+		validation.Field(&b.CreatedBy,
+			validation.When(b.Connector != "",
+				validation.Required,
+				validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+			).Else(validation.Empty),
+		),
+
+		validation.Field(&b.CreatedAt,
+			validation.When(b.CreatedAt != "",
+				validation.Required,
+				validation.By(DateValidation(b.CreatedAt)),
+			).Else(validation.Empty),
+		),
+
+		validation.Field(&b.UpdatedAt,
+			validation.When(b.CreatedAt != "",
+				validation.Required,
+				validation.By(DateValidation(b.UpdatedAt)),
+			).Else(validation.Empty),
+		),
 	)
 }

@@ -28,15 +28,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 		return
 	}
 
-	// Валидация типа уведомления
-	if err := m.responser.Error(c, http.StatusUnprocessableEntity,
-		r.NotificationTypeValidation()); err != nil {
-		return
-	}
-
-	if obj := m.responser.RecordHandler(c, r,
-		r.NotificationTypeValidation(),
-	); obj != nil {
+	if obj := m.responser.RecordHandler(c, r, r.Validation()); obj != nil {
 		m.responser.CreateRecordResponse(c, m.store.AdminPanel().Notification(), r,
 			func() error {
 				// Получаю всех менеджеров из БД

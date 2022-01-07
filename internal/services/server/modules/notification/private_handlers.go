@@ -65,10 +65,7 @@ func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 		return
 	}
 
-	if obj := m.responser.RecordHandler(c, r,
-		r.NotificationStatusValidation(),
-		r.NotificationTypeValidation(),
-	); obj != nil {
+	if obj := m.responser.RecordHandler(c, r, r.Validation()); obj != nil {
 		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Notification{}) {
 			return
 		}

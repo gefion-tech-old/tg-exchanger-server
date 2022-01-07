@@ -43,11 +43,6 @@ func (m *ModBills) GetAllBillsHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModBills) DeleteBillHandler(c *gin.Context) {
-	if c.Param("chat_id") == "" {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
-		return
-	}
-
 	chatID, err := strconv.Atoi(c.Param("chat_id"))
 	if err != nil {
 		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)

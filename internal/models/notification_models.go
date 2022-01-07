@@ -1,34 +1,41 @@
 package models
 
 import (
-	_errors "errors"
+	"regexp"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
-	validation "github.com/go-ozzo/ozzo-validation"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type Notification struct {
-	ID       int `json:"id"`
-	Type     int `json:"type" binding:"required"`
-	Status   int `json:"status"`
-	MetaData struct {
-		CardVerification struct {
-			Code     *int    `json:"code"`
-			UserCard *string `json:"user_card"`
-			ImgPath  *string `json:"img_path"`
-		} `json:"card_verification"`
+	ID        int                  `json:"id"`
+	Type      int                  `json:"type" binding:"required"`
+	Status    int                  `json:"status"`
+	MetaData  NotificationMetaData `json:"meta_data"`
+	User      NotificationUserData `json:"user"`
+	CreatedAt string               `json:"created_at"`
+	UpdatedAt string               `json:"updated_at"`
+}
 
-		ExActionCancel struct {
-			ExFrom *string `json:"ex_from"`
-			ExTo   *string `json:"ex_to"`
-		} `json:"ex_action_cancel"`
-	} `json:"meta_data"`
-	User struct {
-		ChatID   int64  `json:"chat_id" binding:"required"`
-		Username string `json:"username" binding:"required"`
-	} `json:"user"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+type NotificationMetaData struct {
+	CardVerification CardVerificationMetaData `json:"card_verification"`
+	ExActionCancel   ExActionCancelMetaData   `json:"ex_action_cancel"`
+}
+
+type CardVerificationMetaData struct {
+	Code     *int    `json:"code"`
+	UserCard *string `json:"user_card"`
+	ImgPath  *string `json:"img_path"`
+}
+
+type ExActionCancelMetaData struct {
+	ExFrom *string `json:"ex_from"`
+	ExTo   *string `json:"ex_to"`
+}
+
+type NotificationUserData struct {
+	ChatID   int64  `json:"chat_id" binding:"required"`
+	Username string `json:"username" binding:"required"`
 }
 
 type NotificationSelection struct {
@@ -42,63 +49,124 @@ type NotificationSelection struct {
 	==========================================================================================
 */
 
-func (n *Notification) StructFullness() error {
+func (n *Notification) Validation() error {
 	return validation.ValidateStruct(
 		n,
-		validation.Field(&n.ID, validation.Required),
-		validation.Field(&n.Type, validation.Required),
-		validation.Field(&n.Status, validation.Required),
-		validation.Field(&n.MetaData, validation.Required),
+		validation.Field(&n.ID,
+			validation.When(n.CreatedAt != "" && n.UpdatedAt != "",
+				validation.Required),
+		),
+
+		validation.Field(&n.Type,
+			validation.Required,
+			validation.In(
+				static.NTF__T__VERIFICATION,
+				static.NTF__T__EXCHANGE_ERROR,
+				static.NTF__T__REQ_SUPPORT,
+			),
+		),
+
+		validation.Field(&n.Status,
+			validation.Required,
+			validation.In(
+				static.NTF__S__NEW,
+				static.NTF__S__IN_PROCESS,
+				static.NTF__S__COMPLETED,
+			),
+		),
+
+		validation.Field(&n.MetaData,
+			validation.Required,
+			validation.When(n.Status != 2,
+				validation.By(NotificationMetaDataValidation(&n.MetaData, n.Type)),
+			),
+		),
+
 		validation.Field(&n.User, validation.Required),
-		validation.Field(&n.CreatedAt, validation.Required),
-		validation.Field(&n.UpdatedAt, validation.Required),
-	)
-}
 
-func (n *Notification) NotificationTypeValidation() error {
-	return validation.ValidateStruct(
-		n,
-		validation.Field(
-			&n.Type,
-			validation.By(nTypeValidation(n.Type)),
+		validation.Field(&n.CreatedAt,
+			validation.When(n.CreatedAt != "",
+				validation.Required,
+				validation.By(DateValidation(n.CreatedAt)),
+			).Else(validation.Empty),
+		),
+
+		validation.Field(&n.UpdatedAt,
+			validation.When(n.CreatedAt != "",
+				validation.Required,
+				validation.By(DateValidation(n.UpdatedAt)),
+			).Else(validation.Empty),
 		),
 	)
 }
 
-func (n *Notification) NotificationStatusValidation() error {
-	return validation.ValidateStruct(
-		n,
-		validation.Field(
-			&n.Status,
-			validation.By(nStatusValidation(n.Status)),
-		),
-	)
-}
-
-func nTypeValidation(s int) validation.RuleFunc {
+func NotificationMetaDataValidation(nmt *NotificationMetaData, nType int) validation.RuleFunc {
 	return func(value interface{}) error {
-		permitted := []int{static.NTF__T__VERIFICATION, static.NTF__T__EXCHANGE_ERROR, static.NTF__T__REQ_SUPPORT}
+		return validation.ValidateStruct(
+			nmt,
 
-		for i := 0; i < len(permitted); i++ {
-			if s == permitted[i] {
-				return nil
-			}
-		}
+			validation.Field(&nmt.CardVerification,
+				validation.When(nType == static.NTF__T__VERIFICATION,
+					validation.By(CardVerificationMetaDataValidation(&nmt.CardVerification)),
+				),
+			),
 
-		return _errors.New("is invalid")
+			validation.Field(&nmt.ExActionCancel,
+				validation.When(nType == static.NTF__T__EXCHANGE_ERROR,
+					validation.By(ExActionCancelMetaDataValidation(&nmt.ExActionCancel)),
+				),
+			),
+		)
 	}
 }
 
-func nStatusValidation(s int) validation.RuleFunc {
+func CardVerificationMetaDataValidation(cvmt *CardVerificationMetaData) validation.RuleFunc {
 	return func(value interface{}) error {
-		permitted := []int{static.NTF__S__NEW, static.NTF__S__IN_PROCESS, static.NTF__S__COMPLETED}
+		return validation.ValidateStruct(
+			cvmt,
+			validation.Field(&cvmt.Code,
+				validation.Required,
+				validation.Min(100000),
+				validation.Max(999999),
+			),
 
-		for i := 0; i < len(permitted); i++ {
-			if s == permitted[i] {
-				return nil
-			}
-		}
+			validation.Field(&cvmt.ImgPath, validation.Required),
 
-		return _errors.New("is invalid")
+			validation.Field(&cvmt.UserCard,
+				validation.Required,
+				validation.Match(regexp.MustCompile(static.REGEX__CARD)),
+			),
+		)
+	}
+}
+
+func ExActionCancelMetaDataValidation(eacmt *ExActionCancelMetaData) validation.RuleFunc {
+	return func(value interface{}) error {
+		return validation.ValidateStruct(
+			eacmt,
+			validation.Field(&eacmt.ExFrom,
+				validation.Required,
+			),
+
+			validation.Field(&eacmt.ExTo,
+				validation.Required,
+			),
+		)
+	}
+}
+
+func NotificationUserDataValidation(nud *NotificationUserData) validation.RuleFunc {
+	return func(value interface{}) error {
+		return validation.ValidateStruct(
+			nud,
+			validation.Field(&nud.ChatID,
+				validation.Required,
+			),
+
+			validation.Field(&nud.Username,
+				validation.Required,
+				validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+			),
+		)
 	}
 }
