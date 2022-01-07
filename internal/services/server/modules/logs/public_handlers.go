@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -26,19 +25,8 @@ func (m *ModLogs) CreateLogRecordHandler(c *gin.Context) {
 		return
 	}
 
-	switch r.Service {
-	case static.L__SERVER:
-		m.responser.Error(c, http.StatusUnprocessableEntity, r.InternalRecordValidation())
-
-	case static.L__BOT:
-		m.responser.Error(c, http.StatusUnprocessableEntity, r.InternalRecordValidation())
-
-	case static.L__ADMIN:
-		m.responser.Error(c, http.StatusUnprocessableEntity, r.AdminRecordValidation())
-
-	default:
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
-		return
+	if err := r.Validation(); err != nil {
+		m.responser.Error(c, http.StatusUnprocessableEntity, err)
 	}
 
 	m.responser.NewRecordResponse(c, r, m.repository.Create(r))

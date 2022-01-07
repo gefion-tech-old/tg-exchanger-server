@@ -135,15 +135,16 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 }
 
 // # TESTED
-func (r *LoggerRepository) DeleteSelection(date_from, date_to string) ([]*models.LogRecord, error) {
+func (r *LoggerRepository) DeleteSelection(querys interface{}) ([]*models.LogRecord, error) {
+	q := querys.(*models.LogRecordSelection)
 	arr := []*models.LogRecord{}
 
-	if date_from == "" {
-		date_from = "2020-01-01T00:00:00.00000000"
+	if q.DateFrom == "" {
+		q.DateFrom = "2020-01-01T00:00:00.00000000"
 	}
 
-	if date_to == "" {
-		date_to = time.Now().Add(27 * time.Hour).UTC().Format("2006-01-02T15:04:05.00000000")
+	if q.DateTo == "" {
+		q.DateTo = time.Now().Add(27 * time.Hour).UTC().Format("2006-01-02T15:04:05.00000000")
 
 	}
 
@@ -153,8 +154,8 @@ func (r *LoggerRepository) DeleteSelection(date_from, date_to string) ([]*models
 		WHERE created_at >= $1 AND created_at < $2	
 		RETURNING id, username, info, service, module, created_at
 		`,
-		date_from,
-		date_to,
+		q.DateFrom,
+		q.DateTo,
 	)
 	if err != nil {
 		return nil, err

@@ -121,7 +121,10 @@ func Test_SQL_LoggerRepository_DeleteSelection(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			arr, err := s.AdminPanel().Logs().DeleteSelection(tc.from, tc.to)
+			arr, err := s.AdminPanel().Logs().DeleteSelection(&models.LogRecordSelection{
+				DateFrom: tc.from,
+				DateTo:   tc.to,
+			})
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedArrLength, len(arr))
 

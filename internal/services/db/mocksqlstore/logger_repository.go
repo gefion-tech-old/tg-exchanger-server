@@ -42,7 +42,7 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 	return arr, nil
 }
 
-func (r *LoggerRepository) DeleteSelection(date_from, date_to string) ([]*models.LogRecord, error) {
+func (r *LoggerRepository) DeleteSelection(querys interface{}) ([]*models.LogRecord, error) {
 	arr := []*models.LogRecord{}
 	for _, lr := range r.logs {
 		arr = append(arr, lr)

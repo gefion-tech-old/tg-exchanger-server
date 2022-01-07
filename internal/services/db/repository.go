@@ -29,7 +29,7 @@ type LoggerRepository interface {
 	Delete(lr *models.LogRecord) error
 	Count(querys interface{}) (int, error)
 	Selection(querys interface{}) ([]*models.LogRecord, error)
-	DeleteSelection(date_from, date_to string) ([]*models.LogRecord, error)
+	DeleteSelection(querys interface{}) ([]*models.LogRecord, error)
 }
 
 type ExchangerRepository interface {
