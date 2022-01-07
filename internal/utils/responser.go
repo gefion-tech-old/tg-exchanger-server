@@ -7,13 +7,13 @@ import (
 	"math"
 	"net/http"
 	"reflect"
+	"regexp"
 	"strconv"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
-	validation "github.com/go-ozzo/ozzo-validation"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -200,14 +200,21 @@ func (u *Responser) RecordHandler(c *gin.Context, model interface{}, validators 
 }
 
 func (u *Responser) DateHandler(c *gin.Context, date ...string) error {
-	for _, d := range date {
-		if d != "" {
-			if err := u.Error(c, http.StatusUnprocessableEntity,
-				validation.Validate(d, validation.Date("2006-01-01T00:00:00.00000000"))); err != nil {
-				return err
+	if len(date) > 0 {
+		r, err := regexp.Compile(static.REGEX__DATE)
+		if err != nil {
+			return err
+		}
+
+		for _, d := range date {
+			if d != "" {
+				if !r.MatchString(d) {
+					return _errors.New("invalid date format")
+				}
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -233,7 +240,7 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository, querys interfa
 		return u.Error(c, http.StatusUnprocessableEntity, _errors.New("limit is too larges"))
 	}
 
-	if page < 1 {
+	if page < 1 || limit < 1 {
 		return u.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
 	}
 
