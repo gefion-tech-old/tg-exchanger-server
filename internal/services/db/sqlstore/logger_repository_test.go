@@ -1,6 +1,7 @@
 package sqlstore_test
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_SQL_LoggerRepository(t *testing.T) {
+func Test_SQL_LoggerRepository_Delete(t *testing.T) {
 	config := config.InitTestConfig(t)
 
 	database, teardown := db.TestDB(t, &config.DB)
@@ -22,54 +23,197 @@ func Test_SQL_LoggerRepository(t *testing.T) {
 	// Вызываю создание хранилища
 	s := sqlstore.Init(database)
 
-	u := mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string)
 	lr := &models.LogRecord{
-		Username: &u,
-		Info:     "some error",
-		Service:  static.L__SERVER,
-		Module:   "DATABASE",
+		Info:    "some error",
+		Service: static.L__SERVER,
+		Module:  "DATABASE",
 	}
 
 	assert.NoError(t, s.AdminPanel().Logs().Create(lr))
-	assert.NotNil(t, lr)
+
+	testCases := []struct {
+		name          string
+		id            int
+		expectedError bool
+	}{
+		{
+			name:          "valid",
+			id:            lr.ID,
+			expectedError: false,
+		},
+		{
+			name:          "undefined id",
+			id:            10,
+			expectedError: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			lr.ID = tc.id
+
+			if tc.expectedError {
+				assert.Error(t, s.AdminPanel().Logs().Delete(lr))
+				return
+			}
+
+			assert.NoError(t, s.AdminPanel().Logs().Delete(lr))
+			assert.NotNil(t, lr)
+		})
+	}
+}
+
+func Test_SQL_LoggerRepository_DeleteSelection(t *testing.T) {
+	config := config.InitTestConfig(t)
+
+	database, teardown := db.TestDB(t, &config.DB)
+	defer teardown("logs")
+
+	// Вызываю создание хранилища
+	s := sqlstore.Init(database)
+
+	assert.NoError(t, LoggerRepositoryTestCreator(t, s))
+
+	testCases := []struct {
+		name,
+		from,
+		to string
+		recreate          func() error
+		expectedArrLength int
+	}{
+		{
+			name: "empty all",
+			from: "",
+			to:   "",
+			recreate: func() error {
+				return LoggerRepositoryTestCreator(t, s)
+			},
+			expectedArrLength: 3,
+		},
+		{
+			name: "date_from from future",
+			from: time.Now().Add(27 * time.Hour).UTC().Format("2006-01-02T15:04:05.00000000"),
+			to:   "",
+			recreate: func() error {
+				return nil
+			},
+			expectedArrLength: 0,
+		},
+		{
+			name: "date_to from pass",
+			from: "",
+			to:   "2020-01-02T00:00:00.00000000",
+			recreate: func() error {
+				return nil
+			},
+			expectedArrLength: 0,
+		},
+		{
+			name: "all filters are empty",
+			from: "",
+			to:   "",
+			recreate: func() error {
+				return nil
+			},
+			expectedArrLength: 3,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			arr, err := s.AdminPanel().Logs().DeleteSelection(tc.from, tc.to)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedArrLength, len(arr))
+
+			assert.NoError(t, tc.recreate())
+		})
+	}
+
+}
+
+func Test_SQL_LoggerRepository_Selection(t *testing.T) {
+	config := config.InitTestConfig(t)
+
+	database, teardown := db.TestDB(t, &config.DB)
+	defer teardown("logs")
+
+	// Вызываю создание хранилища
+	s := sqlstore.Init(database)
+
+	assert.NoError(t, LoggerRepositoryTestCreator(t, s))
+
+	u := mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string)
 
 	testCases := []struct {
 		name,
 		username,
 		from,
+		service,
 		to string
 		expectedArrLength int
 	}{
 		{
-			name:              "fill username and empty all date",
-			username:          u,
+			name:              "set username and empty all date and service",
+			service:           "",
 			from:              "",
 			to:                "",
-			expectedArrLength: 1,
+			expectedArrLength: 3,
 		},
-
 		{
 			name:              "date_from from future",
 			username:          u,
+			service:           "",
 			from:              time.Now().Add(27 * time.Hour).UTC().Format("2006-01-02T15:04:05.00000000"),
 			to:                "",
 			expectedArrLength: 0,
 		},
-
 		{
 			name:              "date_to from pass",
 			username:          u,
+			service:           "",
 			from:              "",
 			to:                "2020-01-02T00:00:00.00000000",
 			expectedArrLength: 0,
 		},
-
 		{
 			name:              "all filters are empty",
 			username:          "",
+			service:           "",
+			from:              "",
+			to:                "",
+			expectedArrLength: 3,
+		},
+		{
+			name:              "selection by service code",
+			username:          "",
+			service:           strconv.Itoa(static.L__SERVER),
 			from:              "",
 			to:                "",
 			expectedArrLength: 1,
+		},
+		{
+			name:              "selection by username",
+			username:          u,
+			service:           "",
+			from:              "",
+			to:                "",
+			expectedArrLength: 1,
+		},
+		{
+			name:              "selection by username and service code",
+			username:          u,
+			service:           strconv.Itoa(static.L__ADMIN),
+			from:              "",
+			to:                "",
+			expectedArrLength: 1,
+		},
+		{
+			name:              "selection by username and service code",
+			username:          u,
+			service:           strconv.Itoa(static.L__SERVER),
+			from:              "",
+			to:                "",
+			expectedArrLength: 0,
 		},
 	}
 
@@ -78,7 +222,7 @@ func Test_SQL_LoggerRepository(t *testing.T) {
 			Page:     1,
 			Limit:    15,
 			Username: tc.username,
-			Service:  []string{""},
+			Service:  []string{tc.service},
 			DateFrom: tc.from,
 			DateTo:   tc.to,
 		}
@@ -98,23 +242,43 @@ func Test_SQL_LoggerRepository(t *testing.T) {
 				assert.Equal(t, tc.expectedArrLength, len(arr))
 			})
 		})
+	}
+}
 
-		t.Run("delete selection", func(t *testing.T) {
-			t.Run(tc.name, func(t *testing.T) {
-				arr, err := s.AdminPanel().Logs().DeleteSelection(tc.from, tc.to)
-				assert.NoError(t, err)
-				assert.Equal(t, tc.expectedArrLength, len(arr))
+func LoggerRepositoryTestCreator(t *testing.T, s db.SQLStoreI) error {
+	t.Helper()
 
-				if len(arr) > 0 {
-					t.Run("create record after delete selection", func(t *testing.T) {
-						assert.NoError(t, s.AdminPanel().Logs().Create(lr))
-						assert.NotNil(t, lr)
-					})
-				}
-			})
-		})
+	u := mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string)
+	lr := &models.LogRecord{
+		Info:    "some error",
+		Service: static.L__SERVER,
+		Module:  "DATABASE",
 	}
 
-	assert.NoError(t, s.AdminPanel().Logs().Delete(lr))
-	assert.NotNil(t, lr)
+	if err := s.AdminPanel().Logs().Create(lr); err != nil {
+		return err
+	}
+
+	lra := &models.LogRecord{
+		Username: &u,
+		Info:     "some error",
+		Service:  static.L__ADMIN,
+		Module:   "DATABASE",
+	}
+
+	if err := s.AdminPanel().Logs().Create(lra); err != nil {
+		return err
+	}
+
+	lrb := &models.LogRecord{
+		Info:    "some error",
+		Service: static.L__BOT,
+		Module:  "DATABASE",
+	}
+
+	if err := s.AdminPanel().Logs().Create(lrb); err != nil {
+		return err
+	}
+
+	return nil
 }
