@@ -50,6 +50,7 @@ func (m *ModBills) RejectBillHandler(c *gin.Context) {
 	if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
 		m.modlog(err)
 	}
+
 	c.JSON(http.StatusOK, gin.H{})
 }
 

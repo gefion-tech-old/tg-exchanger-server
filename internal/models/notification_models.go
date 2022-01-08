@@ -78,7 +78,7 @@ func (n *Notification) Validation() error {
 
 		validation.Field(&n.MetaData,
 			validation.Required,
-			validation.When(n.Status != 2,
+			validation.When(n.Status == 1,
 				validation.By(NotificationMetaDataValidation(&n.MetaData, n.Type)),
 			),
 		),
