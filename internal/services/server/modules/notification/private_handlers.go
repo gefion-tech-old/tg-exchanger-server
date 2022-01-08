@@ -18,6 +18,8 @@ import (
 	@Documentation
 
 	Получить кол-во новых уведомлений `notifications`
+
+	# TESTED
 */
 func (m *ModNotification) NewNotificationsCheckHandler(c *gin.Context) {
 	count, err := m.store.AdminPanel().Notification().CheckNew()
@@ -39,7 +41,6 @@ func (m *ModNotification) NewNotificationsCheckHandler(c *gin.Context) {
 	Получение лимитированного объема записей из таблицы `notifications`
 
 	# TESTED
-
 */
 func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 	m.responser.SelectionResponse(c,

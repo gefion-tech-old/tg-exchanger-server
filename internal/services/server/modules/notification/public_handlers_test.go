@@ -36,6 +36,7 @@ func Test_Server_CreateNotification(t *testing.T) {
 		{
 			name: "empty type",
 			payload: map[string]interface{}{
+				"status": 1,
 				"meta_data": map[string]interface{}{
 					"card_verification": map[string]interface{}{
 						"code":      245335,
@@ -50,7 +51,8 @@ func Test_Server_CreateNotification(t *testing.T) {
 		{
 			name: "invalid type 1",
 			payload: map[string]interface{}{
-				"type": "invalid",
+				"type":   "invalid",
+				"status": 1,
 				"meta_data": map[string]interface{}{
 					"card_verification": map[string]interface{}{
 						"code":      245335,
@@ -65,7 +67,8 @@ func Test_Server_CreateNotification(t *testing.T) {
 		{
 			name: "invalid type 2",
 			payload: map[string]interface{}{
-				"type": 100,
+				"type":   100,
+				"status": 1,
 				"meta_data": map[string]interface{}{
 					"card_verification": map[string]interface{}{
 						"code":      245335,
@@ -80,7 +83,8 @@ func Test_Server_CreateNotification(t *testing.T) {
 		{
 			name: "invalid user",
 			payload: map[string]interface{}{
-				"type": 854,
+				"type":   854,
+				"status": 1,
 				"meta_data": map[string]interface{}{
 					"card_verification": map[string]interface{}{
 						"code":      245335,
@@ -93,8 +97,172 @@ func Test_Server_CreateNotification(t *testing.T) {
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
+			name: "invalid verification code",
+			payload: map[string]interface{}{
+				"type":   854,
+				"status": 1,
+				"meta_data": map[string]interface{}{
+					"card_verification": map[string]interface{}{
+						"code":      24533,
+						"user_card": "5559494130410854",
+						"img_path":  "tmp/some_path.png",
+					},
+				},
+				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "invalid user card",
+			payload: map[string]interface{}{
+				"type":   854,
+				"status": 1,
+				"meta_data": map[string]interface{}{
+					"card_verification": map[string]interface{}{
+						"code":      245332,
+						"user_card": "5559494130410",
+						"img_path":  "tmp/some_path.png",
+					},
+				},
+				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "invalid username",
+			payload: map[string]interface{}{
+				"type":   854,
+				"status": 1,
+				"meta_data": map[string]interface{}{
+					"card_verification": map[string]interface{}{
+						"code":      245331,
+						"user_card": "5559494130410854",
+						"img_path":  "tmp/some_path.png",
+					},
+				},
+				"user": map[string]interface{}{
+					"chat_id":  3673563,
+					"username": "<script> </script>",
+				},
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "invalid chat_id",
+			payload: map[string]interface{}{
+				"type":   854,
+				"status": 1,
+				"meta_data": map[string]interface{}{
+					"card_verification": map[string]interface{}{
+						"code":      245331,
+						"user_card": "5559494130410854",
+						"img_path":  "tmp/some_path.png",
+					},
+				},
+				"user": map[string]interface{}{
+					"chat_id":  "invalid",
+					"username": "I0HuKc",
+				},
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "empty chat_id",
+			payload: map[string]interface{}{
+				"type":   854,
+				"status": 1,
+				"meta_data": map[string]interface{}{
+					"card_verification": map[string]interface{}{
+						"code":      245331,
+						"user_card": "5559494130410854",
+						"img_path":  "tmp/some_path.png",
+					},
+				},
+				"user": map[string]interface{}{
+					// "chat_id":  "invalid",
+					"username": "I0HuKc",
+				},
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "empty username",
+			payload: map[string]interface{}{
+				"type":   854,
+				"status": 1,
+				"meta_data": map[string]interface{}{
+					"card_verification": map[string]interface{}{
+						"code":      245331,
+						"user_card": "5559494130410854",
+						"img_path":  "tmp/some_path.png",
+					},
+				},
+				"user": map[string]interface{}{
+					"chat_id": 3673563,
+					// "username": "<script></script>",
+				},
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
 			name:         "valid",
 			payload:      mocks.ADMIN_NOTIFICATION_854,
+			expectedCode: http.StatusCreated,
+		},
+
+		{
+			name: "invalid meta_data",
+			payload: map[string]interface{}{
+				"type":      855,
+				"status":    1,
+				"meta_data": "invalid",
+				"user":      mocks.USER_IN_BOT_REGISTRATION_REQ,
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "empty ex_from",
+			payload: map[string]interface{}{
+				"type":   855,
+				"status": 1,
+				"meta_data": map[string]interface{}{
+					"ex_action_cancel": map[string]interface{}{
+						// "ex_from": "ETH",
+						"ex_to": "BTC",
+					},
+				},
+				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "empty ex_to",
+			payload: map[string]interface{}{
+				"type":   855,
+				"status": 1,
+				"meta_data": map[string]interface{}{
+					"ex_action_cancel": map[string]interface{}{
+						"ex_from": "ETH",
+						// "ex_to": "BTC",
+					},
+				},
+				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
+			},
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name: "valid action cancel",
+			payload: map[string]interface{}{
+				"type":   855,
+				"status": 1,
+				"meta_data": map[string]interface{}{
+					"ex_action_cancel": map[string]interface{}{
+						"ex_from": "ETH",
+						"ex_to":   "BTC",
+					},
+				},
+				"user": mocks.USER_IN_BOT_REGISTRATION_REQ,
+			},
 			expectedCode: http.StatusCreated,
 		},
 	}
@@ -111,6 +279,11 @@ func Test_Server_CreateNotification(t *testing.T) {
 			s.Router.ServeHTTP(rec, req)
 
 			assert.Equal(t, tc.expectedCode, rec.Code)
+
+			// if tc.expectedCode == 201 {
+			// 	ttt, _ := server.TestGetErrorText(t, rec.Body)
+			// 	assert.Equal(t, "", ttt)
+			// }
 
 			if rec.Code == http.StatusCreated {
 				t.Run("response_validation", func(t *testing.T) {

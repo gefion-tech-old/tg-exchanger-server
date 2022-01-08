@@ -4,7 +4,7 @@ import "github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 
 var ADMIN_NOTIFICATION_854 = map[string]interface{}{
 	"id":     1,
-	"status": 2,
+	"status": 1,
 	"type":   static.NTF__T__VERIFICATION,
 	"meta_data": map[string]interface{}{
 		"card_verification": map[string]interface{}{

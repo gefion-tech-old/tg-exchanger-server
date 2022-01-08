@@ -14,6 +14,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_Server_NewNotificationsCheckHandler(t *testing.T) {
+	s, redis, teardown := server.TestServer(t)
+	defer teardown(redis)
+
+	// Регистрирую менеджера в админке
+	tokens, err := server.TestManager(t, s)
+	assert.NotNil(t, tokens)
+	assert.NoError(t, err)
+
+	assert.NoError(t, server.TestNotification854(t, s, tokens))
+
+	rec := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/admin/notifications/check", nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
+	s.Router.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	if rec.Code == http.StatusOK {
+		t.Run("body check", func(t *testing.T) {
+			var body map[string]interface{}
+			assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
+			assert.NotNil(t, body)
+			assert.Equal(t, 1, int(body["new_notifications"].(float64)))
+		})
+	}
+}
+
 func Test_Server_DeleteNotification(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)

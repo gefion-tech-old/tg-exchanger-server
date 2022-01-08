@@ -13,7 +13,15 @@ type NotificationRepository struct {
 }
 
 func (r *NotificationRepository) CheckNew() (int, error) {
-	return 0, nil
+	var c int
+
+	for _, n := range r.notification {
+		if n.Status == 1 {
+			c++
+		}
+	}
+
+	return c, nil
 }
 
 func (r *NotificationRepository) Create(n *models.Notification) error {
@@ -22,6 +30,7 @@ func (r *NotificationRepository) Create(n *models.Notification) error {
 	n.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
 
 	r.notification[n.ID] = n
+
 	return nil
 }
 

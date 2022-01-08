@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
@@ -82,7 +83,10 @@ func (n *Notification) Validation() error {
 			),
 		),
 
-		validation.Field(&n.User, validation.Required),
+		validation.Field(&n.User,
+			validation.Required,
+			validation.By(NotificationUserDataValidation(&n.User)),
+		),
 
 		validation.Field(&n.CreatedAt,
 			validation.When(n.CreatedAt != "",
@@ -156,6 +160,7 @@ func ExActionCancelMetaDataValidation(eacmt *ExActionCancelMetaData) validation.
 }
 
 func NotificationUserDataValidation(nud *NotificationUserData) validation.RuleFunc {
+	fmt.Println(111)
 	return func(value interface{}) error {
 		return validation.ValidateStruct(
 			nud,
