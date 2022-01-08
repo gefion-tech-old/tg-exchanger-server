@@ -3,6 +3,7 @@ package notification
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
@@ -29,6 +30,10 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 	}
 
 	if obj := m.responser.RecordHandler(c, r, r.Validation()); obj != nil {
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Notification{}) {
+			return
+		}
+
 		m.responser.CreateRecordResponse(c, m.store.AdminPanel().Notification(), r,
 			func() error {
 				// Получаю всех менеджеров из БД
