@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
 	"github.com/stretchr/testify/assert"
 )
@@ -38,7 +38,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "empty module for server log",
 			payload: map[string]interface{}{
-				"service": static.L__SERVER,
+				"service": AppType.LogLevelServer,
 				// "module": "db",
 				"info": "some error text",
 			},
@@ -47,7 +47,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "empty info for server log",
 			payload: map[string]interface{}{
-				"service": static.L__SERVER,
+				"service": AppType.LogLevelServer,
 				"module":  "db",
 				// "info":    "some error text",
 			},
@@ -57,7 +57,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "empty username for admin log",
 			payload: map[string]interface{}{
-				"service": static.L__ADMIN,
+				"service": AppType.LogLevelAdmin,
 				"module":  "db",
 				"info":    "some error text",
 			},
@@ -75,7 +75,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "valid server log",
 			payload: map[string]interface{}{
-				"service": static.L__SERVER,
+				"service": AppType.LogLevelServer,
 				"module":  "db",
 				"info":    "some error text",
 			},
@@ -84,7 +84,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "valid bot log",
 			payload: map[string]interface{}{
-				"service": static.L__BOT,
+				"service": AppType.LogLevelBot,
 				"module":  "db",
 				"info":    "some error text",
 			},
@@ -94,7 +94,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 			name: "valid admin log",
 			payload: map[string]interface{}{
 				"username": "I0HuKc",
-				"service":  static.L__ADMIN,
+				"service":  AppType.LogLevelAdmin,
 				"module":   "db",
 				"info":     "some error text",
 			},

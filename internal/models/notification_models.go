@@ -3,7 +3,7 @@ package models
 import (
 	"regexp"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
@@ -80,18 +80,18 @@ func (n *Notification) Validation() error {
 		validation.Field(&n.Type,
 			validation.Required,
 			validation.In(
-				static.NTF__T__VERIFICATION,
-				static.NTF__T__EXCHANGE_ERROR,
-				static.NTF__T__REQ_SUPPORT,
+				AppTypes.NotifyTypeVerification,
+				AppTypes.NotifyTypeExchangeError,
+				AppTypes.NotifyTypeReqSupport,
 			),
 		),
 
 		validation.Field(&n.Status,
 			validation.Required,
 			validation.In(
-				static.NTF__S__NEW,
-				static.NTF__S__IN_PROCESS,
-				static.NTF__S__COMPLETED,
+				AppTypes.NotifyStatusNew,
+				AppTypes.NotifyStatusInProgress,
+				AppTypes.NotifyStatusCompleted,
 			),
 		),
 
@@ -129,13 +129,13 @@ func NotificationMetaDataValidation(nmt *NotificationMetaData, nType int) valida
 			nmt,
 
 			validation.Field(&nmt.CardVerification,
-				validation.When(nType == static.NTF__T__VERIFICATION,
+				validation.When(nType == AppTypes.NotifyTypeVerification,
 					validation.By(CardVerificationMetaDataValidation(&nmt.CardVerification)),
 				),
 			),
 
 			validation.Field(&nmt.ExActionCancel,
-				validation.When(nType == static.NTF__T__EXCHANGE_ERROR,
+				validation.When(nType == AppTypes.NotifyTypeExchangeError,
 					validation.By(ExActionCancelMetaDataValidation(&nmt.ExActionCancel)),
 				),
 			),

@@ -1,11 +1,11 @@
 package mocks
 
-import "github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+import AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 
 var ADMIN_NOTIFICATION_854 = map[string]interface{}{
 	"id":     1,
 	"status": 1,
-	"type":   static.NTF__T__VERIFICATION,
+	"type":   AppTypes.NotifyTypeVerification,
 	"meta_data": map[string]interface{}{
 		"card_verification": map[string]interface{}{
 			"code":      245335,

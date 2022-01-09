@@ -1,7 +1,7 @@
 package logs
 
 import (
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/gin-gonic/gin"

@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"

@@ -3,9 +3,9 @@ package models
 import (
 	"errors"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
+	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -75,7 +75,13 @@ func (u *User) StructFullness() error {
 		validation.Field(&u.ChatID, validation.Required),
 		validation.Field(&u.Username, validation.Required),
 		validation.Field(&u.Hash, validation.NilOrNotEmpty),
-		validation.Field(&u.Role, validation.In(static.S__ROLE__MANAGER, static.S__ROLE__USER, static.S__ROLE__ADMIN)),
+		validation.Field(&u.Role,
+			validation.In(
+				AppTypes.AppRoleManager,
+				AppTypes.AppRoleUser,
+				AppTypes.AppRoleAdmin,
+			),
+		),
 		validation.Field(&u.CreatedAt, validation.Required),
 		validation.Field(&u.UpdatedAt, validation.Required),
 	)

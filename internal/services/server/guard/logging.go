@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +18,7 @@ func (g *Guard) Logger(resource, action string) gin.HandlerFunc {
 		}
 
 		go g.logger.NewRecord(&models.LogRecord{
-			Service:  static.L__ADMIN,
+			Service:  AppType.LogLevelAdmin,
 			Module:   resource,
 			Info:     fmt.Sprintf("%s %s", action, resource),
 			Username: &token.Username,

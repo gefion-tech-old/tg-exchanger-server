@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
@@ -53,9 +53,9 @@ func (ls *LogRecordSelection) Validation() error {
 		validation.Field(&ls.Service, validation.When(len(ls.Service) > 0,
 			validation.Each(
 				validation.In(
-					strconv.Itoa(static.L__BOT),
-					strconv.Itoa(static.L__SERVER),
-					strconv.Itoa(static.L__ADMIN),
+					strconv.Itoa(AppType.LogLevelBot),
+					strconv.Itoa(AppType.LogLevelServer),
+					strconv.Itoa(AppType.LogLevelAdmin),
 				),
 			),
 		).Else(validation.Nil),
@@ -82,7 +82,7 @@ func (l *LogRecord) Validation() error {
 		l,
 		validation.Field(&l.ID, validation.When(l.ID > 0, validation.Required)),
 		validation.Field(&l.Username,
-			validation.When(l.Service == static.L__ADMIN,
+			validation.When(l.Service == AppType.LogLevelAdmin,
 				validation.Required,
 				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
 			).Else(validation.Nil),
@@ -90,7 +90,7 @@ func (l *LogRecord) Validation() error {
 
 		validation.Field(&l.Info, validation.Required),
 		validation.Field(&l.Service, validation.Required,
-			validation.In(static.L__BOT, static.L__SERVER, static.L__ADMIN),
+			validation.In(AppType.LogLevelBot, AppType.LogLevelServer, AppType.LogLevelAdmin),
 		),
 
 		validation.Field(&l.Module, validation.Required),

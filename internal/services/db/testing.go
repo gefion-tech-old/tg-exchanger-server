@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )

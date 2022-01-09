@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
@@ -103,7 +103,7 @@ func runner(cfg *config.Config) (err error) {
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.NewRecord(&models.LogRecord{
-				Service: static.L__SERVER,
+				Service: AppType.LogLevelServer,
 				Module:  "Application",
 				Info:    err.Error(),
 			})
@@ -117,7 +117,7 @@ func runner(cfg *config.Config) (err error) {
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		logger.NewRecord(&models.LogRecord{
-			Service: static.L__SERVER,
+			Service: AppType.LogLevelServer,
 			Module:  "Application",
 			Info:    "Server forced to shutdown: " + err.Error(),
 		})

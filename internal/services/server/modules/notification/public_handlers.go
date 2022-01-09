@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
+	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gin-gonic/gin"
@@ -43,7 +43,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 				}
 
 				switch r.Type {
-				case static.NTF__T__VERIFICATION:
+				case AppTypes.NotifyTypeVerification:
 					// Запись уведомления в очередь для всех менеджеров
 					for i := 0; i < len(uArr); i++ {
 						payload, err := json.Marshal(newVefificationNotify(uArr, i, r))
@@ -56,7 +56,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 						}
 					}
 
-				case static.NTF__T__EXCHANGE_ERROR:
+				case AppTypes.NotifyTypeExchangeError:
 					// Запись уведомления в очередь для всех менеджеров
 					for i := 0; i < len(uArr); i++ {
 						payload, err := json.Marshal(newActionCancelNotify(uArr, i, r))
@@ -69,7 +69,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 						}
 					}
 
-				case static.NTF__T__REQ_SUPPORT:
+				case AppTypes.NotifyTypeReqSupport:
 					// Запись уведомления в очередь для всех менеджеров
 					for i := 0; i < len(uArr); i++ {
 						payload, err := json.Marshal(newSupportReqNotify(uArr, i, r))

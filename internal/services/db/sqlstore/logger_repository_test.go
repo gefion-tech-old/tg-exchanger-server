@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
@@ -25,7 +25,7 @@ func Test_SQL_LoggerRepository_Delete(t *testing.T) {
 
 	lr := &models.LogRecord{
 		Info:    "some error",
-		Service: static.L__SERVER,
+		Service: AppType.LogLevelServer,
 		Module:  "DATABASE",
 	}
 
@@ -189,7 +189,7 @@ func Test_SQL_LoggerRepository_Selection(t *testing.T) {
 		{
 			name:              "selection by service code",
 			username:          "",
-			service:           strconv.Itoa(static.L__SERVER),
+			service:           strconv.Itoa(AppType.LogLevelServer),
 			from:              "",
 			to:                "",
 			expectedArrLength: 1,
@@ -205,7 +205,7 @@ func Test_SQL_LoggerRepository_Selection(t *testing.T) {
 		{
 			name:              "selection by username and service code",
 			username:          u,
-			service:           strconv.Itoa(static.L__ADMIN),
+			service:           strconv.Itoa(AppType.LogLevelAdmin),
 			from:              "",
 			to:                "",
 			expectedArrLength: 1,
@@ -213,7 +213,7 @@ func Test_SQL_LoggerRepository_Selection(t *testing.T) {
 		{
 			name:              "selection by username and service code",
 			username:          u,
-			service:           strconv.Itoa(static.L__SERVER),
+			service:           strconv.Itoa(AppType.LogLevelServer),
 			from:              "",
 			to:                "",
 			expectedArrLength: 0,
@@ -256,7 +256,7 @@ func LoggerRepositoryTestCreator(t *testing.T, s db.SQLStoreI) error {
 	u := mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string)
 	lr := &models.LogRecord{
 		Info:    "some error",
-		Service: static.L__SERVER,
+		Service: AppType.LogLevelServer,
 		Module:  "DATABASE",
 	}
 
@@ -267,7 +267,7 @@ func LoggerRepositoryTestCreator(t *testing.T, s db.SQLStoreI) error {
 	lra := &models.LogRecord{
 		Username: &u,
 		Info:     "some error",
-		Service:  static.L__ADMIN,
+		Service:  AppType.LogLevelAdmin,
 		Module:   "DATABASE",
 	}
 
@@ -277,7 +277,7 @@ func LoggerRepositoryTestCreator(t *testing.T, s db.SQLStoreI) error {
 
 	lrb := &models.LogRecord{
 		Info:    "some error",
-		Service: static.L__BOT,
+		Service: AppType.LogLevelBot,
 		Module:  "DATABASE",
 	}
 

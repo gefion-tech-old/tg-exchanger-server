@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
+	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
@@ -167,7 +167,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 	}
 
 	// Назначение роли пользователю
-	if r := tools.RoleDefine(u.Username, m.cnf.Users); r != static.S__ROLE__USER {
+	if r := tools.RoleDefine(u.Username, m.cnf.Users); r != AppTypes.AppRoleUser {
 		u.Role = r
 	} else {
 		m.responser.Error(c, http.StatusForbidden, AppError.ErrNotEnoughRights)

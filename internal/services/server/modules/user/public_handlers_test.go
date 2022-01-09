@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
@@ -80,7 +80,7 @@ func Test_Server_UserInBotRegistrationHandler(t *testing.T) {
 					var body models.User
 					assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
 					assert.NoError(t, body.StructFullness())
-					assert.Equal(t, body.Role, static.S__ROLE__USER)
+					assert.Equal(t, body.Role, AppType.AppRoleUser)
 				})
 			}
 		})
@@ -233,7 +233,7 @@ func Test_Server_UserAdminHandler(t *testing.T) {
 						var body models.User
 						assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
 						assert.NoError(t, body.StructFullness())
-						assert.Equal(t, body.Role, static.S__ROLE__ADMIN)
+						assert.Equal(t, body.Role, AppType.AppRoleAdmin)
 					})
 				}
 			})
@@ -323,8 +323,8 @@ func Test_Server_Helper_Roledefine(t *testing.T) {
 		Managers:   []string{"mngun"},
 	}
 
-	assert.Equal(t, tools.RoleDefine(urs.Admins[0], urs), static.S__ROLE__ADMIN)
-	assert.Equal(t, tools.RoleDefine(urs.Developers[0], urs), static.S__ROLE__ADMIN)
-	assert.Equal(t, tools.RoleDefine(urs.Managers[0], urs), static.S__ROLE__MANAGER)
-	assert.Equal(t, tools.RoleDefine("undefined", urs), static.S__ROLE__USER)
+	assert.Equal(t, tools.RoleDefine(urs.Admins[0], urs), AppType.AppRoleAdmin)
+	assert.Equal(t, tools.RoleDefine(urs.Developers[0], urs), AppType.AppRoleAdmin)
+	assert.Equal(t, tools.RoleDefine(urs.Managers[0], urs), AppType.AppRoleManager)
+	assert.Equal(t, tools.RoleDefine("undefined", urs), AppType.AppRoleUser)
 }

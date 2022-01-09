@@ -1,8 +1,8 @@
 package tools
 
 import (
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 )
 
 /*
@@ -11,21 +11,21 @@ import (
 func RoleDefine(uname string, urs config.UsersConfig) int {
 	for _, v := range urs.Admins {
 		if v == uname {
-			return static.S__ROLE__ADMIN
+			return AppType.AppRoleAdmin
 		}
 	}
 
 	for _, v := range urs.Developers {
 		if v == uname {
-			return static.S__ROLE__ADMIN
+			return AppType.AppRoleAdmin
 		}
 	}
 
 	for _, v := range urs.Managers {
 		if v == uname {
-			return static.S__ROLE__MANAGER
+			return AppType.AppRoleManager
 		}
 	}
 
-	return static.S__ROLE__USER
+	return AppType.AppRoleUser
 }

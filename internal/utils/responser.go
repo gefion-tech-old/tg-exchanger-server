@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
@@ -36,7 +36,7 @@ func InitResponser(l LoggerI) ResponserI {
 		logger: l,
 		template: models.LogRecord{
 			Module:  "HTTP RESPONSER",
-			Service: static.L__SERVER,
+			Service: AppType.LogLevelServer,
 		},
 	}
 }

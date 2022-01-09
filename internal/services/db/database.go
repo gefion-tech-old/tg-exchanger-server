@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	"github.com/go-redis/redis/v7"
 	_ "github.com/lib/pq" // database driver
 	"github.com/nsqio/go-nsq"

@@ -1,8 +1,8 @@
 package bills
 
 import (
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
@@ -44,7 +44,7 @@ func InitModBills(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, ns
 
 func (m *ModBills) modlog(err error) {
 	m.logger.NewRecord(&models.LogRecord{
-		Service: static.L__SERVER,
+		Service: AppType.LogLevelServer,
 		Module:  "BILL_HANDLER_MOD",
 		Info:    err.Error(),
 	})

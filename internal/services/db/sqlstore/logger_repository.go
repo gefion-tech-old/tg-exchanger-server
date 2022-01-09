@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
@@ -206,9 +206,9 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 			q.Service = q.Service[:len(q.Service)-1]
 
 			q.Service = append(q.Service,
-				strconv.Itoa(static.L__ADMIN),
-				strconv.Itoa(static.L__BOT),
-				strconv.Itoa(static.L__SERVER),
+				strconv.Itoa(AppType.LogLevelAdmin),
+				strconv.Itoa(AppType.LogLevelBot),
+				strconv.Itoa(AppType.LogLevelServer),
 			)
 		}
 
