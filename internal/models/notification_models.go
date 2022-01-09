@@ -3,6 +3,7 @@ package models
 import (
 	"regexp"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -149,8 +150,8 @@ func CardVerificationMetaDataValidation(cvmt *CardVerificationMetaData) validati
 			cvmt,
 			validation.Field(&cvmt.Code,
 				validation.Required,
-				validation.Min(100000),
-				validation.Max(999999),
+				validation.Min(core.VerificationCodeMin),
+				validation.Max(core.VerificationCodeMax),
 			),
 
 			validation.Field(&cvmt.ImgPath, validation.Required),

@@ -10,6 +10,4 @@ var (
 	ErrNotEnoughRights   = errors.New("not enough rights to make this request")
 	ErrTokenInvalid      = errors.New("token is invalid")
 	ErrUnauthorized      = errors.New("unauthorized")
-
-	ErrFailedToInitializeStruct = errors.New("failed to initialize structure")
 )

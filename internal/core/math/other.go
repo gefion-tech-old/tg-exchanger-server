@@ -3,6 +3,8 @@ package cmath
 import (
 	"math/rand"
 	"time"
+
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 )
 
 // Сгенерировать случайное число
@@ -20,7 +22,10 @@ func VerificationCode(testing bool) int {
 	if testing {
 		return 100000
 	} else {
-		return RandInt(100000, 999999)
+		return RandInt(
+			core.VerificationCodeMin,
+			core.VerificationCodeMax,
+		)
 	}
 }
 
