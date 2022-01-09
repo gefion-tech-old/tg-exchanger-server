@@ -9,9 +9,9 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
+	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -323,8 +323,8 @@ func Test_Server_Helper_Roledefine(t *testing.T) {
 		Managers:   []string{"mngun"},
 	}
 
-	assert.Equal(t, tools.RoleDefine(urs.Admins[0], urs), AppType.AppRoleAdmin)
-	assert.Equal(t, tools.RoleDefine(urs.Developers[0], urs), AppType.AppRoleAdmin)
-	assert.Equal(t, tools.RoleDefine(urs.Managers[0], urs), AppType.AppRoleManager)
-	assert.Equal(t, tools.RoleDefine("undefined", urs), AppType.AppRoleUser)
+	assert.Equal(t, AppValidation.RoleDefine(urs.Admins[0], urs), AppType.AppRoleAdmin)
+	assert.Equal(t, AppValidation.RoleDefine(urs.Developers[0], urs), AppType.AppRoleAdmin)
+	assert.Equal(t, AppValidation.RoleDefine(urs.Managers[0], urs), AppType.AppRoleManager)
+	assert.Equal(t, AppValidation.RoleDefine("undefined", urs), AppType.AppRoleUser)
 }

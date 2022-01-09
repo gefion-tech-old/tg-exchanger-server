@@ -1,10 +1,8 @@
-package tools
+package cmath
 
 import (
 	"math/rand"
 	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 // Сгенерировать случайное число
@@ -15,21 +13,6 @@ func RandInt(min int, max int) int {
 	} else {
 		return rand.Intn(max-min) + min
 	}
-}
-
-// Создать хеш из пароля
-func EncryptString(s string) (string, error) {
-	b, err := bcrypt.GenerateFromPassword([]byte(s), bcrypt.MinCost)
-	if err != nil {
-		return "", err
-	}
-
-	return string(b), nil
-}
-
-// Сравнить хеш и пароль
-func ComparePassword(hash, password string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }
 
 // Сгенерировать код подтверждения

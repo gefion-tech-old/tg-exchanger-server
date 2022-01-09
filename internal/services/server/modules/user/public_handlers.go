@@ -10,10 +10,11 @@ import (
 	"time"
 
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
+	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
+	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/twinj/uuid"
@@ -77,7 +78,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 	}
 
 	// Генерирую код подтверждения
-	code := tools.VerificationCode(req.Testing)
+	code := AppMath.VerificationCode(req.Testing)
 
 	// Формирую сообщение и отправляю его в очередь
 	msg := map[string]interface{}{
@@ -99,7 +100,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 	}
 
 	// Хеширую пароль
-	hash, err := tools.EncryptString(req.Password)
+	hash, err := AppMath.EncryptString(req.Password)
 	if err != nil {
 		m.responser.Error(c, http.StatusInternalServerError, err)
 		return
@@ -167,7 +168,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 	}
 
 	// Назначение роли пользователю
-	if r := tools.RoleDefine(u.Username, m.cnf.Users); r != AppTypes.AppRoleUser {
+	if r := AppValidation.RoleDefine(u.Username, m.cnf.Users); r != AppTypes.AppRoleUser {
 		u.Role = r
 	} else {
 		m.responser.Error(c, http.StatusForbidden, AppError.ErrNotEnoughRights)
@@ -201,7 +202,7 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 	u, err := m.store.User().FindByUsername(req.Username)
 	switch err {
 	case nil:
-		if u.Hash != nil && tools.ComparePassword(*u.Hash, req.Password) {
+		if u.Hash != nil && AppMath.ComparePassword(*u.Hash, req.Password) {
 			// Генерирую сборку токенов и сопутствующих деталей
 			td, err := m.createToken(u.ChatID, u.Username, u.Role)
 			if err != nil {

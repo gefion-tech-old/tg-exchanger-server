@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"time"
 
+	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type BotMessagesRepository struct {
@@ -37,7 +37,7 @@ func (r *BotMessagesRepository) Selection(querys interface{}) ([]*models.BotMess
 	q := querys.(*models.BotMessageSelection)
 
 	for i, v := range r.messages {
-		if i > tools.OffsetThreshold(q.Page, q.Limit) && i <= tools.OffsetThreshold(q.Page, q.Limit)+q.Limit {
+		if i > AppMath.OffsetThreshold(q.Page, q.Limit) && i <= AppMath.OffsetThreshold(q.Page, q.Limit)+q.Limit {
 			arr = append(arr, v)
 		}
 		i++

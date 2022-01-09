@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"time"
 
+	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type BotMessagesRepository struct {
@@ -100,7 +100,7 @@ func (r *BotMessagesRepository) Selection(querys interface{}) ([]*models.BotMess
 		OFFSET $1
 		LIMIT $2
 		`,
-		tools.OffsetThreshold(q.Page, q.Limit),
+		AppMath.OffsetThreshold(q.Page, q.Limit),
 		q.Limit,
 	)
 	if err != nil {

@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"time"
 
+	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type ExchangerRepository struct {
@@ -111,7 +111,7 @@ func (r *ExchangerRepository) Selection(querys interface{}) ([]*models.Exchanger
 		OFFSET $1
 		LIMIT $2
 		`,
-		tools.OffsetThreshold(q.Page, q.Limit),
+		AppMath.OffsetThreshold(q.Page, q.Limit),
 		q.Limit,
 	)
 	if err != nil {

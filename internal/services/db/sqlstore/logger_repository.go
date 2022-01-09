@@ -8,9 +8,9 @@ import (
 	"time"
 
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
+	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
 
 type LoggerRepository struct {
@@ -101,7 +101,7 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 		LIMIT %d
 	`,
 		strings.Join(r.queryGeneration(q), " AND "),
-		tools.OffsetThreshold(*q.Page, *q.Limit),
+		AppMath.OffsetThreshold(*q.Page, *q.Limit),
 		q.Limit,
 	)
 

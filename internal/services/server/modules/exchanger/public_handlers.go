@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
+	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/valyala/fasthttp"
 )
@@ -43,6 +43,6 @@ func (m *ModExchanger) GetExchangerDocumentHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"file": tools.OneObmenDocumentGenerate(&data, m.cnf.Server.Tmp),
+		"file": utils.OneObmenDocumentGenerate(&data, m.cnf.Server.Tmp),
 	})
 }
