@@ -1,4 +1,3 @@
-SOURCES=./cmd/main
 SERVICE=server
 
 .PHONY: init
@@ -9,15 +8,15 @@ init:
 .PHONY: run
 
 run:
-	go build -o $(SERVICE) -v $(SOURCES)
+	go build -o $(SERVICE) main.go
 	clear		
-	./$(SERVICE)
+	./$(SERVICE) run
 
 
 .PHONY: build
 
 build:
-	go build -o $(SERVICE) -v $(SOURCES)
+	go build -o $(SERVICE) main.go
 	clear
 
 
