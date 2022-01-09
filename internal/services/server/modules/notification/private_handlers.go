@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
@@ -111,7 +112,7 @@ func newSupportReqNotify(uArr []*models.User, i int, n *models.Notification) map
 			"type": "confirmation_req",
 			"text": fmt.Sprintf("🔵 Запрос тех. поддержки 🔵\n\n*Пользователь*: @%s", n.User.Username),
 		},
-		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		"created_at": time.Now().UTC().Format(core.DateStandart),
 	}
 }
 
@@ -125,7 +126,7 @@ func newVefificationNotify(uArr []*models.User, i int, n *models.Notification) m
 			"type": "confirmation_req",
 			"text": fmt.Sprintf("🟢 Новая заявка 🟢\n\n*Пользователь*: @%s", n.User.Username),
 		},
-		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		"created_at": time.Now().UTC().Format(core.DateStandart),
 	}
 }
 
@@ -139,6 +140,6 @@ func newActionCancelNotify(uArr []*models.User, i int, n *models.Notification) m
 			"type": "skip_operation",
 			"text": fmt.Sprintf("🔴 Отмена операции 🔴\n\n*Пользователь*: @%s", n.User.Username),
 		},
-		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		"created_at": time.Now().UTC().Format(core.DateStandart),
 	}
 }

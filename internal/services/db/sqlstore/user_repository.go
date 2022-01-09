@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
 
@@ -59,7 +60,7 @@ func (r *UserRepository) RegisterInAdminPanel(u *models.User) error {
 		`,
 		u.Hash,
 		u.Role,
-		time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		time.Now().UTC().Format(core.DateStandart),
 		u.Username,
 	).Scan(
 		&u.ChatID,

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
@@ -26,8 +27,8 @@ func (r *NotificationRepository) CheckNew() (int, error) {
 
 func (r *NotificationRepository) Create(n *models.Notification) error {
 	n.ID = len(r.notification) + 1
-	n.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
-	n.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+	n.CreatedAt = time.Now().UTC().Format(core.DateStandart)
+	n.UpdatedAt = time.Now().UTC().Format(core.DateStandart)
 
 	r.notification[n.ID] = n
 
@@ -58,7 +59,7 @@ func (r *NotificationRepository) Delete(n *models.Notification) error {
 func (r *NotificationRepository) Update(n *models.Notification) error {
 	if r.notification[n.ID] != nil {
 		r.notification[n.ID].Status = n.Status
-		r.notification[n.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+		r.notification[n.ID].UpdatedAt = time.Now().UTC().Format(core.DateStandart)
 
 		r.rewrite(n.ID, n)
 		return nil

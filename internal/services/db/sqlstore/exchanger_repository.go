@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
@@ -62,7 +63,7 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) error {
 		`,
 		e.Name,
 		e.UrlToParse,
-		time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		time.Now().UTC().Format(core.DateStandart),
 		e.ID,
 	).Scan(
 		&e.ID,

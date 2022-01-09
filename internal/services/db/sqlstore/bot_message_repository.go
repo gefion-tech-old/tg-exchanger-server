@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
@@ -141,7 +142,7 @@ func (r *BotMessagesRepository) Update(m *models.BotMessage) error {
 		RETURNING id, connector, message_text, created_by, created_at, updated_at
 		`,
 		m.MessageText,
-		time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		time.Now().UTC().Format(core.DateStandart),
 		m.ID,
 	).Scan(
 		&m.ID,

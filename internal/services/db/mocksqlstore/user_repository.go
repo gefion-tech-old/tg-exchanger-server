@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
 
@@ -18,8 +19,8 @@ type UserRepository struct {
 */
 
 func (r *UserRepository) Create(u *models.User) error {
-	u.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
-	u.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+	u.CreatedAt = time.Now().UTC().Format(core.DateStandart)
+	u.UpdatedAt = time.Now().UTC().Format(core.DateStandart)
 
 	r.users[u.ChatID] = u
 	return nil
@@ -30,7 +31,7 @@ func (r *UserRepository) RegisterInAdminPanel(u *models.User) error {
 		if u.Username == user.Username {
 			r.users[user.ChatID].Hash = u.Hash
 			r.users[user.ChatID].Role = u.Role
-			r.users[user.ChatID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+			r.users[user.ChatID].UpdatedAt = time.Now().UTC().Format(core.DateStandart)
 
 			u.CreatedAt = r.users[user.ChatID].CreatedAt
 			u.UpdatedAt = r.users[user.ChatID].UpdatedAt

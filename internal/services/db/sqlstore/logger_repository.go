@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
@@ -144,7 +145,7 @@ func (r *LoggerRepository) DeleteSelection(querys interface{}) ([]*models.LogRec
 	}
 
 	if q.DateTo == "" {
-		q.DateTo = time.Now().Add(27 * time.Hour).UTC().Format("2006-01-02T15:04:05.00000000")
+		q.DateTo = time.Now().Add(27 * time.Hour).UTC().Format(core.DateStandart)
 
 	}
 
@@ -192,7 +193,7 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 	}
 
 	if q.DateTo == "" {
-		q.DateTo = time.Now().Add(27 * time.Hour).UTC().Format("2006-01-02T15:04:05.00000000")
+		q.DateTo = time.Now().Add(27 * time.Hour).UTC().Format(core.DateStandart)
 	}
 
 	conditions := []string{"created_at >= $1 AND created_at < $2"}

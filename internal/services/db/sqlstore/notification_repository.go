@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
@@ -82,7 +83,7 @@ func (r *NotificationRepository) Update(n *models.Notification) error {
 		RETURNING id, type, status, chat_id, username, code, user_card, img_path, ex_from, ex_to, created_at, updated_at
 		`,
 		n.Status,
-		time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		time.Now().UTC().Format(core.DateStandart),
 		n.ID,
 	).Scan(
 		&n.ID,

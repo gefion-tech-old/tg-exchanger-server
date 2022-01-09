@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
@@ -90,7 +91,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 			"type": "verification_code",
 			"text": fmt.Sprintf("%d", code),
 		},
-		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		"created_at": time.Now().UTC().Format(core.DateStandart),
 	}
 
 	payload, err := json.Marshal(msg)

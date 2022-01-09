@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
@@ -14,8 +15,8 @@ type BotMessagesRepository struct {
 
 func (r *BotMessagesRepository) Create(m *models.BotMessage) error {
 	m.ID = len(r.messages) + 1
-	m.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
-	m.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+	m.CreatedAt = time.Now().UTC().Format(core.DateStandart)
+	m.UpdatedAt = time.Now().UTC().Format(core.DateStandart)
 
 	r.messages[m.ID] = m
 	return nil
@@ -50,7 +51,7 @@ func (r *BotMessagesRepository) Update(m *models.BotMessage) error {
 	for _, msg := range r.messages {
 		if msg.ID == m.ID {
 			r.messages[msg.ID].MessageText = m.MessageText
-			r.messages[msg.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+			r.messages[msg.ID].UpdatedAt = time.Now().UTC().Format(core.DateStandart)
 
 			r.rewrite(m.ID, m)
 			return nil

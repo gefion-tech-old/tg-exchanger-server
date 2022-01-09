@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
@@ -41,7 +42,7 @@ func (m *ModBills) RejectBillHandler(c *gin.Context) {
 			"type": "confirmation_successful",
 			"text": fmt.Sprintf("🔴 Отклонение 🔴\n\nКарта `%s` отклонена.\nПричина: %s", req.Bill, req.Reason),
 		},
-		"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+		"created_at": time.Now().UTC().Format(core.DateStandart),
 	})
 	if err != nil {
 		m.modlog(err)
@@ -85,7 +86,7 @@ func (m *ModBills) CreateBillHandler(c *gin.Context) {
 					"type": "confirmation_successful",
 					"text": fmt.Sprintf("🟢 Успех! 🟢\n\nКарта `%s` успешно верифицированa.", r.Bill),
 				},
-				"created_at": time.Now().UTC().Format("2006-01-02T15:04:05.00000000"),
+				"created_at": time.Now().UTC().Format(core.DateStandart),
 			})
 			if err != nil {
 				m.modlog(err)

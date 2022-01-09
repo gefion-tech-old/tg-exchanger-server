@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
 
@@ -13,7 +14,7 @@ type LoggerRepository struct {
 
 func (r *LoggerRepository) Create(lr *models.LogRecord) error {
 	lr.ID = len(r.logs) + 1
-	lr.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+	lr.CreatedAt = time.Now().UTC().Format(core.DateStandart)
 
 	r.logs[lr.ID] = lr
 	return nil

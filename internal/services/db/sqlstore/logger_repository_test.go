@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/config"
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
@@ -92,7 +93,7 @@ func Test_SQL_LoggerRepository_DeleteSelection(t *testing.T) {
 		},
 		{
 			name: "date_from from future",
-			from: time.Now().Add(27 * time.Hour).UTC().Format("2006-01-02T15:04:05.00000000"),
+			from: time.Now().Add(27 * time.Hour).UTC().Format(core.DateStandart),
 			to:   "",
 			recreate: func() error {
 				return nil
@@ -166,7 +167,7 @@ func Test_SQL_LoggerRepository_Selection(t *testing.T) {
 			name:              "date_from from future",
 			username:          u,
 			service:           "",
-			from:              time.Now().Add(27 * time.Hour).UTC().Format("2006-01-02T15:04:05.00000000"),
+			from:              time.Now().Add(27 * time.Hour).UTC().Format(core.DateStandart),
 			to:                "",
 			expectedArrLength: 0,
 		},

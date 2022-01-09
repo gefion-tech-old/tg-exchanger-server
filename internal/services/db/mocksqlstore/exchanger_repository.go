@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
@@ -14,8 +15,8 @@ type ExchangerRepository struct {
 
 func (r *ExchangerRepository) Create(e *models.Exchanger) error {
 	e.ID = len(r.exchangers) + 1
-	e.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
-	e.UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+	e.CreatedAt = time.Now().UTC().Format(core.DateStandart)
+	e.UpdatedAt = time.Now().UTC().Format(core.DateStandart)
 
 	r.exchangers[e.ID] = e
 	return nil
@@ -25,7 +26,7 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) error {
 	if r.exchangers[e.ID] != nil {
 		r.exchangers[e.ID].Name = e.Name
 		r.exchangers[e.ID].UrlToParse = e.UrlToParse
-		r.exchangers[e.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+		r.exchangers[e.ID].UpdatedAt = time.Now().UTC().Format(core.DateStandart)
 		return nil
 
 	}
@@ -34,7 +35,7 @@ func (r *ExchangerRepository) Update(e *models.Exchanger) error {
 		if ex.ID == e.ID {
 			r.exchangers[e.ID].Name = e.Name
 			r.exchangers[e.ID].UrlToParse = e.UrlToParse
-			r.exchangers[e.ID].UpdatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+			r.exchangers[e.ID].UpdatedAt = time.Now().UTC().Format(core.DateStandart)
 
 			r.rewrite(ex.ID, e)
 			return nil

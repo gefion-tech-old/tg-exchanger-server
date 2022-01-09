@@ -6,6 +6,7 @@ import (
 	"time"
 
 	excel "github.com/I0HuKc/go-excel"
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
 
@@ -54,7 +55,7 @@ func OneObmenDocumentGenerate(data *models.OneObmen, path string) string {
 		})
 	}
 
-	f := fmt.Sprintf("%s/file/%s.xlsx", path, time.Now().UTC().Format("2006-01-02T15:04:05.00000000"))
+	f := fmt.Sprintf("%s/file/%s.xlsx", path, time.Now().UTC().Format(core.DateStandart))
 	excel.NewFile(f)
 
 	excel.CreateDefaultTable(excel.DefaultTable{

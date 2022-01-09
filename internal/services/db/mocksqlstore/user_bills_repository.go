@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
 
@@ -13,7 +14,7 @@ type UserBillsRepository struct {
 
 func (r *UserBillsRepository) Create(b *models.Bill) error {
 	b.ID = len(r.bills) + 1
-	b.CreatedAt = time.Now().UTC().Format("2006-01-02T15:04:05.00000000")
+	b.CreatedAt = time.Now().UTC().Format(core.DateStandart)
 
 	r.bills[b.ID] = b
 	return nil
