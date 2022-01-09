@@ -11,7 +11,7 @@ import (
 // приложения данного формата даты.
 func DateValidation(d string) validation.RuleFunc {
 	return func(value interface{}) error {
-		r, err := regexp.Compile(REGEX__DATE)
+		r, err := regexp.Compile(RegexDate)
 		if err != nil {
 			return err
 		}

@@ -63,7 +63,7 @@ func (ls *LogRecordSelection) Validation() error {
 
 		validation.Field(&ls.Username,
 			validation.When(ls.Username != "",
-				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.RegexName)),
 			).Else(validation.Empty),
 		),
 
@@ -84,7 +84,7 @@ func (l *LogRecord) Validation() error {
 		validation.Field(&l.Username,
 			validation.When(l.Service == AppType.LogLevelAdmin,
 				validation.Required,
-				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.RegexName)),
 			).Else(validation.Nil),
 		),
 

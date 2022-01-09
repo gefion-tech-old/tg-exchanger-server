@@ -157,7 +157,7 @@ func CardVerificationMetaDataValidation(cvmt *CardVerificationMetaData) validati
 
 			validation.Field(&cvmt.UserCard,
 				validation.Required,
-				validation.Match(regexp.MustCompile(AppValidation.REGEX__CARD)),
+				validation.Match(regexp.MustCompile(AppValidation.RegexCard)),
 			),
 		)
 	}
@@ -188,7 +188,7 @@ func NotificationUserDataValidation(nud *NotificationUserData) validation.RuleFu
 
 			validation.Field(&nud.Username,
 				validation.Required,
-				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.RegexName)),
 			),
 		)
 	}

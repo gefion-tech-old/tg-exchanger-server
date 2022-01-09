@@ -74,14 +74,14 @@ func (e *Exchanger) ExchangerCreateValidation() error {
 			&e.Name,
 			validation.Required,
 			validation.Length(3, 10),
-			validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
+			validation.Match(regexp.MustCompile(AppValidation.RegexName)),
 		),
 		validation.Field(
 			&e.UrlToParse,
 			validation.Required,
 			validation.Required,
 			validation.Length(3, 255),
-			validation.Match(regexp.MustCompile(AppValidation.REGEX__URL)),
+			validation.Match(regexp.MustCompile(AppValidation.RegexUrl)),
 		),
 	)
 }
@@ -93,13 +93,13 @@ func (e *Exchanger) ExchangerUpdateValidation() error {
 			&e.Name,
 			validation.Required,
 			validation.Length(3, 10),
-			validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
+			validation.Match(regexp.MustCompile(AppValidation.RegexName)),
 		),
 		validation.Field(
 			&e.UrlToParse,
 			validation.Required,
 			validation.Length(3, 255),
-			validation.Match(regexp.MustCompile(AppValidation.REGEX__URL)),
+			validation.Match(regexp.MustCompile(AppValidation.RegexUrl)),
 		),
 	)
 }

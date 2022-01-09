@@ -57,7 +57,7 @@ func (b *BotMessage) Validation() error {
 		validation.Field(&b.Connector,
 			validation.When(b.CreatedBy != "",
 				validation.Required,
-				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.RegexName)),
 			).Else(validation.Empty),
 		),
 
@@ -66,7 +66,7 @@ func (b *BotMessage) Validation() error {
 		validation.Field(&b.CreatedBy,
 			validation.When(b.Connector != "",
 				validation.Required,
-				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.RegexName)),
 			).Else(validation.Empty),
 		),
 

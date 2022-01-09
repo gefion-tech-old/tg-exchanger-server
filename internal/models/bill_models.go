@@ -37,7 +37,7 @@ func (rb *RejectBill) Validation() error {
 			&rb.Bill,
 			validation.Required,
 			validation.Length(16, 16),
-			validation.Match(regexp.MustCompile(AppValidation.REGEX__CARD)),
+			validation.Match(regexp.MustCompile(AppValidation.RegexCard)),
 		),
 		validation.Field(&rb.Reason, validation.Required),
 	)
@@ -58,7 +58,7 @@ func (b *Bill) Validation() error {
 		validation.Field(&b.Bill,
 			validation.Required,
 			validation.Length(16, 16),
-			validation.Match(regexp.MustCompile(AppValidation.REGEX__CARD)),
+			validation.Match(regexp.MustCompile(AppValidation.RegexCard)),
 		),
 
 		validation.Field(&b.CreatedAt, validation.When(b.ID > 0,
