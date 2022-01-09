@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
 )
@@ -101,7 +101,7 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 		LIMIT %d
 	`,
 		strings.Join(r.queryGeneration(q), " AND "),
-		tools.OffsetThreshold(q.Page, q.Limit),
+		tools.OffsetThreshold(*q.Page, *q.Limit),
 		q.Limit,
 	)
 
@@ -131,7 +131,7 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 		return arr, nil
 	}
 
-	return nil, errors.ErrInvalidCondition
+	return nil, AppError.ErrInvalidCondition
 }
 
 // # TESTED

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +23,7 @@ import (
 func (m *ModBills) GetAllBillsHandler(c *gin.Context) {
 	chatID, err := strconv.Atoi(c.Param("chat_id"))
 	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidPathParams)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (m *ModBills) GetAllBillsHandler(c *gin.Context) {
 func (m *ModBills) DeleteBillHandler(c *gin.Context) {
 	chatID, err := strconv.Atoi(c.Param("chat_id"))
 	if err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidPathParams)
 		return
 	}
 

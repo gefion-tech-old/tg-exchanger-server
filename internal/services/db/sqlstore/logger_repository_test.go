@@ -221,9 +221,11 @@ func Test_SQL_LoggerRepository_Selection(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+		p, l := 1, 15
+
 		q := &models.LogRecordSelection{
-			Page:     1,
-			Limit:    15,
+			Page:     &p,
+			Limit:    &l,
 			Username: tc.username,
 			Service:  []string{tc.service},
 			DateFrom: tc.from,

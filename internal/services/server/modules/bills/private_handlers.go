@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gin-gonic/gin"
@@ -24,7 +24,7 @@ import (
 func (m *ModBills) RejectBillHandler(c *gin.Context) {
 	req := &models.RejectBill{}
 	if err := c.ShouldBindJSON(req); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (m *ModBills) RejectBillHandler(c *gin.Context) {
 func (m *ModBills) CreateBillHandler(c *gin.Context) {
 	r := &models.Bill{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 

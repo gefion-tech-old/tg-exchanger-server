@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -62,7 +62,7 @@ func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 	r := &models.Notification{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -98,7 +98,7 @@ func (m *ModNotification) DeleteNotificationHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 func newSupportReqNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {

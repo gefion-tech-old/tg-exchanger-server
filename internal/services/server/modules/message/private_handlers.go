@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -29,7 +29,7 @@ func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -45,7 +45,7 @@ func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 	r := &models.BotMessage{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -88,7 +88,7 @@ func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
 func (m *ModMessage) CreateNewMessageHandler(c *gin.Context) {
 	r := &models.BotMessage{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -101,5 +101,5 @@ func (m *ModMessage) CreateNewMessageHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }

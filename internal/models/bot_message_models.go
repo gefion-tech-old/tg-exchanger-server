@@ -3,9 +3,12 @@ package models
 import (
 	"regexp"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
+
+var _ AppValidation.ResourceI = (*BotMessage)(nil)
+var _ AppValidation.ResourceI = (*BotMessageSelection)(nil)
 
 type BotMessage struct {
 	ID          int    `json:"id"`
@@ -27,6 +30,22 @@ type BotMessageSelection struct {
 	==========================================================================================
 */
 
+func (bms *BotMessageSelection) Validation() error {
+	return validation.ValidateStruct(
+		bms,
+		validation.Field(&bms.Page,
+			validation.Required,
+			validation.Min(1),
+		),
+
+		validation.Field(&bms.Limit,
+			validation.Required,
+			validation.Min(1),
+			validation.Max(30),
+		),
+	)
+}
+
 func (b *BotMessage) Validation() error {
 	return validation.ValidateStruct(
 		b,
@@ -38,7 +57,7 @@ func (b *BotMessage) Validation() error {
 		validation.Field(&b.Connector,
 			validation.When(b.CreatedBy != "",
 				validation.Required,
-				validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
 			).Else(validation.Empty),
 		),
 
@@ -47,21 +66,21 @@ func (b *BotMessage) Validation() error {
 		validation.Field(&b.CreatedBy,
 			validation.When(b.Connector != "",
 				validation.Required,
-				validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
 			).Else(validation.Empty),
 		),
 
 		validation.Field(&b.CreatedAt,
 			validation.When(b.CreatedAt != "",
 				validation.Required,
-				validation.By(DateValidation(b.CreatedAt)),
+				validation.By(AppValidation.DateValidation(b.CreatedAt)),
 			).Else(validation.Empty),
 		),
 
 		validation.Field(&b.UpdatedAt,
 			validation.When(b.CreatedAt != "",
 				validation.Required,
-				validation.By(DateValidation(b.UpdatedAt)),
+				validation.By(AppValidation.DateValidation(b.UpdatedAt)),
 			).Else(validation.Empty),
 		),
 	)

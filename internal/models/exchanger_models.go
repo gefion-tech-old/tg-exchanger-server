@@ -4,9 +4,11 @@ import (
 	"encoding/xml"
 	"regexp"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
+
+var _ AppValidation.ResourceI = (*ExchangerSelection)(nil)
 
 type Exchanger struct {
 	ID         int    `json:"id"`
@@ -44,6 +46,22 @@ type OneObmenItem struct {
 	==========================================================================================
 */
 
+func (es *ExchangerSelection) Validation() error {
+	return validation.ValidateStruct(
+		es,
+		validation.Field(&es.Page,
+			validation.Required,
+			validation.Min(1),
+		),
+
+		validation.Field(&es.Limit,
+			validation.Required,
+			validation.Min(1),
+			validation.Max(30),
+		),
+	)
+}
+
 func (e *Exchanger) ExchangerCreateValidation() error {
 	return validation.ValidateStruct(
 		e,
@@ -56,14 +74,14 @@ func (e *Exchanger) ExchangerCreateValidation() error {
 			&e.Name,
 			validation.Required,
 			validation.Length(3, 10),
-			validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+			validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
 		),
 		validation.Field(
 			&e.UrlToParse,
 			validation.Required,
 			validation.Required,
 			validation.Length(3, 255),
-			validation.Match(regexp.MustCompile(static.REGEX__URL)),
+			validation.Match(regexp.MustCompile(AppValidation.REGEX__URL)),
 		),
 	)
 }
@@ -75,13 +93,13 @@ func (e *Exchanger) ExchangerUpdateValidation() error {
 			&e.Name,
 			validation.Required,
 			validation.Length(3, 10),
-			validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+			validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
 		),
 		validation.Field(
 			&e.UrlToParse,
 			validation.Required,
 			validation.Length(3, 255),
-			validation.Match(regexp.MustCompile(static.REGEX__URL)),
+			validation.Match(regexp.MustCompile(AppValidation.REGEX__URL)),
 		),
 	)
 }

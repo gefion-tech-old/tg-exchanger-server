@@ -1,14 +1,17 @@
 package models
 
 import (
-	_errors "errors"
 	"fmt"
 	"regexp"
 	"strconv"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
+
+var _ AppValidation.ResourceI = (*LogRecord)(nil)
+var _ AppValidation.ResourceI = (*LogRecordSelection)(nil)
 
 type LogRecord struct {
 	ID        int     `json:"id"`
@@ -20,8 +23,8 @@ type LogRecord struct {
 }
 
 type LogRecordSelection struct {
-	Page     int
-	Limit    int
+	Page     *int
+	Limit    *int
 	Service  []string
 	Username string
 	DateFrom string
@@ -29,9 +32,24 @@ type LogRecordSelection struct {
 }
 
 func (ls *LogRecordSelection) Validation() error {
-	fmt.Println(ls.DateTo == "")
+	fmt.Println(ls.Page)
+
 	return validation.ValidateStruct(
 		ls,
+		validation.Field(&ls.Page,
+			validation.When(ls.Page != nil,
+				validation.Required,
+				validation.Min(1)),
+		),
+
+		validation.Field(&ls.Limit,
+			validation.When(ls.Limit != nil,
+				validation.Required,
+				validation.Min(1),
+				validation.Max(30),
+			),
+		),
+
 		validation.Field(&ls.Service, validation.When(len(ls.Service) > 0,
 			validation.Each(
 				validation.In(
@@ -45,16 +63,16 @@ func (ls *LogRecordSelection) Validation() error {
 
 		validation.Field(&ls.Username,
 			validation.When(ls.Username != "",
-				validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
 			).Else(validation.Empty),
 		),
 
 		validation.Field(&ls.DateFrom, validation.When(ls.DateFrom != "",
-			validation.By(DateValidation(ls.DateFrom)),
+			validation.By(AppValidation.DateValidation(ls.DateFrom)),
 		).Else(validation.Empty)),
 
 		validation.Field(&ls.DateTo, validation.When(ls.DateTo != "",
-			validation.By(DateValidation(ls.DateTo)),
+			validation.By(AppValidation.DateValidation(ls.DateTo)),
 		).Else(validation.Empty)),
 	)
 }
@@ -66,7 +84,7 @@ func (l *LogRecord) Validation() error {
 		validation.Field(&l.Username,
 			validation.When(l.Service == static.L__ADMIN,
 				validation.Required,
-				validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
 			).Else(validation.Nil),
 		),
 
@@ -78,19 +96,4 @@ func (l *LogRecord) Validation() error {
 		validation.Field(&l.Module, validation.Required),
 		validation.Field(&l.CreatedAt, validation.When(l.ID > 0, validation.Required)),
 	)
-}
-
-func DateValidation(d string) validation.RuleFunc {
-	return func(value interface{}) error {
-		r, err := regexp.Compile(static.REGEX__DATE)
-		if err != nil {
-			return err
-		}
-
-		if !r.MatchString(d) {
-			return _errors.New("invalid date format")
-		}
-
-		return nil
-	}
 }

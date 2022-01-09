@@ -1,6 +1,8 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
@@ -23,25 +25,18 @@ type Server struct {
 }
 
 type ServerI interface {
-	Run() error
+	Create() *http.Server
 }
 
 func Init(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, l utils.LoggerI, c *config.Config) ServerI {
 	return root(s, nsq, r, l, c)
 }
 
-// Метод запуска сервера
-func (s *Server) Run() error {
-	return s.Router.Run(s.config.Server.Port)
-}
-
-// Метод общей конфигурации сервера
-func (s *Server) configure() {
-	api := s.Router.Group("/api")
-	v1 := api.Group("/v1")
-
-	// Подключение всех модулей
-	s.mods.ModulesConfigure(v1, s.guard, s.middleware)
+func (s *Server) Create() *http.Server {
+	return &http.Server{
+		Addr:    s.config.Server.Port,
+		Handler: s.Router,
+	}
 }
 
 func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, l utils.LoggerI, c *config.Config) *Server {
@@ -68,4 +63,13 @@ func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 
 	server.configure()
 	return server
+}
+
+// Метод общей конфигурации сервера
+func (s *Server) configure() {
+	api := s.Router.Group("/api")
+	v1 := api.Group("/v1")
+
+	// Подключение всех модулей
+	s.mods.ModulesConfigure(v1, s.guard, s.middleware)
 }

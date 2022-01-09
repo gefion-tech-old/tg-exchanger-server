@@ -2,16 +2,14 @@ package utils
 
 import (
 	"database/sql"
-	_errors "errors"
 	"fmt"
 	"math"
 	"net/http"
 	"reflect"
-	"regexp"
 	"strconv"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
@@ -26,9 +24,7 @@ type ResponserI interface {
 	NewRecordResponse(c *gin.Context, data interface{}, err error)
 	RecordResponse(c *gin.Context, data interface{}, err error)
 	SelectionResponse(c *gin.Context, repository, querys interface{}) error
-	SelectionResponseObj(c *gin.Context, arr interface{}, page, limit, count int)
 	RecordHandler(c *gin.Context, model interface{}, validators ...error) interface{}
-	DateHandler(c *gin.Context, date ...string) error
 	DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
 	UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
 	CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
@@ -53,7 +49,7 @@ func (u *Responser) NewRecordResponse(c *gin.Context, data interface{}, err erro
 	case nil:
 		c.JSON(http.StatusCreated, data)
 	case sql.ErrNoRows:
-		u.Error(c, http.StatusUnprocessableEntity, errors.ErrAlreadyExists)
+		u.Error(c, http.StatusUnprocessableEntity, AppError.ErrAlreadyExists)
 		return
 	default:
 		u.Error(c, http.StatusInternalServerError, err)
@@ -69,7 +65,7 @@ func (u *Responser) RecordResponse(c *gin.Context, data interface{}, err error) 
 	case nil:
 		c.JSON(http.StatusOK, data)
 	case sql.ErrNoRows:
-		u.Error(c, http.StatusNotFound, errors.ErrRecordNotFound)
+		u.Error(c, http.StatusNotFound, AppError.ErrRecordNotFound)
 		return
 	default:
 		u.Error(c, http.StatusInternalServerError, err)
@@ -99,7 +95,7 @@ func (u *Responser) DeleteRecordResponse(c *gin.Context, repository, model inter
 		return err
 	}
 
-	return u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	return u.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -124,7 +120,7 @@ func (u *Responser) UpdateRecordResponse(c *gin.Context, repository, model inter
 		return err
 	}
 
-	return u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	return u.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -156,7 +152,7 @@ func (u *Responser) CreateRecordResponse(c *gin.Context, repository, model inter
 		return err
 	}
 
-	return u.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	return u.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -166,7 +162,7 @@ func (u *Responser) RecordHandler(c *gin.Context, model interface{}, validators 
 	if c.Param("id") != "" {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			return u.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
+			return u.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidPathParams)
 		}
 
 		// Может быть любым типом
@@ -199,25 +195,6 @@ func (u *Responser) RecordHandler(c *gin.Context, model interface{}, validators 
 	return model
 }
 
-func (u *Responser) DateHandler(c *gin.Context, date ...string) error {
-	if len(date) > 0 {
-		r, err := regexp.Compile(static.REGEX__DATE)
-		if err != nil {
-			return err
-		}
-
-		for _, d := range date {
-			if d != "" {
-				if !r.MatchString(d) {
-					return _errors.New("invalid date format")
-				}
-			}
-		}
-	}
-
-	return nil
-}
-
 /*
 	Метод для динамической разбивки данных из БД и
 	автоматическим HTTP ответом.
@@ -235,19 +212,6 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository, querys interfa
 	if err != nil {
 		return u.Error(c, http.StatusUnprocessableEntity, err)
 	}
-
-	if limit > 30 {
-		return u.Error(c, http.StatusUnprocessableEntity, _errors.New("limit is too larges"))
-	}
-
-	if page < 1 || limit < 1 {
-		return u.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidPathParams)
-	}
-
-	errs, _ := errgroup.WithContext(c)
-
-	cArr := make(chan interface{})
-	cCount := make(chan *int)
 
 	// Заполнение объекта querys
 	// Может быть любым типом
@@ -269,7 +233,11 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository, querys interfa
 		return u.Error(c, http.StatusInternalServerError, err)
 	}
 
-	fPage.SetInt(int64(page))
+	if fPage.Kind() == reflect.Ptr {
+		fPage.Set(reflect.ValueOf(&page))
+	} else {
+		fPage.SetInt(int64(page))
+	}
 
 	fLimit := val.FieldByName("Limit")
 	if !fLimit.IsValid() && fLimit.Kind() != reflect.Int {
@@ -277,7 +245,30 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository, querys interfa
 		return u.Error(c, http.StatusInternalServerError, err)
 	}
 
-	fLimit.SetInt(int64(limit))
+	if fLimit.Kind() == reflect.Ptr {
+		fLimit.Set(reflect.ValueOf(&limit))
+	} else {
+		fLimit.SetInt(int64(limit))
+	}
+
+	// Вызов метода валидации структуры запросов
+
+	vfn, err := GetReflectMethod(querys, "Validation")
+	if err != nil {
+		return err
+	}
+
+	validation := vfn.Call([]reflect.Value{})
+	if validation[0].Interface() != nil {
+		return u.Error(c, http.StatusUnprocessableEntity, validation[0].Interface().(error))
+	}
+
+	// Выполнение операций с БД
+
+	errs, _ := errgroup.WithContext(c)
+
+	cArr := make(chan interface{})
+	cCount := make(chan *int)
 
 	// Подсчет кол-ва записей в таблице
 	errs.Go(func() error {
@@ -328,18 +319,14 @@ func (u *Responser) SelectionResponse(c *gin.Context, repository, querys interfa
 		return u.Error(c, http.StatusInternalServerError, errs.Wait())
 	}
 
-	u.SelectionResponseObj(c, arr, page, limit, *count)
-	return nil
-}
-
-func (u *Responser) SelectionResponseObj(c *gin.Context, arr interface{}, page, limit, count int) {
 	c.JSON(http.StatusOK, gin.H{
 		"limit":        limit,
 		"current_page": page,
-		"last_page":    math.Ceil(float64(count) / float64(limit)),
+		"last_page":    math.Ceil(float64(*count) / float64(limit)),
 		"total":        count,
 		"data":         arr,
 	})
+	return nil
 }
 
 /*

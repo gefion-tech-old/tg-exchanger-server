@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -29,7 +29,7 @@ func (m *ModLogs) DeleteLogRecordHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -48,11 +48,6 @@ func (m *ModLogs) GetLogRecordsSelectionHandler(c *gin.Context) {
 		Service:  []string{c.Query("service")},
 		DateFrom: c.Query("from"),
 		DateTo:   c.Query("to"),
-	}
-
-	if err := lrs.Validation(); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, err)
-		return
 	}
 
 	m.responser.SelectionResponse(c, m.repository, lrs)

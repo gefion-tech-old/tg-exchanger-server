@@ -3,7 +3,6 @@ package user_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -234,7 +233,6 @@ func Test_Server_UserAdminHandler(t *testing.T) {
 						var body models.User
 						assert.NoError(t, json.NewDecoder(rec.Body).Decode(&body))
 						assert.NoError(t, body.StructFullness())
-						fmt.Println(body.CreatedAt)
 						assert.Equal(t, body.Role, static.S__ROLE__ADMIN)
 					})
 				}

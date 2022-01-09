@@ -1,11 +1,11 @@
 package models
 
 import (
-	_errors "errors"
+	"errors"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/config"
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -88,7 +88,7 @@ func verificationСodeValidation(code uint64) validation.RuleFunc {
 			return nil
 		}
 
-		return _errors.New("is invalid")
+		return errors.New("is invalid")
 	}
 }
 
@@ -106,6 +106,6 @@ func userRightsValidation(uname string, urs config.UsersConfig) validation.RuleF
 			}
 		}
 
-		return errors.ErrNotEnoughRights
+		return AppError.ErrNotEnoughRights
 	}
 }

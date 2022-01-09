@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gin-gonic/gin"
@@ -25,7 +25,7 @@ import (
 func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 	r := &models.Notification{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 

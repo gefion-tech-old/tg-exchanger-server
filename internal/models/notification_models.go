@@ -1,12 +1,15 @@
 package models
 
 import (
-	"fmt"
 	"regexp"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
+
+var _ AppValidation.ResourceI = (*Notification)(nil)
+var _ AppValidation.ResourceI = (*NotificationSelection)(nil)
 
 type Notification struct {
 	ID        int                  `json:"id"`
@@ -50,6 +53,22 @@ type NotificationSelection struct {
 	==========================================================================================
 */
 
+func (ns *NotificationSelection) Validation() error {
+	return validation.ValidateStruct(
+		ns,
+		validation.Field(&ns.Page,
+			validation.Required,
+			validation.Min(1),
+		),
+
+		validation.Field(&ns.Limit,
+			validation.Required,
+			validation.Min(1),
+			validation.Max(30),
+		),
+	)
+}
+
 func (n *Notification) Validation() error {
 	return validation.ValidateStruct(
 		n,
@@ -91,14 +110,14 @@ func (n *Notification) Validation() error {
 		validation.Field(&n.CreatedAt,
 			validation.When(n.CreatedAt != "",
 				validation.Required,
-				validation.By(DateValidation(n.CreatedAt)),
+				validation.By(AppValidation.DateValidation(n.CreatedAt)),
 			).Else(validation.Empty),
 		),
 
 		validation.Field(&n.UpdatedAt,
 			validation.When(n.CreatedAt != "",
 				validation.Required,
-				validation.By(DateValidation(n.UpdatedAt)),
+				validation.By(AppValidation.DateValidation(n.UpdatedAt)),
 			).Else(validation.Empty),
 		),
 	)
@@ -138,7 +157,7 @@ func CardVerificationMetaDataValidation(cvmt *CardVerificationMetaData) validati
 
 			validation.Field(&cvmt.UserCard,
 				validation.Required,
-				validation.Match(regexp.MustCompile(static.REGEX__CARD)),
+				validation.Match(regexp.MustCompile(AppValidation.REGEX__CARD)),
 			),
 		)
 	}
@@ -160,7 +179,6 @@ func ExActionCancelMetaDataValidation(eacmt *ExActionCancelMetaData) validation.
 }
 
 func NotificationUserDataValidation(nud *NotificationUserData) validation.RuleFunc {
-	fmt.Println(111)
 	return func(value interface{}) error {
 		return validation.ValidateStruct(
 			nud,
@@ -170,7 +188,7 @@ func NotificationUserDataValidation(nud *NotificationUserData) validation.RuleFu
 
 			validation.Field(&nud.Username,
 				validation.Required,
-				validation.Match(regexp.MustCompile(static.REGEX__NAME)),
+				validation.Match(regexp.MustCompile(AppValidation.REGEX__NAME)),
 			),
 		)
 	}

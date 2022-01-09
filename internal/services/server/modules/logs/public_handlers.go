@@ -3,7 +3,7 @@ package logs
 import (
 	"net/http"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	CoreErrors "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -21,7 +21,7 @@ import (
 func (m *ModLogs) CreateLogRecordHandler(c *gin.Context) {
 	r := &models.LogRecord{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, CoreErrors.ErrInvalidBody)
 		return
 	}
 

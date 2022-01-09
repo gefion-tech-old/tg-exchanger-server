@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -46,7 +46,7 @@ func (m *ModExchanger) DeleteExchangerHandler(c *gin.Context) {
 		m.responser.DeleteRecordResponse(c, m.store.AdminPanel().Exchanger(), obj)
 	}
 
-	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -63,7 +63,7 @@ func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 	// Декодирование
 	r := &models.Exchanger{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -77,7 +77,7 @@ func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -94,7 +94,7 @@ func (m *ModExchanger) CreateExchangerHandler(c *gin.Context) {
 	// Декодирование
 	r := &models.Exchanger{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -108,5 +108,5 @@ func (m *ModExchanger) CreateExchangerHandler(c *gin.Context) {
 		return
 	}
 
-	m.responser.Error(c, http.StatusInternalServerError, errors.ErrFailedToInitializeStruct)
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }

@@ -3,9 +3,12 @@ package models
 import (
 	"regexp"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
+
+var _ AppValidation.ResourceI = (*Bill)(nil)
+var _ AppValidation.ResourceI = (*RejectBill)(nil)
 
 type Bill struct {
 	ID        int    `json:"id"`
@@ -34,7 +37,7 @@ func (rb *RejectBill) Validation() error {
 			&rb.Bill,
 			validation.Required,
 			validation.Length(16, 16),
-			validation.Match(regexp.MustCompile(static.REGEX__CARD)),
+			validation.Match(regexp.MustCompile(AppValidation.REGEX__CARD)),
 		),
 		validation.Field(&rb.Reason, validation.Required),
 	)
@@ -55,12 +58,12 @@ func (b *Bill) Validation() error {
 		validation.Field(&b.Bill,
 			validation.Required,
 			validation.Length(16, 16),
-			validation.Match(regexp.MustCompile(static.REGEX__CARD)),
+			validation.Match(regexp.MustCompile(AppValidation.REGEX__CARD)),
 		),
 
 		validation.Field(&b.CreatedAt, validation.When(b.ID > 0,
 			validation.Required,
-			validation.By(DateValidation(b.CreatedAt))),
+			validation.By(AppValidation.DateValidation(b.CreatedAt))),
 		),
 	)
 }

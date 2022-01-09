@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gin-gonic/gin"
 )
@@ -58,7 +58,7 @@ func (g *Guard) IsAdmin() gin.HandlerFunc {
 				Username: &token.Username,
 			})
 
-			g.responser.Error(c, http.StatusForbidden, errors.ErrNotEnoughRights)
+			g.responser.Error(c, http.StatusForbidden, AppError.ErrNotEnoughRights)
 			return
 		}
 

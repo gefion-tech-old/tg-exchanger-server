@@ -63,5 +63,5 @@ func (a *App) Start(ctx context.Context) error {
 
 	// Инициализация сервера
 	server := server.Init(sqlStore, nsqStore, a.redis, logger, a.config)
-	return server.Run()
+	return server.Run(ctx)
 }

@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gefion-tech/tg-exchanger-server/internal/app/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/app/static"
+	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/tools"
@@ -33,7 +33,7 @@ import (
 func (m *ModUsers) UserInBotRegistrationHandler(c *gin.Context) {
 	r := &models.User{}
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 	req := &models.UserFromAdminRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:
-			m.responser.Error(c, http.StatusNotFound, errors.ErrNotRegistered)
+			m.responser.Error(c, http.StatusNotFound, AppError.ErrNotRegistered)
 			return
 		default:
 			m.responser.Error(c, http.StatusInternalServerError, err)
@@ -144,7 +144,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 
 	// Парсинг входящего тела запроса
 	if err := c.ShouldBindJSON(r); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -170,7 +170,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 	if r := tools.RoleDefine(u.Username, m.cnf.Users); r != static.S__ROLE__USER {
 		u.Role = r
 	} else {
-		m.responser.Error(c, http.StatusForbidden, errors.ErrNotEnoughRights)
+		m.responser.Error(c, http.StatusForbidden, AppError.ErrNotEnoughRights)
 		return
 	}
 
@@ -193,7 +193,7 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 	req := &models.UserFromAdminRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
@@ -221,11 +221,11 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 			return
 		}
 
-		m.responser.Error(c, http.StatusNotFound, errors.ErrNotRegistered)
+		m.responser.Error(c, http.StatusNotFound, AppError.ErrNotRegistered)
 		return
 
 	case sql.ErrNoRows:
-		m.responser.Error(c, http.StatusNotFound, errors.ErrNotRegistered)
+		m.responser.Error(c, http.StatusNotFound, AppError.ErrNotRegistered)
 		return
 
 	default:
@@ -249,7 +249,7 @@ func (m *ModUsers) UserRefreshToken(c *gin.Context) {
 	mapToken := map[string]string{}
 
 	if err := c.ShouldBindJSON(&mapToken); err != nil {
-		m.responser.Error(c, http.StatusUnprocessableEntity, errors.ErrInvalidBody)
+		m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
 		return
 	}
 
