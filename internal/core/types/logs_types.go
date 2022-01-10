@@ -2,7 +2,7 @@ package ctypes
 
 // Типы логов
 const (
-	LogLevelServer = 100
-	LogLevelBot    = 200
-	LogLevelAdmin  = 300
+	LogTypeServer = 100
+	LogTypeBot    = 200
+	LogTypeAdmin  = 300
 )

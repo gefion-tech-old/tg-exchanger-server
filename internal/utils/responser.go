@@ -36,7 +36,7 @@ func InitResponser(l LoggerI) ResponserI {
 		logger: l,
 		template: models.LogRecord{
 			Module:  "HTTP RESPONSER",
-			Service: AppType.LogLevelServer,
+			Service: AppType.LogTypeServer,
 		},
 	}
 }

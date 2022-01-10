@@ -207,9 +207,9 @@ func (r *LoggerRepository) queryGeneration(q *models.LogRecordSelection) []strin
 			q.Service = q.Service[:len(q.Service)-1]
 
 			q.Service = append(q.Service,
-				strconv.Itoa(AppType.LogLevelAdmin),
-				strconv.Itoa(AppType.LogLevelBot),
-				strconv.Itoa(AppType.LogLevelServer),
+				strconv.Itoa(AppType.LogTypeAdmin),
+				strconv.Itoa(AppType.LogTypeBot),
+				strconv.Itoa(AppType.LogTypeServer),
 			)
 		}
 

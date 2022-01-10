@@ -18,7 +18,7 @@ func (g *Guard) Logger(resource, action string) gin.HandlerFunc {
 		}
 
 		go g.logger.NewRecord(&models.LogRecord{
-			Service:  AppType.LogLevelAdmin,
+			Service:  AppType.LogTypeAdmin,
 			Module:   resource,
 			Info:     fmt.Sprintf("%s %s", action, resource),
 			Username: &token.Username,

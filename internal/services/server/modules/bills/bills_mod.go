@@ -44,7 +44,7 @@ func InitModBills(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, ns
 
 func (m *ModBills) modlog(err error) {
 	m.logger.NewRecord(&models.LogRecord{
-		Service: AppType.LogLevelServer,
+		Service: AppType.LogTypeServer,
 		Module:  "BILL_HANDLER_MOD",
 		Info:    err.Error(),
 	})

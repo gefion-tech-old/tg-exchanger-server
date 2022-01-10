@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 
@@ -32,8 +31,6 @@ type LogRecordSelection struct {
 }
 
 func (ls *LogRecordSelection) Validation() error {
-	fmt.Println(ls.Page)
-
 	return validation.ValidateStruct(
 		ls,
 		validation.Field(&ls.Page,
@@ -53,9 +50,9 @@ func (ls *LogRecordSelection) Validation() error {
 		validation.Field(&ls.Service, validation.When(len(ls.Service) > 0,
 			validation.Each(
 				validation.In(
-					strconv.Itoa(AppType.LogLevelBot),
-					strconv.Itoa(AppType.LogLevelServer),
-					strconv.Itoa(AppType.LogLevelAdmin),
+					strconv.Itoa(AppType.LogTypeBot),
+					strconv.Itoa(AppType.LogTypeServer),
+					strconv.Itoa(AppType.LogTypeAdmin),
 				),
 			),
 		).Else(validation.Nil),
@@ -82,7 +79,7 @@ func (l *LogRecord) Validation() error {
 		l,
 		validation.Field(&l.ID, validation.When(l.ID > 0, validation.Required)),
 		validation.Field(&l.Username,
-			validation.When(l.Service == AppType.LogLevelAdmin,
+			validation.When(l.Service == AppType.LogTypeAdmin,
 				validation.Required,
 				validation.Match(regexp.MustCompile(AppValidation.RegexName)),
 			).Else(validation.Nil),
@@ -90,7 +87,7 @@ func (l *LogRecord) Validation() error {
 
 		validation.Field(&l.Info, validation.Required),
 		validation.Field(&l.Service, validation.Required,
-			validation.In(AppType.LogLevelBot, AppType.LogLevelServer, AppType.LogLevelAdmin),
+			validation.In(AppType.LogTypeBot, AppType.LogTypeServer, AppType.LogTypeAdmin),
 		),
 
 		validation.Field(&l.Module, validation.Required),

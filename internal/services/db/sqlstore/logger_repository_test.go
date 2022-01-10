@@ -26,7 +26,7 @@ func Test_SQL_LoggerRepository_Delete(t *testing.T) {
 
 	lr := &models.LogRecord{
 		Info:    "some error",
-		Service: AppType.LogLevelServer,
+		Service: AppType.LogTypeServer,
 		Module:  "DATABASE",
 	}
 
@@ -190,7 +190,7 @@ func Test_SQL_LoggerRepository_Selection(t *testing.T) {
 		{
 			name:              "selection by service code",
 			username:          "",
-			service:           strconv.Itoa(AppType.LogLevelServer),
+			service:           strconv.Itoa(AppType.LogTypeServer),
 			from:              "",
 			to:                "",
 			expectedArrLength: 1,
@@ -206,7 +206,7 @@ func Test_SQL_LoggerRepository_Selection(t *testing.T) {
 		{
 			name:              "selection by username and service code",
 			username:          u,
-			service:           strconv.Itoa(AppType.LogLevelAdmin),
+			service:           strconv.Itoa(AppType.LogTypeAdmin),
 			from:              "",
 			to:                "",
 			expectedArrLength: 1,
@@ -214,7 +214,7 @@ func Test_SQL_LoggerRepository_Selection(t *testing.T) {
 		{
 			name:              "selection by username and service code",
 			username:          u,
-			service:           strconv.Itoa(AppType.LogLevelServer),
+			service:           strconv.Itoa(AppType.LogTypeServer),
 			from:              "",
 			to:                "",
 			expectedArrLength: 0,
@@ -257,7 +257,7 @@ func LoggerRepositoryTestCreator(t *testing.T, s db.SQLStoreI) error {
 	u := mocks.USER_IN_BOT_REGISTRATION_REQ["username"].(string)
 	lr := &models.LogRecord{
 		Info:    "some error",
-		Service: AppType.LogLevelServer,
+		Service: AppType.LogTypeServer,
 		Module:  "DATABASE",
 	}
 
@@ -268,7 +268,7 @@ func LoggerRepositoryTestCreator(t *testing.T, s db.SQLStoreI) error {
 	lra := &models.LogRecord{
 		Username: &u,
 		Info:     "some error",
-		Service:  AppType.LogLevelAdmin,
+		Service:  AppType.LogTypeAdmin,
 		Module:   "DATABASE",
 	}
 
@@ -278,7 +278,7 @@ func LoggerRepositoryTestCreator(t *testing.T, s db.SQLStoreI) error {
 
 	lrb := &models.LogRecord{
 		Info:    "some error",
-		Service: AppType.LogLevelBot,
+		Service: AppType.LogTypeBot,
 		Module:  "DATABASE",
 	}
 

@@ -38,7 +38,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "empty module for server log",
 			payload: map[string]interface{}{
-				"service": AppType.LogLevelServer,
+				"service": AppType.LogTypeServer,
 				// "module": "db",
 				"info": "some error text",
 			},
@@ -47,7 +47,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "empty info for server log",
 			payload: map[string]interface{}{
-				"service": AppType.LogLevelServer,
+				"service": AppType.LogTypeServer,
 				"module":  "db",
 				// "info":    "some error text",
 			},
@@ -57,7 +57,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "empty username for admin log",
 			payload: map[string]interface{}{
-				"service": AppType.LogLevelAdmin,
+				"service": AppType.LogTypeServer,
 				"module":  "db",
 				"info":    "some error text",
 			},
@@ -75,7 +75,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "valid server log",
 			payload: map[string]interface{}{
-				"service": AppType.LogLevelServer,
+				"service": AppType.LogTypeServer,
 				"module":  "db",
 				"info":    "some error text",
 			},
@@ -84,7 +84,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "valid bot log",
 			payload: map[string]interface{}{
-				"service": AppType.LogLevelBot,
+				"service": AppType.LogTypeBot,
 				"module":  "db",
 				"info":    "some error text",
 			},
@@ -94,7 +94,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 			name: "valid admin log",
 			payload: map[string]interface{}{
 				"username": "I0HuKc",
-				"service":  AppType.LogLevelAdmin,
+				"service":  AppType.LogTypeAdmin,
 				"module":   "db",
 				"info":     "some error text",
 			},

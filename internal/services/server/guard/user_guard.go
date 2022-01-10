@@ -52,7 +52,7 @@ func (g *Guard) IsAdmin() gin.HandlerFunc {
 
 		if token.Role != AppType.AppRoleAdmin {
 			go g.logger.NewRecord(&models.LogRecord{
-				Service:  AppType.LogLevelAdmin,
+				Service:  AppType.LogTypeAdmin,
 				Module:   "GUARD",
 				Info:     "Unauthorized access attempt",
 				Username: &token.Username,
