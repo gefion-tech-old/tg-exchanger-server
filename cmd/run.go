@@ -103,7 +103,7 @@ func runner(cfg *config.Config) (err error) {
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.NewRecord(&models.LogRecord{
-				Service: AppType.LogLevelServer,
+				Service: AppType.LogTypeServer,
 				Module:  "Application",
 				Info:    err.Error(),
 			})
@@ -117,7 +117,7 @@ func runner(cfg *config.Config) (err error) {
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		logger.NewRecord(&models.LogRecord{
-			Service: AppType.LogLevelServer,
+			Service: AppType.LogTypeServer,
 			Module:  "Application",
 			Info:    "Server forced to shutdown: " + err.Error(),
 		})
