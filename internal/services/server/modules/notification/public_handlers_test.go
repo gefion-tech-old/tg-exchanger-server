@@ -280,11 +280,6 @@ func Test_Server_CreateNotification(t *testing.T) {
 
 			assert.Equal(t, tc.expectedCode, rec.Code)
 
-			// if tc.expectedCode == 201 {
-			// 	ttt, _ := server.TestGetErrorText(t, rec.Body)
-			// 	assert.Equal(t, "", ttt)
-			// }
-
 			if rec.Code == http.StatusCreated {
 				t.Run("response_validation", func(t *testing.T) {
 					var body models.Notification
