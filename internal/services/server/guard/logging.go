@@ -1,7 +1,6 @@
 package guard
 
 import (
-	"fmt"
 	"net/http"
 
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
@@ -17,10 +16,25 @@ func (g *Guard) Logger(resource, action string) gin.HandlerFunc {
 			return
 		}
 
+		// // var body map[string]interface{}
+		// // if err := c.ShouldBindJSON(&body); err != nil {
+		// // 	fmt.Println(err)
+		// // 	return
+		// // }
+
+		// // jsonString, err := json.Marshal(body)
+		// // if err != nil {
+		// // 	fmt.Println(err)
+		// // }
+		// b := c.Request.Body
+		// jsonData, err := ioutil.ReadAll(c.Request.Body)
+
+		// fmt.Println(string(jsonData))
+
 		go g.logger.NewRecord(&models.LogRecord{
 			Service:  AppType.LogTypeAdmin,
 			Module:   resource,
-			Info:     fmt.Sprintf("%s %s", action, resource),
+			Info:     c.Request.Body,
 			Username: &token.Username,
 		})
 

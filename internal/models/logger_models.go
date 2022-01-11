@@ -13,12 +13,12 @@ var _ AppValidation.ResourceI = (*LogRecord)(nil)
 var _ AppValidation.ResourceI = (*LogRecordSelection)(nil)
 
 type LogRecord struct {
-	ID        int     `json:"id"`
-	Username  *string `json:"username"`
-	Info      string  `json:"info"`
-	Service   int     `json:"service"`
-	Module    string  `json:"module"`
-	CreatedAt string  `json:"created_at"`
+	ID        int         `json:"id"`
+	Username  *string     `json:"username"`
+	Info      interface{} `json:"info"`
+	Service   int         `json:"service"`
+	Module    string      `json:"module"`
+	CreatedAt string      `json:"created_at"`
 }
 
 type LogRecordSelection struct {
