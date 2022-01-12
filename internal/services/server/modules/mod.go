@@ -113,6 +113,7 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 		router.POST("/admin/message",
 			g.AuthTokenValidation(),
 			g.IsAuth(),
+			g.Logger(AppType.ResourceMessage, AppType.ResourceCreate),
 			m.msgMod.CreateNewMessageHandler,
 		)
 		router.PUT("/admin/message/:id",
@@ -170,6 +171,7 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 		router.POST("/admin/exchanger",
 			g.AuthTokenValidation(),
 			g.IsAuth(),
+			g.Logger(AppType.ResourceExchange, AppType.ResourceCreate),
 			m.exMod.CreateExchangerHandler,
 		)
 		router.PUT("/admin/exchanger/:id",
