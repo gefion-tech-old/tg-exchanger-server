@@ -103,7 +103,7 @@ func (r *LoggerRepository) Selection(querys interface{}) ([]*models.LogRecord, e
 	`,
 		strings.Join(r.queryGeneration(q), " AND "),
 		AppMath.OffsetThreshold(*q.Page, *q.Limit),
-		q.Limit,
+		*q.Limit,
 	)
 
 	rows, err := r.store.Query(sb, q.DateFrom, q.DateTo)
