@@ -4,13 +4,14 @@ import (
 	"regexp"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/core"
+	AppInterfaces "github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
 	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ AppValidation.ResourceI = (*Notification)(nil)
-var _ AppValidation.ResourceI = (*NotificationSelection)(nil)
+var _ AppInterfaces.ResourceI = (*Notification)(nil)
+var _ AppInterfaces.ResourceI = (*NotificationSelection)(nil)
 
 type Notification struct {
 	ID        int                  `json:"id"`

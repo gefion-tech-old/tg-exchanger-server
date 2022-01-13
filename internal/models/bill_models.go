@@ -3,12 +3,13 @@ package models
 import (
 	"regexp"
 
+	AppInterfaces "github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ AppValidation.ResourceI = (*Bill)(nil)
-var _ AppValidation.ResourceI = (*RejectBill)(nil)
+var _ AppInterfaces.ResourceI = (*Bill)(nil)
+var _ AppInterfaces.ResourceI = (*RejectBill)(nil)
 
 type Bill struct {
 	ID        int    `json:"id"`

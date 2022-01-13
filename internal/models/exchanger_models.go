@@ -4,11 +4,12 @@ import (
 	"encoding/xml"
 	"regexp"
 
+	AppInterfaces "github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
-var _ AppValidation.ResourceI = (*ExchangerSelection)(nil)
+var _ AppInterfaces.ResourceI = (*ExchangerSelection)(nil)
 
 type Exchanger struct {
 	ID         int    `json:"id"`

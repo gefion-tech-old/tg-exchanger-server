@@ -3,12 +3,13 @@ package models
 import (
 	"regexp"
 
+	AppInterfaces "github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ AppValidation.ResourceI = (*BotMessage)(nil)
-var _ AppValidation.ResourceI = (*BotMessageSelection)(nil)
+var _ AppInterfaces.ResourceI = (*BotMessage)(nil)
+var _ AppInterfaces.ResourceI = (*BotMessageSelection)(nil)
 
 type BotMessage struct {
 	ID          int    `json:"id"`

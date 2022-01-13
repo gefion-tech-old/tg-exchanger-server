@@ -4,13 +4,14 @@ import (
 	"regexp"
 	"strconv"
 
+	AppInterfaces "github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-var _ AppValidation.ResourceI = (*LogRecord)(nil)
-var _ AppValidation.ResourceI = (*LogRecordSelection)(nil)
+var _ AppInterfaces.ResourceI = (*LogRecord)(nil)
+var _ AppInterfaces.ResourceI = (*LogRecordSelection)(nil)
 
 type LogRecord struct {
 	ID        int         `json:"id"`
