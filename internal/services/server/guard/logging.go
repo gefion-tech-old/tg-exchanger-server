@@ -2,6 +2,7 @@ package guard
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -19,12 +20,17 @@ func (g *Guard) Logger(resource, action string) gin.HandlerFunc {
 		}
 
 		var bodyBytes []byte
+		var infoPayload interface{}
+
 		if c.Request.Body != nil {
 			bodyBytes, err = ioutil.ReadAll(c.Request.Body)
 			if err != nil {
 				g.responser.Error(c, http.StatusInternalServerError, err)
 				return
 			}
+			infoPayload = string(bodyBytes)
+		} else {
+			infoPayload = fmt.Sprintf("%s %s", resource, action)
 		}
 
 		// Возвращаю io.ReadCloser в исходное состояние.
@@ -33,7 +39,7 @@ func (g *Guard) Logger(resource, action string) gin.HandlerFunc {
 		go g.logger.NewRecord(&models.LogRecord{
 			Service:  AppType.LogTypeAdmin,
 			Module:   resource,
-			Info:     string(bodyBytes),
+			Info:     infoPayload,
 			Username: &token.Username,
 		})
 
