@@ -2,9 +2,12 @@ package notification
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"reflect"
+	"time"
 
+	"github.com/gefion-tech/tg-exchanger-server/internal/core"
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
@@ -86,5 +89,47 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 				return nil
 			},
 		)
+	}
+}
+
+func newSupportReqNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {
+	return map[string]interface{}{
+		"to": map[string]interface{}{
+			"chat_id":  uArr[i].ChatID,
+			"username": uArr[i].Username,
+		},
+		"message": map[string]interface{}{
+			"type": AppTypes.QueueEventConfirmationRequest,
+			"text": fmt.Sprintf("🔵 Запрос тех. поддержки 🔵\n\n*Пользователь*: @%s", n.User.Username),
+		},
+		"created_at": time.Now().UTC().Format(core.DateStandart),
+	}
+}
+
+func newVefificationNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {
+	return map[string]interface{}{
+		"to": map[string]interface{}{
+			"chat_id":  uArr[i].ChatID,
+			"username": uArr[i].Username,
+		},
+		"message": map[string]interface{}{
+			"type": AppTypes.QueueEventConfirmationRequest,
+			"text": fmt.Sprintf("🟢 Новая заявка 🟢\n\n*Пользователь*: @%s", n.User.Username),
+		},
+		"created_at": time.Now().UTC().Format(core.DateStandart),
+	}
+}
+
+func newActionCancelNotify(uArr []*models.User, i int, n *models.Notification) map[string]interface{} {
+	return map[string]interface{}{
+		"to": map[string]interface{}{
+			"chat_id":  uArr[i].ChatID,
+			"username": uArr[i].Username,
+		},
+		"message": map[string]interface{}{
+			"type": AppTypes.QueueEventSkipOperation,
+			"text": fmt.Sprintf("🔴 Отмена операции 🔴\n\n*Пользователь*: @%s", n.User.Username),
+		},
+		"created_at": time.Now().UTC().Format(core.DateStandart),
 	}
 }

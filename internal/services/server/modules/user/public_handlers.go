@@ -88,7 +88,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 			"username": u.Username,
 		},
 		"message": map[string]interface{}{
-			"type": "verification_code",
+			"type": AppTypes.QueueEventVerificationCode,
 			"text": fmt.Sprintf("%d", code),
 		},
 		"created_at": time.Now().UTC().Format(core.DateStandart),
