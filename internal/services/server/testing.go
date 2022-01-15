@@ -30,11 +30,11 @@ func TestServer(t *testing.T) (*Server, *redisstore.AppRedisDictionaries, func(*
 	assert.NotNil(t, config)
 
 	// Создание redis хранилища для хранения данных о регистрации пользователя
-	rRegistration, err := db.InitRedis(&config.Redis, 1)
+	rRegistration, err := db.InitRedis(&config.Services.Redis, 1)
 	assert.NoError(t, err)
 
 	// Создание redis хранилища для хранения пользовательских сессий
-	rAuth, err := db.InitRedis(&config.Redis, 2)
+	rAuth, err := db.InitRedis(&config.Services.Redis, 2)
 	assert.NoError(t, err)
 
 	AppRedis := &redisstore.AppRedisDictionaries{
@@ -43,7 +43,7 @@ func TestServer(t *testing.T) (*Server, *redisstore.AppRedisDictionaries, func(*
 	}
 
 	// Инициализация соединения с NSQ
-	producer, err := db.InitNSQ(&config.NSQ)
+	producer, err := db.InitNSQ(&config.Services.NSQ)
 	assert.NoError(t, err)
 
 	logger := utils.InitLogger(mocksqlstore.Init().AdminPanel().Logs())

@@ -72,18 +72,18 @@ func runner(cfg *config.Config) (err error) {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	postgres, err := db.InitPostgres(&cfg.DB)
+	postgres, err := db.InitPostgres(&cfg.Services.DB)
 	if err != nil {
 		panic(err)
 	}
 	defer postgres.Close()
 
-	nsq, err := db.InitNSQ(&cfg.NSQ)
+	nsq, err := db.InitNSQ(&cfg.Services.NSQ)
 	if err != nil {
 		panic(err)
 	}
 
-	redisStore, closer, err := redisstore.InitAppRedisDictionaries(&cfg.Redis)
+	redisStore, closer, err := redisstore.InitAppRedisDictionaries(&cfg.Services.Redis)
 	if err != nil {
 		panic(err)
 	}

@@ -1,27 +1,39 @@
-[server]
-host = "127.0.0.1"
-port = ":4000"
-log_level = "error"
-tmp = "./tmp"
+[services]
+
+[services.server]
+HOST = "127.0.0.1"
+PORT = ":4000"
+LOG_LEVEL = "error"
+TMP = "./tmp"
+
+[services.database]
+DB_URL = "postgres://exchanger:qwerty@localhost:5432/exchanger_server_dev?sslmode=disable"
+
+[services.redis]
+HOST = "localhost"
+PORT = 6379
+DB = 1
+
+[services.nsq]
+HOST = "80.87.197.206"
+PORT = 4150
+
 
 [secrets]
-access_secret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-refresh_secret = "JzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikpva"
-token_secret = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+ACCESS_SECRET = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+REFRESH_SECRET = "JzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikpva"
+TOKEN_SECRET = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
 
-[redis]
-host = "localhost"
-port = 6379
-db = 1
-
-[nsq]
-host = "80.87.197.206"
-port = 4150
-
-[database]
-db_url = "postgres://exchanger:qwerty@localhost:5432/exchanger_server_dev?sslmode=disable"
 
 [users]
-managers = []
-developers = ["I0HuKc", "enthusedfir"]
-admins = []
+MANAGERS = []
+DEVELOPERS = ["I0HuKc", "enthusedfir"]
+ADMINS = []
+
+
+[plugins]
+
+[plugins.whitebit]
+PUBLIC_KEY = ""
+PRIVATE_KEY = ""
+URL = "https://whitebit.com"

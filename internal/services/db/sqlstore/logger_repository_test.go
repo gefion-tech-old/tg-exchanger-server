@@ -18,7 +18,7 @@ import (
 func Test_SQL_LoggerRepository_Delete(t *testing.T) {
 	config := config.InitTestConfig(t)
 
-	database, teardown := db.TestDB(t, &config.DB)
+	database, teardown := db.TestDB(t, &config.Services.DB)
 	defer teardown("logs")
 
 	// Вызываю создание хранилища
@@ -67,7 +67,7 @@ func Test_SQL_LoggerRepository_Delete(t *testing.T) {
 func Test_SQL_LoggerRepository_DeleteSelection(t *testing.T) {
 	config := config.InitTestConfig(t)
 
-	database, teardown := db.TestDB(t, &config.DB)
+	database, teardown := db.TestDB(t, &config.Services.DB)
 	defer teardown("logs")
 
 	// Вызываю создание хранилища
@@ -138,7 +138,7 @@ func Test_SQL_LoggerRepository_DeleteSelection(t *testing.T) {
 func Test_SQL_LoggerRepository_Selection(t *testing.T) {
 	config := config.InitTestConfig(t)
 
-	database, teardown := db.TestDB(t, &config.DB)
+	database, teardown := db.TestDB(t, &config.Services.DB)
 	defer teardown("logs")
 
 	// Вызываю создание хранилища

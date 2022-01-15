@@ -57,7 +57,7 @@ func Test_Server_CreateLogRecordHandler(t *testing.T) {
 		{
 			name: "empty username for admin log",
 			payload: map[string]interface{}{
-				"service": AppType.LogTypeServer,
+				"service": AppType.LogTypeAdmin,
 				"module":  "db",
 				"info":    "some error text",
 			},

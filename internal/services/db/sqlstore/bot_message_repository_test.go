@@ -15,7 +15,7 @@ import (
 func Test_SQL_BotMessagesRepository(t *testing.T) {
 	config := config.InitTestConfig(t)
 
-	database, teardown := db.TestDB(t, &config.DB)
+	database, teardown := db.TestDB(t, &config.Services.DB)
 	defer teardown("users", "bot_messages")
 
 	// Вызываю создание хранилища

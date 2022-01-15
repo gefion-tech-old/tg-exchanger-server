@@ -34,7 +34,7 @@ func Init(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries,
 
 func (s *Server) Create() *http.Server {
 	return &http.Server{
-		Addr:    s.config.Server.Port,
+		Addr:    s.config.Services.Server.Port,
 		Handler: s.Router,
 	}
 }

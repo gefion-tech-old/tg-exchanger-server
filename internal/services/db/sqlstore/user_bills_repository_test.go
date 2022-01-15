@@ -14,7 +14,7 @@ import (
 func Test_SQL_UserBillsRepository(t *testing.T) {
 	config := config.InitTestConfig(t)
 
-	db, teardown := db.TestDB(t, &config.DB)
+	db, teardown := db.TestDB(t, &config.Services.DB)
 	defer teardown("users", "bills")
 
 	// Вызываю создание хранилища

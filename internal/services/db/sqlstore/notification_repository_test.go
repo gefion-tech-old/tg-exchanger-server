@@ -15,7 +15,7 @@ import (
 func Test_SQL_NotificationRepository(t *testing.T) {
 	config := config.InitTestConfig(t)
 
-	db, teardown := db.TestDB(t, &config.DB)
+	db, teardown := db.TestDB(t, &config.Services.DB)
 	defer teardown("notifications")
 
 	// Вызываю создание хранилища

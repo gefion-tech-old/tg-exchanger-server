@@ -1,46 +1,61 @@
 package config
 
 type Config struct {
-	Server  ServerConfig   `toml:"server"`
-	Secrets SecretsConfig  `toml:"secrets"`
-	Redis   RedisConfig    `toml:"redis"`
-	NSQ     NsqConfig      `toml:"nsq"`
-	DB      DatabaseConfig `toml:"database"`
-	Users   UsersConfig    `toml:"users"`
+	Services ServicesConfigs `toml:"services"`
+	Secrets  SecretsConfig   `toml:"secrets"`
+	Users    UsersConfig     `toml:"users"`
+	Plugins  PluginsConfig   `toml:"plugins"`
+}
+
+type ServicesConfigs struct {
+	Server ServerConfig   `toml:"server"`
+	DB     DatabaseConfig `toml:"database"`
+	Redis  RedisConfig    `toml:"redis"`
+	NSQ    NsqConfig      `toml:"nsq"`
+}
+
+type PluginsConfig struct {
+	Whitebit WhitebitConfig `toml:"whitebit"`
 }
 
 type ServerConfig struct {
-	Host     string `toml:"host"`
-	Port     string `toml:"port"`
-	LogLevel string `toml:"log_level"`
-	Tmp      string `toml:"tmp"`
+	Host     string `toml:"HOST"`
+	Port     string `toml:"PORT"`
+	LogLevel string `toml:"LOG_LEVEL"`
+	Tmp      string `toml:"TMP"`
 }
 
 type SecretsConfig struct {
-	AccessSecret  string `toml:"access_secret"`
-	RefreshSecret string `toml:"refresh_secret"`
-	TokenSecret   string `toml:"token_secret"`
+	AccessSecret  string `toml:"ACCESS_SECRET"`
+	RefreshSecret string `toml:"REFRESH_SECRET"`
+	TokenSecret   string `toml:"TOKEN_SECRET"`
 }
 
 type RedisConfig struct {
-	Host string `toml:"host"`
-	Port int64  `toml:"port"`
-	DB   int8   `toml:"db"`
+	Host string `toml:"HOST"`
+	Port int64  `toml:"PORT"`
+	DB   int8   `toml:"DB"`
 }
 
 type DatabaseConfig struct {
-	DbUrl string `toml:"db_url"`
+	DbUrl string `toml:"DB_URL"`
 }
 
 type NsqConfig struct {
-	Host string `toml:"host"`
-	Port uint16 `toml:"port"`
+	Host string `toml:"HOST"`
+	Port uint16 `toml:"PORT"`
 }
 
 type UsersConfig struct {
-	Managers   []string `toml:"managers"`
-	Developers []string `toml:"developers"`
-	Admins     []string `toml:"admins"`
+	Managers   []string `toml:"MANAGERS"`
+	Developers []string `toml:"DEVELOPERS"`
+	Admins     []string `toml:"ADMINS"`
+}
+
+type WhitebitConfig struct {
+	PublicKey string `toml:"PUBLIC_KEY"`
+	SecretKey string `toml:"PRIVATE_KEY"`
+	URL       string `toml:"URL"`
 }
 
 func Init() *Config {
