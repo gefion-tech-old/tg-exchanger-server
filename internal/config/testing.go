@@ -44,5 +44,4 @@ func InitTestConfig(t *testing.T) *Config {
 			Admins:     []string{},
 		},
 	}
-
 }
