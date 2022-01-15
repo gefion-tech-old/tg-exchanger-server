@@ -64,7 +64,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 	}
 
 	// Валидирую полученные данные
-	m.responser.Error(c, http.StatusUnprocessableEntity, req.UserFromAdminRequestValidation(m.cnf.Users))
+	m.responser.Error(c, http.StatusUnprocessableEntity, req.UserFromAdminRequestValidation(m.cfg.Users))
 
 	u, err := m.store.User().FindByUsername(req.Username)
 	if err != nil {
@@ -169,7 +169,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 	}
 
 	// Назначение роли пользователю
-	if r := AppValidation.RoleDefine(u.Username, m.cnf.Users); r != AppTypes.AppRoleUser {
+	if r := AppValidation.RoleDefine(u.Username, m.cfg.Users); r != AppTypes.AppRoleUser {
 		u.Role = r
 	} else {
 		m.responser.Error(c, http.StatusForbidden, AppError.ErrNotEnoughRights)
@@ -264,7 +264,7 @@ func (m *ModUsers) UserRefreshToken(c *gin.Context) {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(m.cnf.Secrets.RefreshSecret), nil
+		return []byte(m.cfg.Secrets.RefreshSecret), nil
 	})
 
 	// Если возникла ошибка, значит токен просрочен
@@ -365,7 +365,7 @@ func (m *ModUsers) createToken(chatID int64, username string, role int) (*models
 
 	// Кодирую полезную нагрузку создавая ТОКЕН ДОСТУПА
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	td.AccessToken, err = at.SignedString([]byte(m.cnf.Secrets.AccessSecret))
+	td.AccessToken, err = at.SignedString([]byte(m.cfg.Secrets.AccessSecret))
 	if err != nil {
 		return nil, err
 	}
@@ -380,7 +380,7 @@ func (m *ModUsers) createToken(chatID int64, username string, role int) (*models
 
 	// Кодирую полезную нагрузку создавая ТОКЕН ОБНОВЛЕНИЯ
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	td.RefreshToken, err = rt.SignedString([]byte(m.cnf.Secrets.RefreshSecret))
+	td.RefreshToken, err = rt.SignedString([]byte(m.cfg.Secrets.RefreshSecret))
 	if err != nil {
 		return nil, err
 	}

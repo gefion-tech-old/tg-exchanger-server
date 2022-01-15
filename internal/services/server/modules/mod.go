@@ -37,18 +37,69 @@ func InitServerModules(
 	store db.SQLStoreI,
 	redis *redisstore.AppRedisDictionaries,
 	nsq nsqstore.NsqI,
-	cnf *config.Config,
+	cfg *config.Config,
 	logger utils.LoggerI,
 	responser utils.ResponserI,
 ) ServerModulesI {
 	return &ServerModules{
-		exMod:     exchanger.InitModExchanger(store, redis, nsq, cnf, responser, logger),
-		notifyMod: notification.InitModNotification(store, redis, nsq, cnf, logger, responser),
-		msgMod:    message.InitModMessage(store, redis, nsq, cnf, responser, logger),
-		userMod:   user.InitModUsers(store, redis, nsq, cnf, responser, logger),
-		billsMod:  bills.InitModBills(store, redis, nsq, cnf, responser, logger),
-		logsMod:   logs.InitModLogs(store.AdminPanel().Logs(), cnf, responser),
-		maMod:     ma.InitModMerchantAutoPayout(store, redis, nsq, cnf, responser, logger),
+		exMod: exchanger.InitModExchanger(
+			store,
+			redis,
+			nsq,
+			cfg,
+			responser,
+			logger,
+		),
+
+		notifyMod: notification.InitModNotification(
+			store,
+			redis,
+			nsq,
+			cfg,
+			logger,
+			responser,
+		),
+
+		msgMod: message.InitModMessage(
+			store,
+			redis,
+			nsq,
+			cfg,
+			responser,
+			logger,
+		),
+
+		userMod: user.InitModUsers(
+			store,
+			redis,
+			nsq,
+			cfg,
+			responser,
+			logger,
+		),
+
+		billsMod: bills.InitModBills(
+			store,
+			redis,
+			nsq,
+			cfg,
+			responser,
+			logger,
+		),
+
+		logsMod: logs.InitModLogs(
+			store.AdminPanel().Logs(),
+			cfg,
+			responser,
+		),
+		maMod: ma.InitModMerchantAutoPayout(
+			store,
+			redis,
+			nsq,
+			cfg,
+			responser,
+			logger,
+		),
 	}
 }
 

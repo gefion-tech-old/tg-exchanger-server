@@ -13,7 +13,7 @@ type ModExchanger struct {
 	store db.SQLStoreI
 	redis *redisstore.AppRedisDictionaries
 	nsq   nsqstore.NsqI
-	cnf   *config.Config
+	cfg   *config.Config
 
 	responser utils.ResponserI
 	logger    utils.LoggerI
@@ -28,12 +28,19 @@ type ModExchangerI interface {
 	GetExchangerDocumentHandler(c *gin.Context)
 }
 
-func InitModExchanger(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI, l utils.LoggerI) ModExchangerI {
+func InitModExchanger(
+	store db.SQLStoreI,
+	redis *redisstore.AppRedisDictionaries,
+	nsq nsqstore.NsqI,
+	cfg *config.Config,
+	responser utils.ResponserI,
+	l utils.LoggerI,
+) ModExchangerI {
 	return &ModExchanger{
 		store: store,
 		redis: redis,
 		nsq:   nsq,
-		cnf:   cnf,
+		cfg:   cfg,
 
 		responser: responser,
 		logger:    l,

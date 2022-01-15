@@ -13,7 +13,7 @@ type ModNotification struct {
 	store db.SQLStoreI
 	redis *redisstore.AppRedisDictionaries
 	nsq   nsqstore.NsqI
-	cnf   *config.Config
+	cfg   *config.Config
 
 	responser utils.ResponserI
 	logger    utils.LoggerI
@@ -27,12 +27,19 @@ type ModNotificationI interface {
 	NewNotificationsCheckHandler(c *gin.Context)
 }
 
-func InitModNotification(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, l utils.LoggerI, responser utils.ResponserI) ModNotificationI {
+func InitModNotification(
+	store db.SQLStoreI,
+	redis *redisstore.AppRedisDictionaries,
+	nsq nsqstore.NsqI,
+	cfg *config.Config,
+	l utils.LoggerI,
+	responser utils.ResponserI,
+) ModNotificationI {
 	return &ModNotification{
 		store: store,
 		redis: redis,
 		nsq:   nsq,
-		cnf:   cnf,
+		cfg:   cfg,
 
 		responser: responser,
 		logger:    l,

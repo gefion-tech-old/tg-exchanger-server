@@ -43,6 +43,6 @@ func (m *ModExchanger) GetExchangerDocumentHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"file": utils.OneObmenDocumentGenerate(&data, m.cnf.Services.Server.Tmp),
+		"file": utils.OneObmenDocumentGenerate(&data, m.cfg.Services.Server.Tmp),
 	})
 }

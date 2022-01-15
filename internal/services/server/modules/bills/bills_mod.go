@@ -15,7 +15,7 @@ type ModBills struct {
 	store db.SQLStoreI
 	redis *redisstore.AppRedisDictionaries
 	nsq   nsqstore.NsqI
-	cnf   *config.Config
+	cfg   *config.Config
 
 	responser utils.ResponserI
 	logger    utils.LoggerI
@@ -30,12 +30,19 @@ type ModBillsI interface {
 	CreateBillHandler(c *gin.Context)
 }
 
-func InitModBills(store db.SQLStoreI, redis *redisstore.AppRedisDictionaries, nsq nsqstore.NsqI, cnf *config.Config, responser utils.ResponserI, l utils.LoggerI) ModBillsI {
+func InitModBills(
+	store db.SQLStoreI,
+	redis *redisstore.AppRedisDictionaries,
+	nsq nsqstore.NsqI,
+	cfg *config.Config,
+	responser utils.ResponserI,
+	l utils.LoggerI,
+) ModBillsI {
 	return &ModBills{
 		store: store,
 		redis: redis,
 		nsq:   nsq,
-		cnf:   cnf,
+		cfg:   cfg,
 
 		responser: responser,
 		logger:    l,

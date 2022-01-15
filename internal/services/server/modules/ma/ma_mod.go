@@ -12,7 +12,7 @@ type ModMerchantAutoPayout struct {
 	store db.SQLStoreI
 	redis *redisstore.AppRedisDictionaries
 	nsq   nsqstore.NsqI
-	cnf   *config.Config
+	cfg   *config.Config
 
 	responser utils.ResponserI
 	logger    utils.LoggerI
@@ -32,7 +32,7 @@ func InitModMerchantAutoPayout(
 		store: store,
 		redis: redis,
 		nsq:   nsq,
-		cnf:   cfg,
+		cfg:   cfg,
 
 		responser: responser,
 		logger:    l,

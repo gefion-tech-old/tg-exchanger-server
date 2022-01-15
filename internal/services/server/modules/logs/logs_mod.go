@@ -9,7 +9,7 @@ import (
 
 type ModLogs struct {
 	repository db.LoggerRepository
-	cnf        *config.Config
+	cfg        *config.Config
 
 	responser utils.ResponserI
 }
@@ -21,10 +21,14 @@ type ModLogsI interface {
 	DeleteLogRecordsSelectionHandler(c *gin.Context)
 }
 
-func InitModLogs(r db.LoggerRepository, cnf *config.Config, responser utils.ResponserI) ModLogsI {
+func InitModLogs(
+	r db.LoggerRepository,
+	cfg *config.Config,
+	responser utils.ResponserI,
+) ModLogsI {
 	return &ModLogs{
 		repository: r,
-		cnf:        cnf,
+		cfg:        cfg,
 		responser:  responser,
 	}
 }
