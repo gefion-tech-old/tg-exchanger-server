@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
 	mp "github.com/gefion-tech/tg-exchanger-server/internal/plugins/mine"
 	wp "github.com/gefion-tech/tg-exchanger-server/internal/plugins/whitebit"
@@ -24,11 +25,11 @@ func (p *AppPlugins) Mine() interfaces.PluginI {
 	return p.mine
 }
 
-func (p *AppPlugins) Whitebit() interfaces.PluginI {
+func (p *AppPlugins) Whitebit(cfg *config.WhitebitConfig) interfaces.PluginI {
 	if p.whitebit != nil {
 		return p.whitebit
 	}
 
-	p.whitebit = wp.InitWhitebitPlugin()
+	p.whitebit = wp.InitWhitebitPlugin(cfg)
 	return p.whitebit
 }

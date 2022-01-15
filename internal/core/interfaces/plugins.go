@@ -1,8 +1,10 @@
 package interfaces
 
+import "github.com/gefion-tech/tg-exchanger-server/internal/config"
+
 type AppPlugins interface {
 	Mine() PluginI
-	Whitebit() PluginI
+	Whitebit(cfg *config.WhitebitConfig) PluginI
 }
 
 type PluginI interface {
