@@ -34,6 +34,6 @@ ADMINS = []
 [plugins]
 
 [plugins.whitebit]
-PUBLIC_KEY = ""
-PRIVATE_KEY = ""
+PUBLIC_KEY = "204cc6a3389162c9930b6b90c550455a"
+PRIVATE_KEY = "99449c488a373c70dc815740c748f03b"
 URL = "https://whitebit.com"
