@@ -3,6 +3,9 @@ package modules
 import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
+	"github.com/gefion-tech/tg-exchanger-server/internal/plugins"
+	mine_plugin "github.com/gefion-tech/tg-exchanger-server/internal/plugins/mine"
+	whitebit_plugin "github.com/gefion-tech/tg-exchanger-server/internal/plugins/whitebit"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
@@ -92,11 +95,16 @@ func InitServerModules(
 			cfg,
 			responser,
 		),
+
 		maMod: ma.InitModMerchantAutoPayout(
 			store,
 			redis,
 			nsq,
 			cfg,
+			plugins.InitAppPlugins(
+				mine_plugin.InitMinePlugin(),
+				whitebit_plugin.InitWhitebitPlugin(&cfg.Plugins.Whitebit),
+			),
 			responser,
 			logger,
 		),
@@ -278,6 +286,14 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 			g.AuthTokenValidation(),
 			g.IsAuth(),
 			m.exMod.GetExchangersSelectionHandler,
+		)
+	}
+
+	// merchant/autopayout
+	{
+		router.POST(
+			"merchant-autopayout/:service/new-adress",
+			m.maMod.CreateNewAdressHandler,
 		)
 	}
 
