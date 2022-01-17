@@ -22,10 +22,11 @@ type apiHelper struct {
 }
 
 type apiHelperI interface {
-	SendRequest(requestURL string, data map[string]string) ([]byte, error)
+	SendRequest(requestURL string, data map[string]interface{}) ([]byte, error)
 }
 
-func (api *apiHelper) SendRequest(requestURL string, data map[string]string) ([]byte, error) {
+// Функция для отправки запроса на конечные точки
+func (api *apiHelper) SendRequest(requestURL string, data map[string]interface{}) ([]byte, error) {
 	// Если одноразовый номер похож на номер предыдущего запроса или меньше
 	// его, будет получено сообщение об ошибке «слишком много запросов»
 

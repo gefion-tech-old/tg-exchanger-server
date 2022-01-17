@@ -12,13 +12,15 @@ type WhitebitPlugin struct {
 }
 
 func InitWhitebitPlugin(cfg *config.WhitebitConfig) interfaces.PluginI {
+	p := &apiHelper{
+		PublicKey: cfg.PublicKey,
+		SecretKey: cfg.SecretKey,
+		BaseURL:   cfg.URL,
+	}
+
 	return &WhitebitPlugin{
-		provider: &apiHelper{
-			PublicKey: cfg.PublicKey,
-			SecretKey: cfg.SecretKey,
-			BaseURL:   cfg.URL,
-		},
-		merchant:   InitMerchant(),
+		provider:   p,
+		merchant:   InitMerchant(p),
 		autopayout: IniAutoPayout(),
 	}
 }
@@ -28,7 +30,7 @@ func (plugin *WhitebitPlugin) Merchant() interfaces.MerchantI {
 		return plugin.merchant
 	}
 
-	plugin.merchant = InitMerchant()
+	plugin.merchant = InitMerchant(plugin.provider)
 	return plugin.merchant
 }
 
