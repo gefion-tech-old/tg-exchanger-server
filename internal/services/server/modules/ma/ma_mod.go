@@ -11,22 +11,27 @@ import (
 )
 
 type ModMerchantAutoPayout struct {
-	store db.SQLStoreI
-	redis *redisstore.AppRedisDictionaries
-	nsq   nsqstore.NsqI
-	cfg   *config.Config
-	pl    *plugins.AppPlugins
+	repository db.MerchantAutopayoutRepository
+	redis      *redisstore.AppRedisDictionaries
+	nsq        nsqstore.NsqI
+	cfg        *config.Config
+	pl         *plugins.AppPlugins
 
 	responser utils.ResponserI
 	logger    utils.LoggerI
 }
 
 type ModMerchantAutoPayoutI interface {
+	CreateMerchantAutopayoutHandler(c *gin.Context)
+	UpdateMerchantAutopayoutHandler(c *gin.Context)
+	DeleteMerchantAutopayoutHandler(c *gin.Context)
+	GetMerchantAutopayoutSelectionHandler(c *gin.Context)
+
 	CreateNewAdressHandler(c *gin.Context)
 }
 
 func InitModMerchantAutoPayout(
-	store db.SQLStoreI,
+	rep db.MerchantAutopayoutRepository,
 	redis *redisstore.AppRedisDictionaries,
 	nsq nsqstore.NsqI,
 	cfg *config.Config,
@@ -35,10 +40,10 @@ func InitModMerchantAutoPayout(
 	l utils.LoggerI,
 ) ModMerchantAutoPayoutI {
 	return &ModMerchantAutoPayout{
-		store: store,
-		redis: redis,
-		nsq:   nsq,
-		cfg:   cfg,
+		repository: rep,
+		redis:      redis,
+		nsq:        nsq,
+		cfg:        cfg,
 
 		pl: pl,
 

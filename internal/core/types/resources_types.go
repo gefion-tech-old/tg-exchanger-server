@@ -10,10 +10,11 @@ var (
 
 // Существующие ресурсы
 var (
-	ResourceBill     = "Bill"
-	ResourceExchange = "Echanger"
-	ResourceMessage  = "Message"
-	ResourceLog      = "Log"
-	ResourceNotify   = "Notifications"
-	ResourceUser     = "User"
+	ResourceBill               = "Bill"
+	ResourceExchange           = "Echanger"
+	ResourceMessage            = "Message"
+	ResourceLog                = "Log"
+	ResourceNotify             = "Notifications"
+	ResourceUser               = "User"
+	ResourceMerchantAutopayout = "Merchant/Autopayout"
 )

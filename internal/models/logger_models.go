@@ -48,15 +48,16 @@ func (ls *LogRecordSelection) Validation() error {
 			),
 		),
 
-		validation.Field(&ls.Service, validation.When(len(ls.Service) > 0,
-			validation.Each(
-				validation.In(
-					strconv.Itoa(AppType.LogTypeBot),
-					strconv.Itoa(AppType.LogTypeServer),
-					strconv.Itoa(AppType.LogTypeAdmin),
+		validation.Field(&ls.Service,
+			validation.When(len(ls.Service) > 0,
+				validation.Each(
+					validation.In(
+						strconv.Itoa(AppType.LogTypeBot),
+						strconv.Itoa(AppType.LogTypeServer),
+						strconv.Itoa(AppType.LogTypeAdmin),
+					),
 				),
-			),
-		).Else(validation.Nil),
+			).Else(validation.Nil),
 		),
 
 		validation.Field(&ls.Username,

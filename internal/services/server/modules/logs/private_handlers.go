@@ -43,14 +43,14 @@ func (m *ModLogs) DeleteLogRecordHandler(c *gin.Context) {
 	# TESTED
 */
 func (m *ModLogs) GetLogRecordsSelectionHandler(c *gin.Context) {
-	lrs := &models.LogRecordSelection{
+	s := &models.LogRecordSelection{
 		Username: c.Query("user"),
 		Service:  []string{c.Query("service")},
 		DateFrom: c.Query("from"),
 		DateTo:   c.Query("to"),
 	}
 
-	m.responser.SelectionResponse(c, m.repository, lrs)
+	m.responser.SelectionResponse(c, m.repository, s)
 }
 
 /*

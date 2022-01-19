@@ -12,3 +12,9 @@ var (
 	MerchantAutoPayoutMine     = "mine"
 	MerchantAutoPayoutWhitebit = "whitebit"
 )
+
+// Типы доступных состояний
+var (
+	UseAsMerchant   = 1
+	UseAsAutoPayout = 0
+)

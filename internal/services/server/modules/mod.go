@@ -97,7 +97,7 @@ func InitServerModules(
 		),
 
 		maMod: ma.InitModMerchantAutoPayout(
-			store,
+			store.AdminPanel().MerchantAutopayout(),
 			redis,
 			nsq,
 			cfg,
@@ -292,7 +292,34 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 	// merchant/autopayout
 	{
 		router.POST(
-			"merchant-autopayout/:service/new-adress",
+			"/merchant-autopayout",
+			g.AuthTokenValidation(),
+			g.IsAuth(),
+			g.Logger(AppType.ResourceMerchantAutopayout, AppType.ResourceCreate),
+			m.maMod.CreateMerchantAutopayoutHandler,
+		)
+		router.PUT(
+			"/merchant-autopayout/:id",
+			g.AuthTokenValidation(),
+			g.IsAuth(),
+			g.Logger(AppType.ResourceMerchantAutopayout, AppType.ResourceUpdate),
+			m.maMod.UpdateMerchantAutopayoutHandler,
+		)
+		router.DELETE(
+			"/merchant-autopayout/:id",
+			g.AuthTokenValidation(),
+			g.IsAuth(),
+			g.Logger(AppType.ResourceMerchantAutopayout, AppType.ResourceDelete),
+			m.maMod.DeleteMerchantAutopayoutHandler,
+		)
+		router.GET(
+			"/merchant-autopayout/all",
+			g.AuthTokenValidation(),
+			g.IsAuth(),
+			m.maMod.GetMerchantAutopayoutSelectionHandler,
+		)
+		router.POST(
+			"/merchant-autopayout/:service/new-adress",
 			m.maMod.CreateNewAdressHandler,
 		)
 	}

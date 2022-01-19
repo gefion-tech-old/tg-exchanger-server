@@ -8,6 +8,7 @@ type AdminPanelRepository interface {
 	BotMessages() BotMessagesRepository
 	Notification() NotificationRepository
 	Exchanger() ExchangerRepository
+	MerchantAutopayout() MerchantAutopayoutRepository
 }
 
 type UserRepository interface {
@@ -58,4 +59,13 @@ type BotMessagesRepository interface {
 	Get(m *models.BotMessage) error
 	Count(querys interface{}) (int, error)
 	Selection(querys interface{}) ([]*models.BotMessage, error)
+}
+
+type MerchantAutopayoutRepository interface {
+	Create(m *models.MerchantAutopayout) error
+	Update(m *models.MerchantAutopayout) error
+	Delete(m *models.MerchantAutopayout) error
+	Get(m *models.MerchantAutopayout) error
+	Count(querys interface{}) (int, error)
+	Selection(querys interface{}) ([]*models.MerchantAutopayout, error)
 }

@@ -7,12 +7,13 @@ import (
 )
 
 type AdminPanelRepository struct {
-	store                  *sql.DB
-	botMessagesRepository  *BotMessagesRepository
-	notificationRepository *NotificationRepository
-	exchangerRepository    *ExchangerRepository
-	userBillsRepository    *UserBillsRepository
-	logsRepository         *LoggerRepository
+	store                        *sql.DB
+	botMessagesRepository        *BotMessagesRepository
+	notificationRepository       *NotificationRepository
+	exchangerRepository          *ExchangerRepository
+	userBillsRepository          *UserBillsRepository
+	logsRepository               *LoggerRepository
+	merchantAutopayoutRepository *MerchantAutopayoutRepository
 }
 
 /*
@@ -79,4 +80,16 @@ func (r *AdminPanelRepository) BotMessages() db.BotMessagesRepository {
 	}
 
 	return r.botMessagesRepository
+}
+
+func (r *AdminPanelRepository) MerchantAutopayout() db.MerchantAutopayoutRepository {
+	if r.merchantAutopayoutRepository != nil {
+		return r.merchantAutopayoutRepository
+	}
+
+	r.merchantAutopayoutRepository = &MerchantAutopayoutRepository{
+		store: r.store,
+	}
+
+	return r.merchantAutopayoutRepository
 }
