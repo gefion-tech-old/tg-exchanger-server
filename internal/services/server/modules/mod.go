@@ -292,34 +292,34 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 	// merchant/autopayout
 	{
 		router.POST(
-			"/merchant-autopayout",
+			"admin/merchant-autopayout",
 			g.AuthTokenValidation(),
 			g.IsAuth(),
 			g.Logger(AppType.ResourceMerchantAutopayout, AppType.ResourceCreate),
 			m.maMod.CreateMerchantAutopayoutHandler,
 		)
 		router.PUT(
-			"/merchant-autopayout/:id",
+			"admin/merchant-autopayout/:id",
 			g.AuthTokenValidation(),
 			g.IsAuth(),
 			g.Logger(AppType.ResourceMerchantAutopayout, AppType.ResourceUpdate),
 			m.maMod.UpdateMerchantAutopayoutHandler,
 		)
 		router.DELETE(
-			"/merchant-autopayout/:id",
+			"admin/merchant-autopayout/:id",
 			g.AuthTokenValidation(),
 			g.IsAuth(),
 			g.Logger(AppType.ResourceMerchantAutopayout, AppType.ResourceDelete),
 			m.maMod.DeleteMerchantAutopayoutHandler,
 		)
 		router.GET(
-			"/merchant-autopayout/all",
+			"admin/merchant-autopayout/all",
 			g.AuthTokenValidation(),
 			g.IsAuth(),
 			m.maMod.GetMerchantAutopayoutSelectionHandler,
 		)
 		router.POST(
-			"/merchant-autopayout/:service/new-adress",
+			"admin/merchant-autopayout/:service/new-adress",
 			m.maMod.CreateNewAdressHandler,
 		)
 	}
