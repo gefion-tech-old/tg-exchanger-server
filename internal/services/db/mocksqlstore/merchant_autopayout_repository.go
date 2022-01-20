@@ -40,7 +40,14 @@ func (r *MerchantAutopayoutRepository) Update(m *models.MerchantAutopayout) erro
 }
 
 func (r *MerchantAutopayoutRepository) Get(m *models.MerchantAutopayout) error {
-	return nil
+	for _, v := range r.ma {
+		if v.ID == m.ID {
+			r.rewrite(m.ID, m)
+			return nil
+		}
+	}
+
+	return sql.ErrNoRows
 }
 
 func (r *MerchantAutopayoutRepository) Delete(m *models.MerchantAutopayout) error {
