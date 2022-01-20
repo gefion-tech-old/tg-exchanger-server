@@ -13,7 +13,7 @@ import (
 	@Method GET
 	@Path admin/notifications/check
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/notifications/notifications_api.md#count-new-notifications
 
 	Получить кол-во новых уведомлений `notifications`
 
@@ -34,7 +34,7 @@ func (m *ModNotification) NewNotificationsCheckHandler(c *gin.Context) {
 	@Method GET
 	@Path admin/notifications?page=1&limit=15
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/notifications/notifications_api.md#selection
 
 	Получение лимитированного объема записей из таблицы `notifications`
 
@@ -51,7 +51,7 @@ func (m *ModNotification) GetNotificationsSelectionHandler(c *gin.Context) {
 	@Method PUT
 	@Path admin/notification
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/notifications/notifications_api.md#update
 
 	Обновить поле status записи в таблице `notifications`
 
@@ -80,7 +80,7 @@ func (m *ModNotification) UpdateNotificationStatusHandler(c *gin.Context) {
 	@Method DELETE
 	@Path admin/notification
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/notifications/notifications_api.md#delete
 
 	Удалить запись в таблице `notifications`
 

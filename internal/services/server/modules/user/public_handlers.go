@@ -25,7 +25,7 @@ import (
 	@Method POST
 	@Path /bot/user/registration
 	@Type PUBLIC
-	@Documentation https://github.com/gefion-tech/tg-exchanger-server#registration-in-bot
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/bot/users/users_api.md#registration
 
 	Регистрация человека как пользователя бота. При валидных данных создается
 	запись в БД в таблице `users`.
@@ -47,7 +47,7 @@ func (m *ModUsers) UserInBotRegistrationHandler(c *gin.Context) {
 	@Method POST
 	@Path /admin/registration/code
 	@Type PUBLIC
-	@Documentation https://github.com/gefion-tech/tg-exchanger-server#registration-in-admin-panel
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/account/account_api.md#first-registration-step
 
 	Пользователю с переданным username в ЛС будет отправлен код подтверждения
 	который он должен будет ввести в окне на фронтенде. В ответ на запрос отдается
@@ -134,7 +134,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 	@Method POST
 	@Path /admin/registration
 	@Type PUBLIC
-	@Documentation https://github.com/gefion-tech/tg-exchanger-server#registration-in-admin-panel
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/account/account_api.md#second-registration-step
 
 	Регистрация человека как пользователя фвьин-панели. При валидных данных
 	обновляется поле has в БД в таблице `users`.
@@ -183,7 +183,7 @@ func (m *ModUsers) UserInAdminRegistrationHandler(c *gin.Context) {
 	@Method POST
 	@Path /admin/auth
 	@Type PUBLIC
-	@Documentation https://github.com/gefion-tech/tg-exchanger-server#auth-in-admin-panel
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/account/account_api.md#auth
 
 	В методе проверяется, есть ли в бд пользователь с переданным username.
 	Если пользователь найден, смотрим есть ли у него hash пароль (если нет, значит он не зареган как менеджер)
@@ -241,6 +241,7 @@ func (m *ModUsers) UserInAdminAuthHandler(c *gin.Context) {
 	@Method POST
 	@Path /token/refresh
 	@Type PUBLIC
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/account/account_api.md#update-access-token
 
 	Метод обновления для токена доступа для доступа
 	к приватным маршрутам.

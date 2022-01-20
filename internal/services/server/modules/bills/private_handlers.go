@@ -18,7 +18,7 @@ import (
 	@Method DELETE
 	@Path admin/bill/reject
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/bills/bills_api.md#reject
 
 	Отклонить верификацию карты
 */
@@ -59,7 +59,7 @@ func (m *ModBills) RejectBillHandler(c *gin.Context) {
 	@Method DELETE
 	@Path admin/bill
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/bills/bills_api.md#create
 
 	Создать запись в таблице `bills`
 

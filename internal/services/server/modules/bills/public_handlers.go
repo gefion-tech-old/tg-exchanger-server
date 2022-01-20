@@ -14,7 +14,7 @@ import (
 	@Method GET
 	@Path /bot/user/:chat_id/bills
 	@Type PUBLIC
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/bills/bills_api.md#selection
 
 	Получить список всех имеющихся счетов у пользователя.
 
@@ -35,7 +35,7 @@ func (m *ModBills) GetAllBillsHandler(c *gin.Context) {
 	@Method DELETE
 	@Path /bot/user/bill/:id
 	@Type PUBLIC
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/bills/bills_api.md#delete
 
 	В методе проверяется валидность переданых данных, если все ок
 	и желаемый счет существует -> удаляю его из БД.
@@ -63,7 +63,7 @@ func (m *ModBills) DeleteBillHandler(c *gin.Context) {
 	@Method DELETE
 	@Path /bot/user/bill/:id
 	@Type PUBLIC
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/bills/bills_api.md#get
 
 	Получить запись из таблицы `bills`
 

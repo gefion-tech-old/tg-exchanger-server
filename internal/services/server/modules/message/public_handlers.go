@@ -9,7 +9,7 @@ import (
 	@Method GET
 	@Path admin/message/:connector
 	@Type PUBLIC
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/messages/messages_api.md#get
 
 	Получить запись из таблицы `bot_messages`
 

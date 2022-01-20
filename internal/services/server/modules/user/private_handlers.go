@@ -13,7 +13,7 @@ import (
 	@Method POST
 	@Path admin/logout
 	@Type PRIVATE
-	@Documentation https://github.com/gefion-tech/tg-exchanger-server/blob/main/docs/admin__user.md#logout
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/account/account_api.md#logout
 
 	При валидных данных токена в Redis удаляется
 	токен используемый в текущей сессии.

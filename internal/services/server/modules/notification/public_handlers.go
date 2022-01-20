@@ -19,7 +19,7 @@ import (
 	@Method POST
 	@Path admin/notification
 	@Type PUBLIC
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/notifications/notifications_api.md#create
 
 	Создать запись в таблице `notifications`
 

@@ -13,7 +13,7 @@ import (
 	@Method DELETE
 	@Path admin/message/:id
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/messages/messages_api.md#delete
 
 	Удалить запись в таблице `bot_messages`
 
@@ -36,7 +36,7 @@ func (m *ModMessage) DeleteBotMessageHandler(c *gin.Context) {
 	@Method PUT
 	@Path admin/message/:id
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/messages/messages_api.md#update
 
 	Обновить запись в таблице `bot_messages`
 
@@ -65,7 +65,7 @@ func (m *ModMessage) UpdateBotMessageHandler(c *gin.Context) {
 	@Method GET
 	@Path admin/messages
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/messages/messages_api.md#selection
 
 	Получение лимитированного объема записей из таблицы `bot_messages`
 
@@ -79,7 +79,7 @@ func (m *ModMessage) GetMessagesSelectionHandler(c *gin.Context) {
 	@Method POST
 	@Path admin/message
 	@Type PRIVATE
-	@Documentation
+	@Documentation https://github.com/exchanger-bot/docs/blob/main/admin/messages/messages_api.md#create
 
 	Создать запись в таблице `bot_messages`
 
