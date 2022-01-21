@@ -210,7 +210,7 @@ func (r *MerchantAutopayoutRepository) Count(querys interface{}) (int, error) {
 func (r *MerchantAutopayoutRepository) queryGeneration(q *models.MerchantAutopayoutSelection) []string {
 	var conditions []string
 
-	if q.Service[0] == "" {
+	if q.Service[0] == "" || len(q.Service) == 0 {
 		q.Service = q.Service[:len(q.Service)-1]
 		q.Service = append(q.Service,
 			AppType.MerchantAutoPayoutWhitebit,
