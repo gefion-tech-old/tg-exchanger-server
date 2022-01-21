@@ -15,6 +15,51 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_Server_GetMerchantAutopayoutHandler(t *testing.T) {
+	s, redis, teardown := server.TestServer(t)
+	defer teardown(redis)
+
+	// Регистрирую менеджера в админке
+	tokens, err := server.TestManager(t, s)
+	assert.NotNil(t, tokens)
+	assert.NoError(t, err)
+
+	assert.NoError(t, server.TestMerchantAutopayout(t, s, tokens))
+
+	testCases := []struct {
+		name         string
+		id           string
+		expectedCode int
+	}{
+		{
+			name:         "invalid id",
+			id:           "invalid",
+			expectedCode: http.StatusUnprocessableEntity,
+		},
+		{
+			name:         "undefined id",
+			id:           "134",
+			expectedCode: http.StatusNotFound,
+		},
+		{
+			name:         "valid",
+			id:           "1",
+			expectedCode: http.StatusOK,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			req, _ := http.NewRequest(http.MethodGet, "/api/v1/admin/merchant-autopayout/"+tc.id, nil)
+			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", tokens["access_token"]))
+			s.Router.ServeHTTP(rec, req)
+
+			assert.Equal(t, tc.expectedCode, rec.Code)
+		})
+	}
+}
+
 func Test_Server_GetMerchantAutopayoutSelectionHandler(t *testing.T) {
 	s, redis, teardown := server.TestServer(t)
 	defer teardown(redis)
