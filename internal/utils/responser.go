@@ -28,6 +28,7 @@ type ResponserI interface {
 	DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
 	UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
 	CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
+	GetRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error
 	Error(c *gin.Context, code int, err ...error) error
 }
 
@@ -39,6 +40,46 @@ func InitResponser(l LoggerI) ResponserI {
 			Service: AppType.LogTypeServer,
 		},
 	}
+}
+
+/*
+	Метод для получения записи любого ресурса, при условии
+	что репозиторий ресурса содержит метод Delete.
+
+	Автоматический HTTP ответ.
+*/
+func (u *Responser) GetRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
+	return u.methodRecordResponse(c, "Get", repository, model, todo...)
+}
+
+/*
+	Метод для удаления записи любого ресурса, при условии
+	что репозиторий ресурса содержит метод Delete.
+
+	Автоматический HTTP ответ.
+*/
+func (u *Responser) DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
+	return u.methodRecordResponse(c, "Delete", repository, model, todo...)
+}
+
+/*
+	Метод для обновления записи любого ресурса, при условии
+	что репозиторий ресурса содержит метод Update.
+
+	Автоматический HTTP ответ.
+*/
+func (u *Responser) UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
+	return u.methodRecordResponse(c, "Update", repository, model, todo...)
+}
+
+/*
+	Метод для создания записи любого ресурса, при условии
+	что репозиторий ресурса содержит метод Create.
+
+	Автоматический HTTP ответ.
+*/
+func (u *Responser) CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
+	return u.methodRecordResponse(c, "Create", repository, model, todo...)
 }
 
 /*
@@ -71,88 +112,6 @@ func (u *Responser) RecordResponse(c *gin.Context, data interface{}, err error) 
 		u.Error(c, http.StatusInternalServerError, err)
 		return
 	}
-}
-
-/*
-	Метод для удаления записи любого ресурса, при условии
-	что репозиторий ресурса содержит метод Delete.
-
-	Автоматический HTTP ответ.
-*/
-func (u *Responser) DeleteRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
-	// Инициализация метода операции с БД
-	fn, err := GetReflectMethod(repository, "Delete")
-	if err != nil {
-		return u.Error(c, http.StatusInternalServerError, err)
-	}
-
-	// Выполнение операции с БД
-	if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
-		u.RecordResponse(c, model, nil)
-		return nil
-	} else if err != nil {
-		u.RecordResponse(c, nil, err)
-		return err
-	}
-
-	return u.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
-}
-
-/*
-	Метод для обновления записи любого ресурса, при условии
-	что репозиторий ресурса содержит метод Update.
-
-	Автоматический HTTP ответ.
-*/
-func (u *Responser) UpdateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
-	// Инициализация метода операции с БД
-	fn, err := GetReflectMethod(repository, "Update")
-	if err != nil {
-		return u.Error(c, http.StatusInternalServerError, err)
-	}
-
-	// Выполнение операции с БД
-	if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
-		u.RecordResponse(c, model, nil)
-		return nil
-	} else if err != nil {
-		u.RecordResponse(c, nil, err)
-		return err
-	}
-
-	return u.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
-}
-
-/*
-	Метод для создания записи любого ресурса, при условии
-	что репозиторий ресурса содержит метод Create.
-
-	Автоматический HTTP ответ.
-*/
-func (u *Responser) CreateRecordResponse(c *gin.Context, repository, model interface{}, todo ...func() error) error {
-	// Выполнение всех вложенных методов
-	for _, executor := range todo {
-		if err := executor(); err != nil {
-			return u.Error(c, http.StatusInternalServerError, err)
-		}
-	}
-
-	// Инициализация метода операции с БД
-	fn, err := GetReflectMethod(repository, "Create")
-	if err != nil {
-		return u.Error(c, http.StatusInternalServerError, err)
-	}
-
-	// Выполнение операции с БД
-	if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
-		u.NewRecordResponse(c, model, nil)
-		return nil
-	} else if err != nil {
-		u.NewRecordResponse(c, nil, err)
-		return err
-	}
-
-	return u.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
 /*
@@ -359,6 +318,45 @@ func (u *Responser) Error(c *gin.Context, code int, errs ...error) error {
 	ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
 	==========================================================================================
 */
+
+func (u *Responser) methodRecordResponse(c *gin.Context, method string, repository, model interface{}, todo ...func() error) error {
+	// Выполнение всех вложенных методов
+	for _, executor := range todo {
+		if err := executor(); err != nil {
+			return u.Error(c, http.StatusInternalServerError, err)
+		}
+	}
+
+	// Инициализация метода операции с БД
+	fn, err := GetReflectMethod(repository, method)
+	if err != nil {
+		return u.Error(c, http.StatusInternalServerError, err)
+	}
+
+	if method == "Create" {
+		// Выполнение операции с БД
+		if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
+			u.NewRecordResponse(c, model, nil)
+			return nil
+		} else if err != nil {
+			u.NewRecordResponse(c, nil, err)
+			return err
+		}
+
+		return u.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
+	} else {
+		// Выполнение операции с БД
+		if obj, err := u.callReflectMethod(c, fn, model); obj != nil {
+			u.RecordResponse(c, model, nil)
+			return nil
+		} else if err != nil {
+			u.RecordResponse(c, nil, err)
+			return err
+		}
+
+		return u.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
+	}
+}
 
 func (u *Responser) callReflectMethod(c *gin.Context, fn *reflect.Value, model interface{}) (interface{}, error) {
 	retv := fn.Call([]reflect.Value{

@@ -25,6 +25,7 @@ type ModMerchantAutoPayoutI interface {
 	CreateMerchantAutopayoutHandler(c *gin.Context)
 	UpdateMerchantAutopayoutHandler(c *gin.Context)
 	DeleteMerchantAutopayoutHandler(c *gin.Context)
+	GetMerchantAutopayoutHandler(c *gin.Context)
 	GetMerchantAutopayoutSelectionHandler(c *gin.Context)
 
 	CreateNewAdressHandler(c *gin.Context)
