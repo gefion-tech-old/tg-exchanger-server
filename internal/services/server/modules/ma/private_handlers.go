@@ -66,8 +66,24 @@ func (m *ModMerchantAutoPayout) GetMerchantAutopayoutHandler(c *gin.Context) {
 }
 
 /*
-	Универсальный метод выполнения CRUD операций
+	@Method GET
+	@Path admin/merchant-autopayout/:id
+	@Type PRIVATE
+	@Documentation
+
+	Получение лимитированного объема записей из таблицы `merchant_autopayout`
+
+	# TESTED
 */
+func (m *ModMerchantAutoPayout) GetMerchantAutopayoutSelectionHandler(c *gin.Context) {
+	s := &models.MerchantAutopayoutSelection{
+		Service: []string{c.Query("service")},
+	}
+
+	m.responser.SelectionResponse(c, m.repository, s)
+}
+
+// Универсальный метод выполнения CRUD операций
 func (m *ModMerchantAutoPayout) MerchantAutopayoutHandler(c *gin.Context) {
 	var r models.MerchantAutopayout
 	if c.Request.ContentLength > 0 {
@@ -104,22 +120,4 @@ func (m *ModMerchantAutoPayout) MerchantAutopayoutHandler(c *gin.Context) {
 	}
 
 	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
-}
-
-/*
-	@Method DELETE
-	@Path admin/merchant-autopayout/:id
-	@Type PRIVATE
-	@Documentation
-
-	Получение лимитированного объема записей из таблицы `merchant_autopayout`
-
-	# TESTED
-*/
-func (m *ModMerchantAutoPayout) GetMerchantAutopayoutSelectionHandler(c *gin.Context) {
-	s := &models.MerchantAutopayoutSelection{
-		Service: []string{c.Query("service")},
-	}
-
-	m.responser.SelectionResponse(c, m.repository, s)
 }
