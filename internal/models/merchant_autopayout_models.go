@@ -117,7 +117,9 @@ func (ma *MerchantAutopayout) Validation() error {
 			is.JSON,
 		),
 
-		validation.Field(&ma.Status, validation.Required),
+		validation.Field(&ma.Status,
+			validation.In(true, false),
+		),
 
 		validation.Field(&ma.MessageID, validation.Required),
 

@@ -387,19 +387,6 @@ func Test_Server_CreateMerchantAutopayoutHandler(t *testing.T) {
 			expectedCode: http.StatusUnprocessableEntity,
 		},
 		{
-			name: "empty status",
-			payload: map[string]interface{}{
-				"name":         "main_accout",
-				"service":      AppType.MerchantAutoPayoutWhitebit,
-				"service_type": AppType.UseAsMerchant,
-				"options":      "{}",
-				// "status":       true,
-				"message_id": 1,
-				"created_by": "I0HuKc",
-			},
-			expectedCode: http.StatusUnprocessableEntity,
-		},
-		{
 			name: "invalid status",
 			payload: map[string]interface{}{
 				"name":         "main_accout",
