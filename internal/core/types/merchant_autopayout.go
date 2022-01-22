@@ -16,5 +16,5 @@ var (
 // Типы доступных состояний
 var (
 	UseAsMerchant   = 1
-	UseAsAutoPayout = 0
+	UseAsAutoPayout = 2
 )
