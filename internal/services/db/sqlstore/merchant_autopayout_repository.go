@@ -198,6 +198,8 @@ func (r *MerchantAutopayoutRepository) Count(querys interface{}) (int, error) {
 		strings.Join(r.queryGeneration(q), " AND "),
 	)
 
+	fmt.Println(sb)
+
 	if err := r.store.QueryRow(sb).Scan(
 		&c,
 	); err != nil {
@@ -210,7 +212,7 @@ func (r *MerchantAutopayoutRepository) Count(querys interface{}) (int, error) {
 func (r *MerchantAutopayoutRepository) queryGeneration(q *models.MerchantAutopayoutSelection) []string {
 	var conditions []string
 
-	if q.Service[0] == "" || len(q.Service) == 0 {
+	if q.Service[0] != AppType.MerchantAutoPayoutMine || q.Service[0] != AppType.MerchantAutoPayoutWhitebit || len(q.Service) == 0 {
 		q.Service = q.Service[:len(q.Service)-1]
 		q.Service = append(q.Service,
 			AppType.MerchantAutoPayoutWhitebit,
