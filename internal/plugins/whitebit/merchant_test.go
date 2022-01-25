@@ -12,34 +12,27 @@ import (
 
 func Test_Plugin_Whitebit_Merchant_PrepareBodyForCreateAdress(t *testing.T) {
 	testCases := []struct {
-		data            *models.MerchantNewAdress
+		data            *models.ExchangeRequest
 		expectedNetwork string
 		expectedTicker  string
 	}{
 		{
-			data: &models.MerchantNewAdress{
-				Ticker: "USDTTRC20",
+			data: &models.ExchangeRequest{
+				ExchangeFrom: "USDTTRC20",
 			},
 			expectedNetwork: AppType.CurrencyNetworkTRC20,
 			expectedTicker:  "USDT",
 		},
-		// {
-		// 	data: &models.MerchantNewAdress{
-		// 		Ticker: "BTC",
-		// 	},
-		// 	expectedNetwork: "",
-		// 	expectedTicker:  "BTC",
-		// },
 		{
-			data: &models.MerchantNewAdress{
-				Ticker: "USDTOMNI",
+			data: &models.ExchangeRequest{
+				ExchangeFrom: "USDTOMNI",
 			},
 			expectedNetwork: AppType.CurrencyNetworkOMNI,
 			expectedTicker:  "USDT",
 		},
 		{
-			data: &models.MerchantNewAdress{
-				Ticker: "USDTERC20",
+			data: &models.ExchangeRequest{
+				ExchangeFrom: "USDTERC20",
 			},
 			expectedNetwork: AppType.CurrencyNetworkERC20,
 			expectedTicker:  "USDT",

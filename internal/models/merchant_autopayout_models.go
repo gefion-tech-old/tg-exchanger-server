@@ -32,11 +32,6 @@ type MerchantAutopayoutSelection struct {
 	Service []string
 }
 
-type MerchantNewAdress struct {
-	Service string `json:"service"`
-	Ticker  string `json:"ticker"`
-}
-
 type WhitebitGetHistory struct {
 	TransactionMethod int           `json:"transactionMethod"`
 	Ticker            string        `json:"ticker"`

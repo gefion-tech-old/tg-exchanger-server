@@ -11,7 +11,7 @@ import (
 )
 
 type ModMerchantAutoPayout struct {
-	repository db.MerchantAutopayoutRepository
+	repository db.AdminPanelRepository
 	redis      *redisstore.AppRedisDictionaries
 	nsq        nsqstore.NsqI
 	cfg        *config.Config
@@ -32,7 +32,7 @@ type ModMerchantAutoPayoutI interface {
 }
 
 func InitModMerchantAutoPayout(
-	rep db.MerchantAutopayoutRepository,
+	rep db.AdminPanelRepository,
 	redis *redisstore.AppRedisDictionaries,
 	nsq nsqstore.NsqI,
 	cfg *config.Config,

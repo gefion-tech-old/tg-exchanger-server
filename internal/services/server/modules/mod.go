@@ -97,7 +97,7 @@ func InitServerModules(
 		),
 
 		maMod: ma.InitModMerchantAutoPayout(
-			store.AdminPanel().MerchantAutopayout(),
+			store.AdminPanel(),
 			redis,
 			nsq,
 			cfg,

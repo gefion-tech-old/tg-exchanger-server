@@ -105,16 +105,16 @@ func (m *ModMerchantAutoPayout) MerchantAutopayoutHandler(c *gin.Context) {
 
 		switch c.Request.Method {
 		case http.MethodPost:
-			m.responser.CreateRecordResponse(c, m.repository, obj)
+			m.responser.CreateRecordResponse(c, m.repository.MerchantAutopayout(), obj)
 			return
 		case http.MethodGet:
-			m.responser.GetRecordResponse(c, m.repository, obj)
+			m.responser.GetRecordResponse(c, m.repository.MerchantAutopayout(), obj)
 			return
 		case http.MethodPut:
-			m.responser.UpdateRecordResponse(c, m.repository, obj)
+			m.responser.UpdateRecordResponse(c, m.repository.MerchantAutopayout(), obj)
 			return
 		case http.MethodDelete:
-			m.responser.DeleteRecordResponse(c, m.repository, obj)
+			m.responser.DeleteRecordResponse(c, m.repository.MerchantAutopayout(), obj)
 			return
 		}
 	}
