@@ -69,6 +69,7 @@ type MerchantAutopayoutRepository interface {
 	Get(m *models.MerchantAutopayout) error
 	Count(querys interface{}) (int, error)
 	Selection(querys interface{}) ([]*models.MerchantAutopayout, error)
+	GetFistIfActive(service string) (*models.MerchantAutopayout, error)
 }
 
 type ExchangeRequestRepository interface {

@@ -7,7 +7,6 @@ import (
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
 
 var _ AppInterfaces.ResourceI = (*MerchantAutopayout)(nil)
@@ -30,6 +29,18 @@ type MerchantAutopayoutSelection struct {
 	Page    *int
 	Limit   *int
 	Service []string
+}
+
+type WhitebitOptionParams struct {
+	PublicKey string `json:"public_key"`
+	SecretKey string `json:"secret_key"`
+	BaseURL   string `json:"base_url"`
+}
+
+type WhitebitApiHelper struct {
+	PublicKey string
+	SecretKey string
+	BaseURL   string
 }
 
 type WhitebitGetHistory struct {
@@ -109,7 +120,6 @@ func (ma *MerchantAutopayout) Validation() error {
 
 		validation.Field(&ma.Options,
 			validation.Required,
-			is.JSON,
 		),
 
 		validation.Field(&ma.Status,

@@ -1,27 +1,28 @@
 package whitebit_plugin
 
 import (
+	"encoding/hex"
+	"encoding/json"
+
 	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
+	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
 
 type WhitebitPlugin struct {
-	provider   *apiHelper
 	merchant   interfaces.MerchantI
 	autopayout interfaces.AutoPayoutI
+
+	cfg *config.PluginsConfig
 }
 
-func InitWhitebitPlugin(cfg *config.WhitebitConfig) interfaces.PluginI {
-	p := &apiHelper{
-		PublicKey: cfg.PublicKey,
-		SecretKey: cfg.SecretKey,
-		BaseURL:   cfg.URL,
-	}
-
+func InitWhitebitPlugin(cfg *config.PluginsConfig) interfaces.PluginI {
 	return &WhitebitPlugin{
-		provider:   p,
-		merchant:   InitMerchant(p),
+		merchant:   InitMerchant(),
 		autopayout: IniAutoPayout(),
+
+		cfg: cfg,
 	}
 }
 
@@ -30,7 +31,7 @@ func (plugin *WhitebitPlugin) Merchant() interfaces.MerchantI {
 		return plugin.merchant
 	}
 
-	plugin.merchant = InitMerchant(plugin.provider)
+	plugin.merchant = InitMerchant()
 	return plugin.merchant
 }
 
@@ -41,4 +42,18 @@ func (plugin *WhitebitPlugin) AutoPayout() interfaces.AutoPayoutI {
 
 	plugin.autopayout = IniAutoPayout()
 	return plugin.autopayout
+}
+
+func (plugin *WhitebitPlugin) GetOptionParams(options string) (interface{}, error) {
+	var p models.WhitebitOptionParams
+	dOptions, err := AppMath.AesDecrypt(options, hex.EncodeToString([]byte(plugin.cfg.AesKey)))
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal([]byte(dOptions), &p); err != nil {
+		return nil, err
+	}
+
+	return &p, nil
 }

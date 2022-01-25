@@ -14,10 +14,6 @@ type ServicesConfigs struct {
 	NSQ    NsqConfig      `toml:"nsq"`
 }
 
-type PluginsConfig struct {
-	Whitebit WhitebitConfig `toml:"whitebit"`
-}
-
 type ServerConfig struct {
 	Host     string `toml:"HOST"`
 	Port     string `toml:"PORT"`
@@ -52,10 +48,8 @@ type UsersConfig struct {
 	Admins     []string `toml:"ADMINS"`
 }
 
-type WhitebitConfig struct {
-	PublicKey string `toml:"PUBLIC_KEY"`
-	SecretKey string `toml:"PRIVATE_KEY"`
-	URL       string `toml:"URL"`
+type PluginsConfig struct {
+	AesKey string `toml:"AES_KEY"`
 }
 
 func Init() *Config {

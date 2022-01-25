@@ -10,4 +10,7 @@ var (
 	ErrNotEnoughRights   = errors.New("not enough rights to make this request")
 	ErrTokenInvalid      = errors.New("token is invalid")
 	ErrUnauthorized      = errors.New("unauthorized")
+
+	ErrNoMerchantAutopatout             = errors.New("at the moment there are no connected merchant&autopayout in this direction")
+	ErrMerchantAutopatoutOptionalParams = errors.New(("failed to decode optional parameters for merchant&autopayout account"))
 )

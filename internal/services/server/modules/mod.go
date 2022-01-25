@@ -103,7 +103,7 @@ func InitServerModules(
 			cfg,
 			plugins.InitAppPlugins(
 				mine_plugin.InitMinePlugin(),
-				whitebit_plugin.InitWhitebitPlugin(&cfg.Plugins.Whitebit),
+				whitebit_plugin.InitWhitebitPlugin(&cfg.Plugins),
 			),
 			responser,
 			logger,

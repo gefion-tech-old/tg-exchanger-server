@@ -11,22 +11,12 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
 
-var _ apiHelperI = (*apiHelper)(nil)
-
-type apiHelper struct {
-	PublicKey string
-	SecretKey string
-	BaseURL   string
-}
-
-type apiHelperI interface {
-	SendRequest(requestURL string, data map[string]interface{}) ([]byte, error)
-}
-
 // Функция для отправки запроса на конечные точки
-func (api *apiHelper) SendRequest(requestURL string, data map[string]interface{}) ([]byte, error) {
+func SendRequest(params *models.WhitebitOptionParams, requestURL string, data map[string]interface{}) ([]byte, error) {
 	// Если одноразовый номер похож на номер предыдущего запроса или меньше
 	// его, будет получено сообщение об ошибке «слишком много запросов»
 
@@ -39,13 +29,13 @@ func (api *apiHelper) SendRequest(requestURL string, data map[string]interface{}
 		return nil, err
 	}
 
-	completeURL := api.BaseURL + requestURL
+	completeURL := params.BaseURL + requestURL
 
 	// Расчет полезной нагрузки
 	payload := base64.StdEncoding.EncodeToString(requestBody)
 
 	// Вычисление подписи с использованием sha512
-	h := hmac.New(sha512.New, []byte(api.SecretKey))
+	h := hmac.New(sha512.New, []byte(params.SecretKey))
 	h.Write([]byte(payload))
 	signature := fmt.Sprintf("%x", h.Sum(nil))
 
@@ -57,7 +47,7 @@ func (api *apiHelper) SendRequest(requestURL string, data map[string]interface{}
 	}
 
 	request.Header.Set("Content-type", "application/json")
-	request.Header.Set("X-TXC-APIKEY", api.PublicKey)
+	request.Header.Set("X-TXC-APIKEY", params.PublicKey)
 	request.Header.Set("X-TXC-PAYLOAD", payload)
 	request.Header.Set("X-TXC-SIGNATURE", signature)
 

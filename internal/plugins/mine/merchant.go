@@ -10,7 +10,7 @@ func InitMerchant() interfaces.MerchantI {
 	return &MinePluginMerchant{}
 }
 
-func (p *MinePluginMerchant) CreateAdress(d interface{}) (interface{}, error) {
+func (p *MinePluginMerchant) CreateAdress(d, apiHandler interface{}) (interface{}, error) {
 	return nil, nil
 }
 

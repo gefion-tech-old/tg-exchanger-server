@@ -8,19 +8,16 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
 )
 
-type WhitebitPluginMerchant struct {
-	provider *apiHelper
-}
+type WhitebitPluginMerchant struct{}
 
-func InitMerchant(p *apiHelper) interfaces.MerchantI {
-	return &WhitebitPluginMerchant{
-		provider: p,
-	}
+func InitMerchant() interfaces.MerchantI {
+	return &WhitebitPluginMerchant{}
 }
 
 // Создать адрес для принятия денег
-func (p *WhitebitPluginMerchant) CreateAdress(d interface{}) (interface{}, error) {
-	b, err := p.provider.SendRequest(
+func (p *WhitebitPluginMerchant) CreateAdress(d, params interface{}) (interface{}, error) {
+	b, err := SendRequest(
+		params.(*models.WhitebitOptionParams),
 		WhitebitCreateNewAddress,
 		PrepareBodyForCreateAdress(d.(*models.ExchangeRequest)),
 	)
@@ -32,17 +29,18 @@ func (p *WhitebitPluginMerchant) CreateAdress(d interface{}) (interface{}, error
 }
 
 func (p *WhitebitPluginMerchant) GetHistory(d interface{}) (interface{}, error) {
-	data := d.(*models.WhitebitGetHistory)
-	b, err := p.provider.SendRequest(WhitebitHistory, map[string]interface{}{
-		"transactionMethod": data.TransactionMethod,
-		"limit":             data.Limit,
-		"offset":            data.Offset,
-	})
-	if err != nil {
-		return nil, err
-	}
+	// data := d.(*models.WhitebitGetHistory)
+	// b, err := SendRequest(WhitebitHistory, map[string]interface{}{
+	// 	"transactionMethod": data.TransactionMethod,
+	// 	"limit":             data.Limit,
+	// 	"offset":            data.Offset,
+	// })
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return b, nil
+	// return b, nil
+	return nil, nil
 }
 
 func PrepareBodyForCreateAdress(data *models.ExchangeRequest) map[string]interface{} {

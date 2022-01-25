@@ -31,3 +31,7 @@ func (plugin *MinePlugin) AutoPayout() interfaces.AutoPayoutI {
 	plugin.autopayout = IniAutoPayout()
 	return plugin.autopayout
 }
+
+func (plugin *MinePlugin) GetOptionParams(options string) (interface{}, error) {
+	return nil, nil
+}
