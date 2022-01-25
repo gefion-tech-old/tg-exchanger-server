@@ -55,11 +55,7 @@ func PrepareBodyForCreateAdress(data *models.MerchantNewAdress) map[string]inter
 		}
 	}
 
-	if network == "" {
-		return map[string]interface{}{
-			"ticker": "BTC",
-		}
-	} else {
+	if network != "" {
 		var t string
 		if network == AppType.CurrencyNetworkOMNI {
 			t = data.Ticker[:len(network)]
@@ -71,5 +67,9 @@ func PrepareBodyForCreateAdress(data *models.MerchantNewAdress) map[string]inter
 			"ticker":  t,
 			"network": network,
 		}
+	}
+
+	return map[string]interface{}{
+		"ticker": data.Ticker,
 	}
 }

@@ -198,8 +198,6 @@ func (r *MerchantAutopayoutRepository) Count(querys interface{}) (int, error) {
 		strings.Join(r.queryGeneration(q), " AND "),
 	)
 
-	fmt.Println(sb)
-
 	if err := r.store.QueryRow(sb).Scan(
 		&c,
 	); err != nil {
