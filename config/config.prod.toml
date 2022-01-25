@@ -27,7 +27,7 @@ TOKEN_SECRET = "mxJ4sOO4JYIyWGvCSlno9KUf3oaF15LOgktDkM2s"
 
 [users]
 MANAGERS = []
-DEVELOPERS = ["I0HuKc", "enthusedfir", "bau00"]
+DEVELOPERS = ["I0HuKc", "enthusedfir", "bau00", "maksammm07"]
 ADMINS = []
 
 
