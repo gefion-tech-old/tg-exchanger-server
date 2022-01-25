@@ -32,8 +32,4 @@ ADMINS = []
 
 
 [plugins]
-
-[plugins.whitebit]
-PUBLIC_KEY = "204cc6a3389162c9930b6b90c550455a"
-PRIVATE_KEY = "99449c488a373c70dc815740c748f03b"
-URL = "https://whitebit.com"
+AES_KEY = "Xd5JHdi4P5Z1Y7zQSkw9S25fkW5HXvXw"
