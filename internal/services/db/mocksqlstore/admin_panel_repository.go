@@ -12,6 +12,7 @@ type AdminPanelRepository struct {
 	userBillsRepository          *UserBillsRepository
 	logsRepository               *LoggerRepository
 	merchantAutopayoutRepository *MerchantAutopayoutRepository
+	exchangeRequestRepository    *ExchangeRequestRepository
 }
 
 func (r *AdminPanelRepository) Logs() db.LoggerRepository {
@@ -84,4 +85,16 @@ func (r *AdminPanelRepository) MerchantAutopayout() db.MerchantAutopayoutReposit
 	}
 
 	return r.merchantAutopayoutRepository
+}
+
+func (r *AdminPanelRepository) ExchangeRequest() db.ExchangeRequestRepository {
+	if r.exchangeRequestRepository != nil {
+		return r.exchangeRequestRepository
+	}
+
+	r.exchangeRequestRepository = &ExchangeRequestRepository{
+		er: make(map[int]*models.ExchangeRequest),
+	}
+
+	return r.exchangeRequestRepository
 }

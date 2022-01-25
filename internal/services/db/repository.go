@@ -9,6 +9,7 @@ type AdminPanelRepository interface {
 	Notification() NotificationRepository
 	Exchanger() ExchangerRepository
 	MerchantAutopayout() MerchantAutopayoutRepository
+	ExchangeRequest() ExchangeRequestRepository
 }
 
 type UserRepository interface {
@@ -68,4 +69,8 @@ type MerchantAutopayoutRepository interface {
 	Get(m *models.MerchantAutopayout) error
 	Count(querys interface{}) (int, error)
 	Selection(querys interface{}) ([]*models.MerchantAutopayout, error)
+}
+
+type ExchangeRequestRepository interface {
+	Create(r *models.ExchangeRequest) error
 }
