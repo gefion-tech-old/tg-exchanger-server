@@ -33,3 +33,6 @@ ADMINS = []
 
 [plugins]
 AES_KEY = "fn5LyPGTnB18gl24nieHavsmKfKRmvLR"
+
+[listener]
+INTERVAL = 3
