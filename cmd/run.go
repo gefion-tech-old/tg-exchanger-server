@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"syscall"
 	"time"
 
@@ -15,14 +17,19 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/plugins"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/sqlstore"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/listener"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
 	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	mine_plugin "github.com/gefion-tech/tg-exchanger-server/internal/plugins/mine"
+	whitebit_plugin "github.com/gefion-tech/tg-exchanger-server/internal/plugins/whitebit"
 )
 
 func runCmd() *cobra.Command {
@@ -90,21 +97,46 @@ func runner(cfg *config.Config) (err error) {
 	defer closer()
 
 	sqlStore := sqlstore.Init(postgres)
+	nsqStore := nsqstore.Init(nsq)
+	plugins := plugins.InitAppPlugins(
+		mine_plugin.InitMinePlugin(),
+		whitebit_plugin.InitWhitebitPlugin(&cfg.Plugins),
+	)
 	logger := utils.InitLogger(sqlStore.AdminPanel().Logs())
+
+	lsnr := listener.InitListener(
+		sqlStore,
+		nsqStore,
+		plugins,
+		logger,
+	)
 
 	srv := server.Init(
 		sqlStore,
-		nsqstore.Init(nsq),
+		nsqStore,
 		redisStore,
+		plugins,
 		logger,
 		cfg,
 	).Create()
 
+	// Запуск сервера
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.NewRecord(&models.LogRecord{
 				Service: AppType.LogTypeServer,
-				Module:  "Application",
+				Module:  AppType.LogModuleServer,
+				Info:    err.Error(),
+			})
+		}
+	}()
+
+	// Запуск слушателя транзакций
+	go func() {
+		if err := lsnr.Listen(ctx, &cfg.Listener); err != nil {
+			logger.NewRecord(&models.LogRecord{
+				Service: AppType.LogTypeServer,
+				Module:  AppType.LogModuleListener,
 				Info:    err.Error(),
 			})
 		}
@@ -118,10 +150,22 @@ func runner(cfg *config.Config) (err error) {
 	if err := srv.Shutdown(ctx); err != nil {
 		logger.NewRecord(&models.LogRecord{
 			Service: AppType.LogTypeServer,
-			Module:  "Application",
+			Module:  AppType.LogModuleServer,
 			Info:    "Server forced to shutdown: " + err.Error(),
 		})
 	}
 
 	return nil
+}
+
+func fuse() bool {
+	var status string
+	fmt.Printf("\nStart back-end? [Y/n]: ")
+	fmt.Fscan(os.Stdin, &status)
+	switch strings.ToLower(status) {
+	case "y":
+		return true
+	default:
+		return false
+	}
 }

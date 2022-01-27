@@ -11,6 +11,9 @@ import (
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/config"
 	"github.com/gefion-tech/tg-exchanger-server/internal/mocks"
+	"github.com/gefion-tech/tg-exchanger-server/internal/plugins"
+	mine_plugin "github.com/gefion-tech/tg-exchanger-server/internal/plugins/mine"
+	whitebit_plugin "github.com/gefion-tech/tg-exchanger-server/internal/plugins/whitebit"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/mocksqlstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
@@ -47,8 +50,12 @@ func TestServer(t *testing.T) (*Server, *redisstore.AppRedisDictionaries, func(*
 	assert.NoError(t, err)
 
 	logger := utils.InitLogger(mocksqlstore.Init().AdminPanel().Logs())
+	plugins := plugins.InitAppPlugins(
+		mine_plugin.InitMinePlugin(),
+		whitebit_plugin.InitWhitebitPlugin(&config.Plugins),
+	)
 
-	return root(mocksqlstore.Init(), nsqstore.Init(producer), AppRedis, logger, config), AppRedis, func(appRedis *redisstore.AppRedisDictionaries) {
+	return root(mocksqlstore.Init(), nsqstore.Init(producer), AppRedis, plugins, logger, config), AppRedis, func(appRedis *redisstore.AppRedisDictionaries) {
 		appRedis.Registration.Clear()
 		appRedis.Registration.Close()
 

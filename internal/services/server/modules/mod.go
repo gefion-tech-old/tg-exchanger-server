@@ -325,6 +325,12 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 			m.maMod.PingMerchantAutopayoutHandler,
 		)
 		router.GET(
+			"admin/merchant-autopayout/history/:id",
+			g.AuthTokenValidation(),
+			g.IsAuth(),
+			m.maMod.GetHistoryMerchantAutopayoutHandler,
+		)
+		router.GET(
 			"admin/merchant-autopayout/all",
 			g.AuthTokenValidation(),
 			g.IsAuth(),

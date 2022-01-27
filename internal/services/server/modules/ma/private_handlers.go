@@ -85,38 +85,64 @@ func (m *ModMerchantAutoPayout) GetMerchantAutopayoutSelectionHandler(c *gin.Con
 	m.responser.SelectionResponse(c, m.repository, s)
 }
 
-// Универсальный метод выполнения CRUD операций
-func (m *ModMerchantAutoPayout) MerchantAutopayoutHandler(c *gin.Context) {
-	var r models.MerchantAutopayout
-	if c.Request.ContentLength > 0 {
-		if err := c.ShouldBindJSON(&r); err != nil {
-			m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrInvalidBody)
-			return
-		}
+/*
+	@Method GET
+	@Path admin/merchant-autopayout/history/:id
+	@Type PRIVATE
+	@Documentation
 
-		if err := r.Validation(); err != nil {
-			m.responser.Error(c, http.StatusUnprocessableEntity, err)
-			return
-		}
-	}
+	Получить историю транзакций аккаунта
+*/
+func (m *ModMerchantAutoPayout) GetHistoryMerchantAutopayoutHandler(c *gin.Context) {
+	var r models.MerchantAutopayout
 
 	if obj := m.responser.RecordHandler(c, &r); obj != nil {
 		if reflect.TypeOf(obj) != reflect.TypeOf(&models.MerchantAutopayout{}) {
 			return
 		}
 
-		switch c.Request.Method {
-		case http.MethodPost:
-			m.responser.CreateRecordResponse(c, m.repository.MerchantAutopayout(), obj)
+		// Достаю из БД нужную запись
+		if m.repository.MerchantAutopayout().Get(obj.(*models.MerchantAutopayout)) != nil {
+			m.responser.Error(c, http.StatusNotFound, AppError.ErrRecordNotFound)
 			return
-		case http.MethodGet:
-			m.responser.GetRecordResponse(c, m.repository.MerchantAutopayout(), obj)
-			return
-		case http.MethodPut:
-			m.responser.UpdateRecordResponse(c, m.repository.MerchantAutopayout(), obj)
-			return
-		case http.MethodDelete:
-			m.responser.DeleteRecordResponse(c, m.repository.MerchantAutopayout(), obj)
+		}
+
+		// Декодирую опциональные параметры
+		switch obj.(*models.MerchantAutopayout).Service {
+		case AppType.MerchantAutoPayoutWhitebit:
+			p, err := m.pl.Whitebit.GetOptionParams(obj.(*models.MerchantAutopayout).Options)
+			if err != nil {
+				m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrMerchantAutopatoutOptionalParams)
+				return
+			}
+
+			// Делаю запрос на сервис мерчанта/автовыплаты
+			b, err := m.pl.Whitebit.History(p, map[string]interface{}{
+				// "transactionMethod": data.TransactionMethod,
+				"limit":  100,
+				"offset": 0,
+			})
+			if err != nil {
+				m.responser.Error(c, http.StatusInternalServerError, err)
+				return
+			}
+
+			var resp map[string]interface{}
+
+			if err := json.Unmarshal([]byte(b.([]byte)), &resp); err != nil {
+				m.responser.Error(c, http.StatusInternalServerError, err)
+				return
+			}
+
+			if resp["code"] != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error":     AppError.ErrConnectionFailed.Error(),
+					"meta_data": resp,
+				})
+				return
+			}
+
+			c.JSON(http.StatusOK, resp)
 			return
 		}
 	}
@@ -124,6 +150,14 @@ func (m *ModMerchantAutoPayout) MerchantAutopayoutHandler(c *gin.Context) {
 	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
 }
 
+/*
+	@Method GET
+	@Path admin/merchant-autopayout/ping/:id
+	@Type PRIVATE
+	@Documentation
+
+	Проверить доступность аккаунта
+*/
 func (m *ModMerchantAutoPayout) PingMerchantAutopayoutHandler(c *gin.Context) {
 	var r models.MerchantAutopayout
 	if obj := m.responser.RecordHandler(c, &r); obj != nil {

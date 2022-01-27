@@ -36,6 +36,10 @@ func (plugin *MinePlugin) Ping(params interface{}) (interface{}, error) {
 	return nil, nil
 }
 
+func (plugin *MinePlugin) History(params, body interface{}) (interface{}, error) {
+	return nil, nil
+}
+
 func (plugin *MinePlugin) GetOptionParams(options string) (interface{}, error) {
 	return nil, nil
 }

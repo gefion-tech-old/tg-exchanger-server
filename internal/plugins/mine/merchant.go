@@ -13,7 +13,3 @@ func InitMerchant() interfaces.MerchantI {
 func (p *MinePluginMerchant) CreateAdress(d, apiHandler interface{}) (interface{}, error) {
 	return nil, nil
 }
-
-func (p *MinePluginMerchant) GetHistory(d interface{}) (interface{}, error) {
-	return nil, nil
-}

@@ -12,5 +12,6 @@ var (
 	ErrUnauthorized      = errors.New("unauthorized")
 
 	ErrNoMerchantAutopatout             = errors.New("at the moment there are no connected merchant&autopayout in this direction")
-	ErrMerchantAutopatoutOptionalParams = errors.New(("failed to decode optional parameters for merchant&autopayout account"))
+	ErrMerchantAutopatoutOptionalParams = errors.New("failed to decode optional parameters for merchant&autopayout account")
+	ErrConnectionFailed                 = errors.New("failed connect to merchant&autopayout account")
 )

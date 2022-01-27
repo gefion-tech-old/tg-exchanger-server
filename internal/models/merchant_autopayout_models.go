@@ -37,6 +37,8 @@ type WhitebitOptionParams struct {
 	BaseURL   string `json:"base_url"`
 }
 
+type MineOptionParams struct{}
+
 type WhitebitApiHelper struct {
 	PublicKey string
 	SecretKey string

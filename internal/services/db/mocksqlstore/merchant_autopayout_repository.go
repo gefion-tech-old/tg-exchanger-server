@@ -80,6 +80,16 @@ func (r *MerchantAutopayoutRepository) GetFistIfActive(service string) (*models.
 	return nil, nil
 }
 
+func (r *MerchantAutopayoutRepository) GetAllMerchants() ([]*models.MerchantAutopayout, error) {
+	return nil, nil
+}
+
+/*
+	==========================================================================================
+	ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+	==========================================================================================
+*/
+
 func (r *MerchantAutopayoutRepository) rewrite(id int, to *models.MerchantAutopayout) {
 	to.ID = r.ma[id].ID
 	to.Name = r.ma[id].Name

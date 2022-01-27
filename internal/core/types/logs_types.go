@@ -6,3 +6,10 @@ const (
 	LogTypeBot    = 200
 	LogTypeAdmin  = 300
 )
+
+const (
+	LogModuleApplication = "application"
+	LogModuleServer      = "server"
+	LogModuleListener    = "listener"
+	LogModuleDatabase    = "database"
+)

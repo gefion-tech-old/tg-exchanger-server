@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/config"
+	"github.com/gefion-tech/tg-exchanger-server/internal/plugins"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
@@ -15,9 +16,10 @@ import (
 )
 
 type Server struct {
-	store  db.SQLStoreI
-	Router *gin.Engine
-	config *config.Config
+	store   db.SQLStoreI
+	Router  *gin.Engine
+	plugins *plugins.AppPlugins
+	config  *config.Config
 
 	guard      guard.GuardI
 	middleware middleware.MiddlewareI
@@ -28,8 +30,8 @@ type ServerI interface {
 	Create() *http.Server
 }
 
-func Init(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, l utils.LoggerI, c *config.Config) ServerI {
-	return root(s, nsq, r, l, c)
+func Init(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, p *plugins.AppPlugins, l utils.LoggerI, c *config.Config) ServerI {
+	return root(s, nsq, r, p, l, c)
 }
 
 func (s *Server) Create() *http.Server {
@@ -39,7 +41,7 @@ func (s *Server) Create() *http.Server {
 	}
 }
 
-func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, l utils.LoggerI, c *config.Config) *Server {
+func root(s db.SQLStoreI, nsq nsqstore.NsqI, r *redisstore.AppRedisDictionaries, p *plugins.AppPlugins, l utils.LoggerI, c *config.Config) *Server {
 	// Инициализация роутера
 	router := gin.New()
 	responser := utils.InitResponser(l)

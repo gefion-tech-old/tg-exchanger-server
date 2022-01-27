@@ -43,5 +43,9 @@ func InitTestConfig(t *testing.T) *Config {
 			Developers: []string{"I0HuKc"},
 			Admins:     []string{},
 		},
+
+		Plugins: PluginsConfig{
+			AesKey: "fn5LyPGTnB18gl24nieHavsmKfKRmvLR",
+		},
 	}
 }

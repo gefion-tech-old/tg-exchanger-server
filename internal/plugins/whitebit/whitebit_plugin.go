@@ -44,6 +44,9 @@ func (plugin *WhitebitPlugin) AutoPayout() interfaces.AutoPayoutI {
 	return plugin.autopayout
 }
 
+// Метод проверки соединение с аккаунтом
+// параметры которого были переданы в params
+// params должен соответствовать типу *models.WhitebitOptionParams
 func (plugin *WhitebitPlugin) Ping(params interface{}) (interface{}, error) {
 	b, err := SendRequest(
 		params.(*models.WhitebitOptionParams),
@@ -57,6 +60,23 @@ func (plugin *WhitebitPlugin) Ping(params interface{}) (interface{}, error) {
 	return b, nil
 }
 
+// Метод получения истории транзакций аккаунта
+// параметры которого были переданы в params
+func (plugin *WhitebitPlugin) History(params, body interface{}) (interface{}, error) {
+	b, err := SendRequest(
+		params.(*models.WhitebitOptionParams),
+		WhitebitHistory,
+		body.(map[string]interface{}),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
+// Метод расшифровывает и декодирует опциональные параметры
+// которые храняться в поле Options структуры MerchantAutopayout
 func (plugin *WhitebitPlugin) GetOptionParams(options string) (interface{}, error) {
 	var p models.WhitebitOptionParams
 	dOptions, err := AppMath.AesDecrypt(options, hex.EncodeToString([]byte(plugin.cfg.AesKey)))

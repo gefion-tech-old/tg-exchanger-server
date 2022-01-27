@@ -28,21 +28,6 @@ func (p *WhitebitPluginMerchant) CreateAdress(d, params interface{}) (interface{
 	return b, nil
 }
 
-func (p *WhitebitPluginMerchant) GetHistory(d interface{}) (interface{}, error) {
-	// data := d.(*models.WhitebitGetHistory)
-	// b, err := SendRequest(WhitebitHistory, map[string]interface{}{
-	// 	"transactionMethod": data.TransactionMethod,
-	// 	"limit":             data.Limit,
-	// 	"offset":            data.Offset,
-	// })
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return b, nil
-	return nil, nil
-}
-
 func PrepareBodyForCreateAdress(data *models.ExchangeRequest) map[string]interface{} {
 	var network string
 	networks := []string{AppType.CurrencyNetworkTRC20, AppType.CurrencyNetworkOMNI, AppType.CurrencyNetworkERC20}

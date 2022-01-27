@@ -236,6 +236,52 @@ func (r *MerchantAutopayoutRepository) Count(querys interface{}) (int, error) {
 	return c, nil
 }
 
+func (r *MerchantAutopayoutRepository) GetAllMerchants() ([]*models.MerchantAutopayout, error) {
+	arr := []*models.MerchantAutopayout{}
+
+	rows, err := r.store.Query(
+		`
+		SELECT id, name, service, service_type, options, status, message_id, created_by, created_at, updated_at
+		FROM merchant_autopayout
+		WHERE service_type=$1 AND status=$2
+		`,
+		AppType.UseAsMerchant,
+		true,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		r := &models.MerchantAutopayout{}
+		if err := rows.Scan(
+			&r.ID,
+			&r.Name,
+			&r.Service,
+			&r.ServiceType,
+			&r.Options,
+			&r.Status,
+			&r.MessageID,
+			&r.CreatedBy,
+			&r.CreatedAt,
+			&r.UpdatedAt,
+		); err != nil {
+			continue
+		}
+
+		arr = append(arr, r)
+	}
+
+	return arr, nil
+}
+
+/*
+	==========================================================================================
+	ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+	==========================================================================================
+*/
+
 func (r *MerchantAutopayoutRepository) queryGeneration(q *models.MerchantAutopayoutSelection) []string {
 	var conditions []string
 
