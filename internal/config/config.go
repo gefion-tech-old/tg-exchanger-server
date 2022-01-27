@@ -5,6 +5,7 @@ type Config struct {
 	Secrets  SecretsConfig   `toml:"secrets"`
 	Users    UsersConfig     `toml:"users"`
 	Plugins  PluginsConfig   `toml:"plugins"`
+	Listener ListenerConfig  `toml:"listener"`
 }
 
 type ServicesConfigs struct {
@@ -50,6 +51,10 @@ type UsersConfig struct {
 
 type PluginsConfig struct {
 	AesKey string `toml:"AES_KEY"`
+}
+
+type ListenerConfig struct {
+	Interval int `toml:"INTERVAL"`
 }
 
 func Init() *Config {
