@@ -32,6 +32,10 @@ func (plugin *MinePlugin) AutoPayout() interfaces.AutoPayoutI {
 	return plugin.autopayout
 }
 
+func (plugin *MinePlugin) Ping(params interface{}) (interface{}, error) {
+	return nil, nil
+}
+
 func (plugin *MinePlugin) GetOptionParams(options string) (interface{}, error) {
 	return nil, nil
 }

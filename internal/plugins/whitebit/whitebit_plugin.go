@@ -44,6 +44,19 @@ func (plugin *WhitebitPlugin) AutoPayout() interfaces.AutoPayoutI {
 	return plugin.autopayout
 }
 
+func (plugin *WhitebitPlugin) Ping(params interface{}) (interface{}, error) {
+	b, err := SendRequest(
+		params.(*models.WhitebitOptionParams),
+		WhitebitbBalance,
+		map[string]interface{}{},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
 func (plugin *WhitebitPlugin) GetOptionParams(options string) (interface{}, error) {
 	var p models.WhitebitOptionParams
 	dOptions, err := AppMath.AesDecrypt(options, hex.EncodeToString([]byte(plugin.cfg.AesKey)))

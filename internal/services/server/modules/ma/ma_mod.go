@@ -29,6 +29,7 @@ type ModMerchantAutoPayoutI interface {
 	GetMerchantAutopayoutSelectionHandler(c *gin.Context)
 
 	CreateNewAdressHandler(c *gin.Context)
+	PingMerchantAutopayoutHandler(c *gin.Context)
 }
 
 func InitModMerchantAutoPayout(
