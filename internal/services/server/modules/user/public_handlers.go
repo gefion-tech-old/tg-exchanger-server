@@ -15,7 +15,6 @@ import (
 	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/twinj/uuid"
@@ -124,7 +123,7 @@ func (m *ModUsers) UserGenerateCodeHandler(c *gin.Context) {
 
 	// Отправляю сообщение в NSQ
 	m.responser.Error(c, http.StatusInternalServerError,
-		m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload),
+		m.nsq.Publish(AppTypes.TopicBotMessages, payload),
 	)
 
 	c.JSON(http.StatusOK, gin.H{})

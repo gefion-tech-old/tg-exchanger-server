@@ -11,7 +11,6 @@ import (
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	AppTypes "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
-	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gin-gonic/gin"
 )
 
@@ -54,7 +53,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 							return err
 						}
 
-						if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+						if err := m.nsq.Publish(AppTypes.TopicBotMessages, payload); err != nil {
 							return err
 						}
 					}
@@ -67,7 +66,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 							return err
 						}
 
-						if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+						if err := m.nsq.Publish(AppTypes.TopicBotMessages, payload); err != nil {
 							return err
 						}
 					}
@@ -80,7 +79,7 @@ func (m *ModNotification) CreateNotificationHandler(c *gin.Context) {
 							return err
 						}
 
-						if err := m.nsq.Publish(nsqstore.TOPIC__MESSAGES, payload); err != nil {
+						if err := m.nsq.Publish(AppTypes.TopicBotMessages, payload); err != nil {
 							return err
 						}
 					}
