@@ -84,25 +84,36 @@ func runner(cfg *config.Config) (err error) {
 		panic(err)
 	}
 	defer postgres.Close()
+	utils.SetSuccessStep(AppType.StartStepDbConnection)
 
 	nsq, err := db.InitNSQ(&cfg.Services.NSQ)
 	if err != nil {
 		panic(err)
 	}
+	defer nsq.Stop()
+	utils.SetSuccessStep(AppType.StartStepNsqConnection)
 
 	redisStore, closer, err := redisstore.InitAppRedisDictionaries(&cfg.Services.Redis)
 	if err != nil {
 		panic(err)
 	}
 	defer closer()
+	utils.SetSuccessStep(AppType.StartStepRedisConnection)
 
 	sqlStore := sqlstore.Init(postgres)
+	utils.SetSuccessStep(AppType.StartStepSqlStoreInit)
+
 	nsqStore := nsqstore.Init(nsq)
+	utils.SetSuccessStep(AppType.StartStepNsqStoreInit)
+
 	plugins := plugins.InitAppPlugins(
 		mine_plugin.InitMinePlugin(),
 		whitebit_plugin.InitWhitebitPlugin(&cfg.Plugins),
 	)
+	utils.SetSuccessStep(AppType.StartStepPluginsInit)
+
 	logger := utils.InitLogger(sqlStore.AdminPanel().Logs())
+	utils.SetSuccessStep(AppType.StartStepLoggerInit)
 
 	lsnr := listener.InitListener(
 		sqlStore,
@@ -110,6 +121,10 @@ func runner(cfg *config.Config) (err error) {
 		plugins,
 		logger,
 	)
+
+	if !fuse() {
+		return nil
+	}
 
 	srv := server.Init(
 		sqlStore,
