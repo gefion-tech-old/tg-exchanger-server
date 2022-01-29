@@ -5,4 +5,5 @@ var (
 	QueueEventVerificationCode    = "verification_code"
 	QueueEventSkipOperation       = "skip_operation"
 	QueueEventConfirmationRequest = "confirmation_req"
+	QueueEventExchangeError       = "exchange_error"
 )

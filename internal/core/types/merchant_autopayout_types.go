@@ -18,3 +18,9 @@ var (
 	UseAsMerchant   = 1
 	UseAsAutoPayout = 2
 )
+
+var BaseWhitebitGetHistoryBody = map[string]interface{}{
+	// "transactionMethod": data.TransactionMethod,
+	"limit":  100,
+	"offset": 0,
+}

@@ -31,13 +31,13 @@ type MerchantAutopayoutSelection struct {
 	Service []string
 }
 
+/* Whitebit */
+
 type WhitebitOptionParams struct {
 	PublicKey string `json:"public_key"`
 	SecretKey string `json:"secret_key"`
 	BaseURL   string `json:"base_url"`
 }
-
-type MineOptionParams struct{}
 
 type WhitebitApiHelper struct {
 	PublicKey string
@@ -54,6 +54,10 @@ type WhitebitGetHistory struct {
 	Offset            int           `json:"offset"`
 	Status            []interface{} `json:"status"`
 }
+
+/* Mine */
+
+type MineOptionParams struct{}
 
 func (ma *MerchantAutopayoutSelection) Validation() error {
 	return validation.ValidateStruct(

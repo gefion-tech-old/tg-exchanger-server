@@ -1,8 +1,6 @@
 package models
 
 import (
-	"regexp"
-
 	AppInterfaces "github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
 	AppValidation "github.com/gefion-tech/tg-exchanger-server/internal/core/validation"
@@ -13,14 +11,18 @@ var _ AppInterfaces.ResourceI = (*ExchangeRequest)(nil)
 var _ AppInterfaces.ResourceI = (*ExchangeRequestSelection)(nil)
 
 type ExchangeRequest struct {
-	ID           int                           `json:"id"`
-	Status       AppType.ExchangeRequestStatus `json:"request_status"`
-	ExchangeFrom string                        `json:"exchange_from"`
-	ExchangeTo   string                        `json:"exchange_to"`
-	Course       string                        `json:"course"`
-	CreatedBy    string                        `json:"created_by"`
-	CreatedAt    string                        `json:"created_at"`
-	UpdatedAt    string                        `json:"updated_at"`
+	ID                int                           `json:"id"`
+	Status            AppType.ExchangeRequestStatus `json:"request_status"`
+	ExchangeFrom      string                        `json:"exchange_from"`
+	ExchangeTo        string                        `json:"exchange_to"`
+	Course            string                        `json:"course"`
+	Address           string                        `json:"address"`
+	ExpectedAmount    float64                       `json:"expected_amount"`
+	TransferredAmount float64                       `json:"transferred_amount"`
+	TransactionHash   *string                       `json:"transaction_hash"`
+	CreatedBy         UserFromBotRequest            `json:"created_by"`
+	CreatedAt         string                        `json:"created_at"`
+	UpdatedAt         string                        `json:"updated_at"`
 }
 
 type ExchangeRequestSelection struct {
@@ -94,11 +96,11 @@ func (er *ExchangeRequest) Validation() error {
 			validation.Required,
 		),
 
-		validation.Field(
-			&er.CreatedBy,
-			validation.Required,
-			validation.Match(regexp.MustCompile(AppValidation.RegexName)),
-		),
+		// validation.Field(
+		// 	&er.CreatedBy,
+		// 	validation.Required,
+		// 	validation.Match(regexp.MustCompile(AppValidation.RegexName)),
+		// ),
 
 		validation.Field(&er.CreatedAt,
 			validation.When(er.CreatedAt != "",

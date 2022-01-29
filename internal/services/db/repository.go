@@ -1,6 +1,9 @@
 package db
 
-import "github.com/gefion-tech/tg-exchanger-server/internal/models"
+import (
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+)
 
 type AdminPanelRepository interface {
 	Logs() LoggerRepository
@@ -75,4 +78,10 @@ type MerchantAutopayoutRepository interface {
 
 type ExchangeRequestRepository interface {
 	Create(r *models.ExchangeRequest) error
+	Update(r *models.ExchangeRequest) error
+	Get(r *models.ExchangeRequest) error
+	Delete(r *models.ExchangeRequest) error
+	Count(querys interface{}) (int, error)
+	Selection(querys interface{}) ([]*models.ExchangeRequest, error)
+	GetAllByStatus(s AppType.ExchangeRequestStatus) ([]*models.ExchangeRequest, error)
 }

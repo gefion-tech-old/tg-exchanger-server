@@ -67,43 +67,29 @@ func (m *ModMerchantAutoPayout) CreateNewAdressHandler(c *gin.Context) {
 		return
 	}
 
-	var resp interface{}
+	var resp map[string]interface{}
 
-	{
-		errs, _ := errgroup.WithContext(c)
-
-		switch c.Param("service") {
-		case AppType.MerchantAutoPayoutWhitebit:
-			// Получение данных адреса
-			errs.Go(func() error {
-				b, err := m.pl.Whitebit.Merchant().CreateAdress(r, p.(*models.WhitebitOptionParams))
-				if err != nil {
-					return err
-				}
-
-				if err := json.Unmarshal(b.([]byte), &resp); err != nil {
-					return err
-				}
-
-				return nil
-			})
-
-			// Создание заявки
-			errs.Go(func() error {
-				if err := m.repository.ExchangeRequest().Create(r); err != nil {
-					return err
-				}
-
-				return nil
-			})
-
-		}
-
-		if errs.Wait() != nil {
-			m.responser.Error(c, http.StatusInternalServerError, errs.Wait())
+	switch c.Param("service") {
+	case AppType.MerchantAutoPayoutWhitebit:
+		// Получение данных адреса
+		b, err := m.pl.Whitebit.Merchant().CreateAdress(r, p.(*models.WhitebitOptionParams))
+		if err != nil {
+			m.responser.Error(c, http.StatusInternalServerError, err)
 			return
 		}
 
+		if err := json.Unmarshal(b.([]byte), &resp); err != nil {
+			m.responser.Error(c, http.StatusInternalServerError, err)
+			return
+		}
+
+		r.Address = resp["account"].(map[string]interface{})["address"].(string)
+
+		// Создание заявки
+		if err := m.repository.ExchangeRequest().Create(r); err != nil {
+			m.responser.Error(c, http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, resp)

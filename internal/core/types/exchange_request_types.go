@@ -15,6 +15,10 @@ var (
 	// на которые клиенты забили
 	ExchangeRequestDeleted ExchangeRequestStatus = 300
 
+	// Если клиент оплатил но полученная сумма
+	// не совпадает с ожидаемой
+	ExchangeRequestInvalidAmount ExchangeRequestStatus = 390
+
 	// Оплаченная заявка
 	// Когда мерчант увидел, что клиент успешно перечислил
 	// средства и они зашли на нашу платежную систему

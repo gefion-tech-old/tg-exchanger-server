@@ -1,6 +1,9 @@
 package mocksqlstore
 
-import "github.com/gefion-tech/tg-exchanger-server/internal/models"
+import (
+	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
+	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+)
 
 type ExchangeRequestRepository struct {
 	er map[int]*models.ExchangeRequest
@@ -33,4 +36,8 @@ func (r *ExchangeRequestRepository) Selection(querys interface{}) ([]*models.Exc
 	}
 
 	return arr, nil
+}
+
+func (r *ExchangeRequestRepository) GetAllByStatus(s AppType.ExchangeRequestStatus) ([]*models.ExchangeRequest, error) {
+	return nil, nil
 }
