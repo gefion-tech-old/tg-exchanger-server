@@ -35,4 +35,4 @@ ADMINS = []
 AES_KEY = "fn5LyPGTnB18gl24nieHavsmKfKRmvLR"
 
 [listener]
-INTERVAL = 3
+INTERVAL = 10
