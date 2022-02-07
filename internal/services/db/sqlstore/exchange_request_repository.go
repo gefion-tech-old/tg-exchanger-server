@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/core"
@@ -20,15 +21,16 @@ type ExchangeRequestRepository struct {
 func (r *ExchangeRequestRepository) Create(er *models.ExchangeRequest) error {
 	if err := r.store.QueryRow(
 		`
-		INSERT INTO request(request_status, exchange_from, exchange_to, course, address, expected_amount, created_by_username, created_by_chat_id)
-		SELECT $1, $2, $3, $4, $5, $6, $7, $8
-		RETURNING id, request_status, exchange_from, exchange_to, course, address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
+		INSERT INTO request(request_status, exchange_from, exchange_to, course, address, client_address, expected_amount, created_by_username, created_by_chat_id)
+		SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9
+		RETURNING id, request_status, exchange_from, exchange_to, course, address, client_address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
 		`,
 		er.Status,
 		er.ExchangeFrom,
 		er.ExchangeTo,
 		er.Course,
 		er.Address,
+		er.ClientAddress,
 		er.ExpectedAmount,
 		er.CreatedBy.Username,
 		er.CreatedBy.ChatID,
@@ -39,6 +41,7 @@ func (r *ExchangeRequestRepository) Create(er *models.ExchangeRequest) error {
 		&er.ExchangeTo,
 		&er.Course,
 		&er.Address,
+		&er.ClientAddress,
 		&er.ExpectedAmount,
 		&er.TransferredAmount,
 		&er.TransactionHash,
@@ -56,7 +59,7 @@ func (r *ExchangeRequestRepository) Create(er *models.ExchangeRequest) error {
 func (r *ExchangeRequestRepository) Get(er *models.ExchangeRequest) error {
 	if err := r.store.QueryRow(
 		`
-		SELECT id, request_status, exchange_from, exchange_to, course, address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
+		SELECT id, request_status, exchange_from, exchange_to, course, address, client_address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
 		FROM request
 		WHERE id=$1
 		`,
@@ -68,6 +71,7 @@ func (r *ExchangeRequestRepository) Get(er *models.ExchangeRequest) error {
 		&er.ExchangeTo,
 		&er.Course,
 		&er.Address,
+		&er.ClientAddress,
 		&er.ExpectedAmount,
 		&er.TransferredAmount,
 		&er.TransactionHash,
@@ -88,7 +92,7 @@ func (r *ExchangeRequestRepository) Update(er *models.ExchangeRequest) error {
 		UPDATE request
 		SET request_status=$1, transferred_amount=$2, transaction_hash=$3, updated_at=$4
 		WHERE id=$5
-		RETURNING id, request_status, exchange_from, exchange_to, course, address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
+		RETURNING id, request_status, exchange_from, exchange_to, course, address, client_address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
 		`,
 		er.Status,
 		er.TransferredAmount,
@@ -102,6 +106,7 @@ func (r *ExchangeRequestRepository) Update(er *models.ExchangeRequest) error {
 		&er.ExchangeTo,
 		&er.Course,
 		&er.Address,
+		&er.ClientAddress,
 		&er.ExpectedAmount,
 		&er.TransferredAmount,
 		&er.TransactionHash,
@@ -122,7 +127,7 @@ func (r *ExchangeRequestRepository) Delete(er *models.ExchangeRequest) error {
 		`
 		DELETE FROM request
 		WHERE id=$1
-		RETURNING id, request_status, exchange_from, exchange_to, course, address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
+		RETURNING id, request_status, exchange_from, exchange_to, course, address, client_address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
 		`,
 		er.ID,
 	).Scan(
@@ -132,6 +137,7 @@ func (r *ExchangeRequestRepository) Delete(er *models.ExchangeRequest) error {
 		&er.ExchangeTo,
 		&er.Course,
 		&er.Address,
+		&er.ClientAddress,
 		&er.ExpectedAmount,
 		&er.TransferredAmount,
 		&er.TransactionHash,
@@ -170,7 +176,7 @@ func (r *ExchangeRequestRepository) Selection(querys interface{}) ([]*models.Exc
 	arr := []*models.ExchangeRequest{}
 
 	sb := fmt.Sprintf(`
-		SELECT id, request_status, exchange_from, exchange_to, course, address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
+		SELECT id, request_status, exchange_from, exchange_to, course, address, client_address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
 		FROM request
 		%s
 		ORDER BY id DESC
@@ -198,6 +204,7 @@ func (r *ExchangeRequestRepository) Selection(querys interface{}) ([]*models.Exc
 				&er.ExchangeTo,
 				&er.Course,
 				&er.Address,
+				&er.ClientAddress,
 				&er.ExpectedAmount,
 				&er.TransferredAmount,
 				&er.TransactionHash,
@@ -218,18 +225,19 @@ func (r *ExchangeRequestRepository) Selection(querys interface{}) ([]*models.Exc
 	return nil, AppError.ErrInvalidCondition
 }
 
-func (r *ExchangeRequestRepository) GetAllByStatus(status AppType.ExchangeRequestStatus) ([]*models.ExchangeRequest, error) {
+func (r *ExchangeRequestRepository) GetAllByStatus(status ...AppType.ExchangeRequestStatus) ([]*models.ExchangeRequest, error) {
 	arr := []*models.ExchangeRequest{}
 
-	rows, err := r.store.Query(
-		`
-		SELECT id, request_status, exchange_from, exchange_to, course, address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
-		FROM request
-		WHERE request_status=$1
-		ORDER BY id DESC
-		`,
-		status,
+	sb := fmt.Sprintf(`
+	SELECT id, request_status, exchange_from, exchange_to, course, address, client_address, expected_amount, transferred_amount, transaction_hash, created_by_username, created_by_chat_id, created_at, updated_at
+	FROM request
+	WHERE %s
+	ORDER BY id DESC
+	`,
+		r.statusQueryGeneration(status...),
 	)
+
+	rows, err := r.store.Query(sb)
 	if err != nil {
 		return nil, err
 	}
@@ -245,6 +253,7 @@ func (r *ExchangeRequestRepository) GetAllByStatus(status AppType.ExchangeReques
 				&er.ExchangeTo,
 				&er.Course,
 				&er.Address,
+				&er.ClientAddress,
 				&er.ExpectedAmount,
 				&er.TransferredAmount,
 				&er.TransactionHash,
@@ -270,6 +279,15 @@ func (r *ExchangeRequestRepository) GetAllByStatus(status AppType.ExchangeReques
 	ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
 	==========================================================================================
 */
+
+func (r *ExchangeRequestRepository) statusQueryGeneration(status ...AppType.ExchangeRequestStatus) string {
+	arr := []string{}
+	for _, s := range status {
+		arr = append(arr, fmt.Sprintf("request_status=%d", s))
+	}
+
+	return strings.Join(arr, " OR ")
+}
 
 func (r *ExchangeRequestRepository) queryGeneration(q *models.ExchangeRequestSelection) string {
 	if q.Status != 0 {

@@ -17,6 +17,7 @@ type ExchangeRequest struct {
 	ExchangeTo        string                        `json:"exchange_to"`
 	Course            string                        `json:"course"`
 	Address           string                        `json:"address"`
+	ClientAddress     string                        `json:"client_address"`
 	ExpectedAmount    float64                       `json:"expected_amount"`
 	TransferredAmount float64                       `json:"transferred_amount"`
 	TransactionHash   *string                       `json:"transaction_hash"`

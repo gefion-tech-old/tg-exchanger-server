@@ -5,6 +5,7 @@ CREATE TABLE request(
     exchange_to VARCHAR(20) NOT NULL,
     course VARCHAR(20) NOT NULL,
     address VARCHAR(255) NOT NULL,
+    client_address VARCHAR(255) NOT NULL,
     expected_amount DECIMAL NOT NULL,
     transferred_amount DECIMAL DEFAULT 0,
     transaction_hash VARCHAR(255),
