@@ -83,5 +83,5 @@ type ExchangeRequestRepository interface {
 	Delete(r *models.ExchangeRequest) error
 	Count(querys interface{}) (int, error)
 	Selection(querys interface{}) ([]*models.ExchangeRequest, error)
-	GetAllByStatus(s AppType.ExchangeRequestStatus) ([]*models.ExchangeRequest, error)
+	GetAllByStatus(s ...AppType.ExchangeRequestStatus) ([]*models.ExchangeRequest, error)
 }

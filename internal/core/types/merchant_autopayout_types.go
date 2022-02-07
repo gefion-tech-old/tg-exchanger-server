@@ -20,7 +20,6 @@ var (
 )
 
 var BaseWhitebitGetHistoryBody = map[string]interface{}{
-	// "transactionMethod": data.TransactionMethod,
 	"limit":  100,
 	"offset": 0,
 }

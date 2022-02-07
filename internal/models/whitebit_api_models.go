@@ -41,3 +41,13 @@ type WhitebitHistoryRecord struct {
 	TransactionHash string      `json:"transactionHash"`
 	UniqueId        interface{} `json:"uniqueId"`
 }
+
+type WhitebitWithdrawRequest struct {
+	Ticker   string  `json:"ticker"`
+	Amount   int     `json:"amount"`
+	Address  string  `json:"address"`
+	Memo     *string `json:"memo"`
+	UniqueId string  `json:"uniqueId"`
+	Provider *string `json:"provider"`
+	Network  *string `json:"network"`
+}

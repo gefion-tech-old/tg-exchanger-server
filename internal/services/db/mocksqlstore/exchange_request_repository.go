@@ -38,6 +38,6 @@ func (r *ExchangeRequestRepository) Selection(querys interface{}) ([]*models.Exc
 	return arr, nil
 }
 
-func (r *ExchangeRequestRepository) GetAllByStatus(s AppType.ExchangeRequestStatus) ([]*models.ExchangeRequest, error) {
+func (r *ExchangeRequestRepository) GetAllByStatus(s ...AppType.ExchangeRequestStatus) ([]*models.ExchangeRequest, error) {
 	return nil, nil
 }
