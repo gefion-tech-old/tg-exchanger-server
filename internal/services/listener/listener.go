@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/config"
@@ -62,7 +61,7 @@ func (l *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig) error
 			errs.Go(func() error {
 				defer close(cExchangeRequestsArr)
 
-				arr, err := l.store.AdminPanel().ExchangeRequest().GetAllByStatus(AppType.ExchangeRequestNew)
+				arr, err := l.store.AdminPanel().ExchangeRequest().GetAllByStatus(AppType.ExchangeRequestNew, AppType.ExchangeRequestPaid)
 				if err != nil {
 					return err
 				}
@@ -104,49 +103,18 @@ func (l *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig) error
 			// Анализ истории всех транзакций со всех аккаунтов на whitebit
 			errs.Go(func() error {
 
-				// rHistory -> Запись из истории транзакеций
+				// rHistory -> Запись из истории транзакций
 				// rRequest -> Запись в таблице заявок
 				for _, account := range whitebitHistoryArr {
 					for _, rHistory := range account.Records {
 						for _, rRequest := range exchangeRequestsArr {
-							if rHistory.Address == rRequest.Address {
-								// Получаю переведенную сумму
-								amount, err := strconv.ParseFloat(rHistory.Amount, 64)
-								if err != nil {
-									return err
-								}
-
-								// Сохраняю сумму полученную от пользователя
-								rRequest.TransferredAmount = amount
-								rRequest.TransactionHash = &rHistory.TransactionHash
-
-								if rRequest.TransferredAmount == rRequest.ExpectedAmount {
-									// Если полученная сумма совпадает с ожидаемой суммой
-									rRequest.Status = AppType.ExchangeRequestPaid
-								} else if rRequest.TransferredAmount < rRequest.ExpectedAmount {
-									// Если полученная сумма меньше ожидаемой суммы
-									rRequest.Status = AppType.ExchangeRequestInvalidAmount
-
-									// Отправка уведомления
-									if err := l.amountLessThanExpected(rRequest.CreatedBy); err != nil {
-										return err
-									}
-								} else {
-									// Если полученная сумма больше ожидаемой суммы
-									rRequest.Status = AppType.ExchangeRequestPaid
-
-									// Отправка уведомления
-									if err := l.amountMoreThanExpected(rRequest.CreatedBy); err != nil {
-										return err
-									}
-								}
-
-								if err := l.store.AdminPanel().ExchangeRequest().Update(rRequest); err != nil {
-									return err
-								}
-
-								utils.SetSuccessStep("Request processed")
-								return nil
+							switch rHistory.Method {
+							case 1: // Событие получение средств
+								l.handleWhitebitDepositAction(rHistory, rRequest)
+							case 2: // Событие вывода средств
+								l.handleWhitebitWithdrawAction(rHistory, rRequest)
+							default:
+								continue
 							}
 						}
 					}
