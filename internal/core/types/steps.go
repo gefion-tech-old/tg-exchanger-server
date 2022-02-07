@@ -17,8 +17,9 @@ const (
 
 // Listener steps
 const (
-	ListenerStepGetAllMerachants AppStep = "Get all merchants from database"
-	ListenerStepDecodeParams     AppStep = "Decode options params for account"
+	ListenerStepGetAllMerachants  AppStep = "Get all merchants from database"
+	ListenerStepGetAllAutopayouts AppStep = "Get all autopayouts from database"
+	ListenerStepDecodeParams      AppStep = "Decode options params for account"
 )
 
 func SprintfStep(format string, args ...interface{}) AppStep {

@@ -236,7 +236,7 @@ func (r *MerchantAutopayoutRepository) Count(querys interface{}) (int, error) {
 	return c, nil
 }
 
-func (r *MerchantAutopayoutRepository) GetAllMerchants() ([]*models.MerchantAutopayout, error) {
+func (r *MerchantAutopayoutRepository) GetAllByServiceType(serviceType int, status bool) ([]*models.MerchantAutopayout, error) {
 	arr := []*models.MerchantAutopayout{}
 
 	rows, err := r.store.Query(
@@ -245,8 +245,8 @@ func (r *MerchantAutopayoutRepository) GetAllMerchants() ([]*models.MerchantAuto
 		FROM merchant_autopayout
 		WHERE service_type=$1 AND status=$2
 		`,
-		AppType.UseAsMerchant,
-		true,
+		serviceType,
+		status,
 	)
 	if err != nil {
 		return nil, err

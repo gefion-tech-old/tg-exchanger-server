@@ -1,6 +1,8 @@
 package mine_plugin
 
-import "github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
+import (
+	"github.com/gefion-tech/tg-exchanger-server/internal/core/interfaces"
+)
 
 type MinePlugin struct {
 	merchant   interfaces.MerchantI
@@ -37,6 +39,10 @@ func (plugin *MinePlugin) Ping(params interface{}) (interface{}, error) {
 }
 
 func (plugin *MinePlugin) History(params, body interface{}) (interface{}, error) {
+	return nil, nil
+}
+
+func (plugin *MinePlugin) Balance(params, body interface{}) (interface{}, error) {
 	return nil, nil
 }
 

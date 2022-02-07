@@ -7,3 +7,7 @@ type MinePluginAutoPayout struct{}
 func IniAutoPayout() interfaces.AutoPayoutI {
 	return &MinePluginAutoPayout{}
 }
+
+func (p *MinePluginAutoPayout) Payout(params, body interface{}) (interface{}, error) {
+	return nil, nil
+}

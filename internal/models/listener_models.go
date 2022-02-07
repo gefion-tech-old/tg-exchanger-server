@@ -1,10 +1,11 @@
 package models
 
 type ListenerState struct {
-	Merchants ListenerMerchants
+	Merchants   *ListeningAccounts
+	Autopayouts *ListeningAccounts
 }
 
-type ListenerMerchants struct {
+type ListeningAccounts struct {
 	Whitebit []*WhitebitOptionParams
 	Mine     []*MineOptionParams
 }

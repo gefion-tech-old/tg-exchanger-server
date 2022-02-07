@@ -75,6 +75,19 @@ func (plugin *WhitebitPlugin) History(params, body interface{}) (interface{}, er
 	return b, nil
 }
 
+func (plugin *WhitebitPlugin) Balance(params, body interface{}) (interface{}, error) {
+	b, err := SendRequest(
+		params.(*models.WhitebitOptionParams),
+		WhitebitbBalance,
+		body.(map[string]interface{}),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, err
+}
+
 // Метод расшифровывает и декодирует опциональные параметры
 // которые храняться в поле Options структуры MerchantAutopayout
 func (plugin *WhitebitPlugin) GetOptionParams(options string) (interface{}, error) {

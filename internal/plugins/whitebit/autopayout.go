@@ -11,6 +11,14 @@ func IniAutoPayout() interfaces.AutoPayoutI {
 	return &WhitebitPluginAutoPayout{}
 }
 
-func (p *WhitebitPluginAutoPayout) Payout(data *models.WhitebitWithdrawRequest) (interface{}, error) {
-	return nil, nil
+func (p *WhitebitPluginAutoPayout) Payout(params, body interface{}) (interface{}, error) {
+	b, err := SendRequest(
+		params.(*models.WhitebitOptionParams),
+		WhitebitbWithdraw,
+		body.(map[string]interface{}),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }

@@ -80,7 +80,7 @@ func (r *MerchantAutopayoutRepository) GetFistIfActive(service string) (*models.
 	return nil, nil
 }
 
-func (r *MerchantAutopayoutRepository) GetAllMerchants() ([]*models.MerchantAutopayout, error) {
+func (r *MerchantAutopayoutRepository) GetAllByServiceType(serviceType int, status bool) ([]*models.MerchantAutopayout, error) {
 	return nil, nil
 }
 

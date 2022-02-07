@@ -36,32 +36,38 @@ func InitListener(s db.SQLStoreI, q nsqstore.NsqI, p *plugins.AppPlugins, l util
 	}
 }
 
-func (l *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig) error {
+func (listener *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig) error {
 	for {
 		t := time.NewTimer(time.Duration(cfg.Interval) * time.Second)
 
-		// Получение актуального списка проверяемых аккаунтов
-		state, err := l.snapshot(cfg)
+		// Получение актуального списка аккаунтов
+		state, err := listener.snapshot(ctx, cfg)
 		if err != nil {
 			return err
 		}
 
-		// Массив историй транзакций со всех аккаунтов на Whitebit
+		// Канал для массива историй транзакций со всех аккаунтов на Whitebit
 		cWhitebitHistoryArr := make(chan []*models.WhitebitHistory)
+		// Канал для массива всех заявок сохраненных в БД
 		cExchangeRequestsArr := make(chan []*models.ExchangeRequest)
 
+		// Массив транзакций со всех аккаунтов на Whitebit
 		var whitebitHistoryArr []*models.WhitebitHistory
+		// Массив всех заявок из БД
 		var exchangeRequestsArr []*models.ExchangeRequest
 
-		// Сбор истории транзакции со всех акаунтов всех мерчантов
 		{
 			errs, _ := errgroup.WithContext(ctx)
 
-			// Получение списка всех актуальных заявок
+			// Получение списка новых заявок и заявок по которым
+			// должны отработать автовыплаты
 			errs.Go(func() error {
 				defer close(cExchangeRequestsArr)
 
-				arr, err := l.store.AdminPanel().ExchangeRequest().GetAllByStatus(AppType.ExchangeRequestNew, AppType.ExchangeRequestPaid)
+				arr, err := listener.store.AdminPanel().ExchangeRequest().GetAllByStatus(
+					AppType.ExchangeRequestNew,  // новые заявки
+					AppType.ExchangeRequestPaid, // заявки по которым должны отработать автовыплаты
+				)
 				if err != nil {
 					return err
 				}
@@ -76,7 +82,7 @@ func (l *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig) error
 				arr := []*models.WhitebitHistory{}
 
 				for _, merchant := range state.Merchants.Whitebit {
-					history, err := l.checker(merchant)
+					history, err := listener.checker(merchant)
 					if err != nil {
 						return err
 					}
@@ -96,27 +102,71 @@ func (l *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig) error
 			}
 		}
 
-		// Анализ истории транзакций всех аккаунтов всех мерчантов
+		// Анализ истории транзакций всех аккаунтов
 		{
 			errs, _ := errgroup.WithContext(ctx)
 
 			// Анализ истории всех транзакций со всех аккаунтов на whitebit
 			errs.Go(func() error {
 
+				// Массив заявок по которым должны отработать автовыплаты
+				var forAutopayout []*models.ExchangeRequest
+
 				// rHistory -> Запись из истории транзакций
 				// rRequest -> Запись в таблице заявок
 				for _, account := range whitebitHistoryArr {
 					for _, rHistory := range account.Records {
 						for _, rRequest := range exchangeRequestsArr {
+							// Если заявка ожидает автовыплаты
+							if rRequest.Status == AppType.ExchangeRequestPaid {
+								if len(forAutopayout) > 0 {
+									for _, alreadyAdd := range forAutopayout {
+										if alreadyAdd.ID != rRequest.ID {
+											forAutopayout = append(forAutopayout, rRequest)
+										}
+									}
+								} else {
+									forAutopayout = append(forAutopayout, rRequest)
+								}
+
+							}
+
 							switch rHistory.Method {
-							case 1: // Событие получение средств
-								l.handleWhitebitDepositAction(rHistory, rRequest)
+							case 1: // Событие получения средств
+								listener.handleWhitebitDepositAction(rHistory, rRequest)
+								continue
 							case 2: // Событие вывода средств
-								l.handleWhitebitWithdrawAction(rHistory, rRequest)
+								listener.handleWhitebitWithdrawAction(rHistory, rRequest)
+								continue
 							default:
 								continue
 							}
 						}
+					}
+				}
+
+				fmt.Println(len(forAutopayout))
+
+				// Работа автовыплаты
+				for _, rRequest := range forAutopayout {
+					for _, account := range state.Merchants.Whitebit {
+						b, err := listener.plugin.Whitebit.Balance(account, map[string]interface{}{
+							"ticker": "USDT",
+						})
+						if err != nil {
+							fmt.Println(err)
+							break
+						}
+
+						var body map[string]interface{}
+						if err := json.Unmarshal(b.([]byte), &body); err != nil {
+							fmt.Println(err)
+							break
+						}
+
+						fmt.Println(rRequest.ExchangeTo)
+						fmt.Println(body["main_balance"])
+
 					}
 				}
 
@@ -132,10 +182,19 @@ func (l *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig) error
 	}
 }
 
-func (l *Listener) checker(m *models.WhitebitOptionParams) (*models.WhitebitHistory, error) {
+// func (listener *Listener) payout(account *models.WhitebitOptionParams, r *models.ExchangeRequest) error {
+// 	b, err := listener.plugin.Whitebit.Balance(account, map[string]interface{}{
+// 		"ticker": "USDT",
+// 	})
+// 	if err != nil {
+
+// 	}
+// }
+
+func (listener *Listener) checker(p *models.WhitebitOptionParams) (*models.WhitebitHistory, error) {
 	time.Sleep(time.Duration(1 * time.Second))
 
-	b, err := l.plugin.Whitebit.History(m, AppType.BaseWhitebitGetHistoryBody)
+	b, err := listener.plugin.Whitebit.History(p, AppType.BaseWhitebitGetHistoryBody)
 	if err != nil {
 		// TODO: Писать лог что не удалось установить соединение с этим аккаунтом
 		return nil, err
