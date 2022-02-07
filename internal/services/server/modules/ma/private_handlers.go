@@ -85,6 +85,61 @@ func (m *ModMerchantAutoPayout) GetMerchantAutopayoutSelectionHandler(c *gin.Con
 	m.responser.SelectionResponse(c, m.repository, s)
 }
 
+func (m *ModMerchantAutoPayout) GetBalanceMerchantAutopayoutHandler(c *gin.Context) {
+	var r models.MerchantAutopayout
+
+	if obj := m.responser.RecordHandler(c, &r); obj != nil {
+		if reflect.TypeOf(obj) != reflect.TypeOf(&models.MerchantAutopayout{}) {
+			return
+		}
+
+		// Достаю из БД нужную запись
+		if m.repository.MerchantAutopayout().Get(obj.(*models.MerchantAutopayout)) != nil {
+			m.responser.Error(c, http.StatusNotFound, AppError.ErrRecordNotFound)
+			return
+		}
+
+		// Декодирую опциональные параметры
+		switch obj.(*models.MerchantAutopayout).Service {
+		case AppType.MerchantAutoPayoutWhitebit:
+			p, err := m.pl.Whitebit.GetOptionParams(obj.(*models.MerchantAutopayout).Options)
+			if err != nil {
+				m.responser.Error(c, http.StatusUnprocessableEntity, AppError.ErrMerchantAutopatoutOptionalParams)
+				return
+			}
+
+			// Делаю запрос на сервис мерчанта/автовыплаты
+			b, err := m.pl.Whitebit.Balance(p, map[string]interface{}{
+				"ticker": c.Query("ticker"),
+			})
+			if err != nil {
+				m.responser.Error(c, http.StatusInternalServerError, err)
+				return
+			}
+
+			var resp map[string]interface{}
+
+			if err := json.Unmarshal([]byte(b.([]byte)), &resp); err != nil {
+				m.responser.Error(c, http.StatusInternalServerError, err)
+				return
+			}
+
+			if resp["code"] != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error":     AppError.ErrConnectionFailed.Error(),
+					"meta_data": resp,
+				})
+				return
+			}
+
+			c.JSON(http.StatusOK, resp)
+			return
+		}
+	}
+
+	m.responser.Error(c, http.StatusInternalServerError, AppError.ErrFailedToInitializeStruct)
+}
+
 /*
 	@Method GET
 	@Path admin/merchant-autopayout/history/:id
