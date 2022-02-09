@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/gefion-tech/tg-exchanger-server/internal/config"
@@ -128,7 +130,7 @@ func (listener *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig
 								} else {
 									forAutopayout = append(forAutopayout, rRequest)
 								}
-
+								continue
 							}
 
 							switch rHistory.Method {
@@ -145,27 +147,41 @@ func (listener *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig
 					}
 				}
 
-				fmt.Println(len(forAutopayout))
+				time.Sleep(time.Duration(1 * time.Second))
 
 				// Работа автовыплаты
 				for _, rRequest := range forAutopayout {
 					for _, account := range state.Merchants.Whitebit {
-						b, err := listener.plugin.Whitebit.Balance(account, map[string]interface{}{
-							"ticker": "USDT",
+						b, err := listener.plugin.Whitebit.AutoPayout().Payout(account, map[string]interface{}{
+							"ticker":   rRequest.ExchangeTo,
+							"amount":   fmt.Sprintf("%f", rRequest.ExpectedAmount),
+							"address":  rRequest.ClientAddress,
+							"uniqueId": strconv.Itoa(rRequest.ID),
+							"network":  "TRC20",
 						})
 						if err != nil {
 							fmt.Println(err)
-							break
 						}
 
-						var body map[string]interface{}
+						var body interface{}
 						if err := json.Unmarshal(b.([]byte), &body); err != nil {
 							fmt.Println(err)
 							break
 						}
 
-						fmt.Println(rRequest.ExchangeTo)
-						fmt.Println(body["main_balance"])
+						// Если получили ошибку и деньги не отправились
+						if reflect.TypeOf(body) == reflect.TypeOf(map[string]interface{}{}) {
+							resp := body.(map[string]interface{})
+							utils.SetSuccessStep(AppType.SprintfStep("Payout done with status %v", resp["code"]))
+							// fmt.Println(resp["errors"])
+							continue
+						}
+
+						// Если деньги ушли
+						rRequest.Status = AppType.ExchangeRequestPaid
+						if err := listener.store.AdminPanel().ExchangeRequest().Update(rRequest); err != nil {
+							fmt.Println(err)
+						}
 
 					}
 				}
@@ -181,15 +197,6 @@ func (listener *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig
 		<-t.C
 	}
 }
-
-// func (listener *Listener) payout(account *models.WhitebitOptionParams, r *models.ExchangeRequest) error {
-// 	b, err := listener.plugin.Whitebit.Balance(account, map[string]interface{}{
-// 		"ticker": "USDT",
-// 	})
-// 	if err != nil {
-
-// 	}
-// }
 
 func (listener *Listener) checker(p *models.WhitebitOptionParams) (*models.WhitebitHistory, error) {
 	time.Sleep(time.Duration(1 * time.Second))

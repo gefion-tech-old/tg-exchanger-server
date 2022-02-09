@@ -14,7 +14,7 @@ func IniAutoPayout() interfaces.AutoPayoutI {
 func (p *WhitebitPluginAutoPayout) Payout(params, body interface{}) (interface{}, error) {
 	b, err := SendRequest(
 		params.(*models.WhitebitOptionParams),
-		WhitebitbWithdraw,
+		WhitebitbWithdrawPay,
 		body.(map[string]interface{}),
 	)
 	if err != nil {

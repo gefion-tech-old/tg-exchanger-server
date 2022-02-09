@@ -37,6 +37,10 @@ var (
 	// ошибка по апи и т.д
 	ExchangeRequestAutopayoutError ExchangeRequestStatus = 600
 
+	// Деньги переведены, ожидается подтверждение успешности
+	// транзакции от биржи
+	ExchangeRequestAwaitingConfirmation ExchangeRequestStatus = 650
+
 	// Выполненная заявка
 	ExchangeRequestDone ExchangeRequestStatus = 700
 )

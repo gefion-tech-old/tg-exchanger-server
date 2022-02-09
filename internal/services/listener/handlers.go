@@ -1,6 +1,7 @@
 package listener
 
 import (
+	"fmt"
 	"strconv"
 
 	AppType "github.com/gefion-tech/tg-exchanger-server/internal/core/types"
@@ -11,8 +12,19 @@ import (
 /* Обработка событий биржи Whitebit */
 
 // Метод обработки события вывода средств
-func (l *Listener) handleWhitebitWithdrawAction(rHistory models.WhitebitHistoryRecord, rRequest *models.ExchangeRequest) error {
+func (listener *Listener) handleWhitebitWithdrawAction(rHistory models.WhitebitHistoryRecord, rRequest *models.ExchangeRequest) error {
+	if rHistory.Address == rRequest.ClientAddress && rHistory.UniqueId == rRequest.ID {
+		rRequest.Status = AppType.ExchangeRequestDone
+		if err := listener.store.AdminPanel().ExchangeRequest().Update(rRequest); err != nil {
+			fmt.Println(err)
+		}
 
+		if err := listener.moneyHasBeenSent(rHistory, rRequest.CreatedBy); err != nil {
+			fmt.Println(err)
+		}
+
+		utils.SetSuccessStep("Request done!")
+	}
 	return nil
 }
 
@@ -32,10 +44,12 @@ func (l *Listener) handleWhitebitDepositAction(rHistory models.WhitebitHistoryRe
 				rRequest.TransferredAmount = amount
 				rRequest.TransactionHash = &rHistory.TransactionHash
 
+				fmt.Println(rRequest.TransferredAmount, rRequest.ExpectedAmount)
+
 				if rRequest.TransferredAmount == rRequest.ExpectedAmount {
 					// Если полученная сумма совпадает с ожидаемой суммой
 					rRequest.Status = AppType.ExchangeRequestPaid
-				} else if rRequest.TransferredAmount > rRequest.ExpectedAmount {
+				} else if rRequest.TransferredAmount < rRequest.ExpectedAmount {
 					// Если полученная сумма меньше ожидаемой суммы
 					rRequest.Status = AppType.ExchangeRequestInvalidAmount
 
@@ -61,7 +75,6 @@ func (l *Listener) handleWhitebitDepositAction(rHistory models.WhitebitHistoryRe
 				utils.SetSuccessStep("New request processed")
 				return nil
 			}
-
 		}
 	}
 
