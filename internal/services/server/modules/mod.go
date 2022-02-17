@@ -12,6 +12,7 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/guard"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/middleware"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/bills"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/directions"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/exchanger"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/logs"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server/modules/ma"
@@ -23,13 +24,14 @@ import (
 )
 
 type ServerModules struct {
-	exMod     exchanger.ModExchangerI
-	notifyMod notification.ModNotificationI
-	userMod   user.ModUsersI
-	msgMod    message.ModMessageI
-	billsMod  bills.ModBillsI
-	logsMod   logs.ModLogsI
-	maMod     ma.ModMerchantAutoPayoutI
+	exMod        exchanger.ModExchangerI
+	notifyMod    notification.ModNotificationI
+	userMod      user.ModUsersI
+	msgMod       message.ModMessageI
+	billsMod     bills.ModBillsI
+	logsMod      logs.ModLogsI
+	maMod        ma.ModMerchantAutoPayoutI
+	directionMod directions.ModDirectionsI
 }
 
 type ServerModulesI interface {
@@ -108,6 +110,8 @@ func InitServerModules(
 			responser,
 			logger,
 		),
+
+		directionMod: directions.InitModDirections(store.AdminPanel(), cfg, responser),
 	}
 }
 
@@ -345,6 +349,16 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 		router.POST(
 			"admin/merchant-autopayout/:service/new-adress",
 			m.maMod.CreateNewAdressHandler,
+		)
+	}
+
+	// directions
+	{
+		router.POST(
+			"/admin/direction",
+			g.AuthTokenValidation(),
+			g.IsAuth(),
+			m.directionMod.CreateDirectionHandler,
 		)
 	}
 

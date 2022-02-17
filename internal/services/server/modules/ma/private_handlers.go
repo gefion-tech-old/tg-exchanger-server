@@ -82,7 +82,7 @@ func (m *ModMerchantAutoPayout) GetMerchantAutopayoutSelectionHandler(c *gin.Con
 		Service: []string{c.Query("service")},
 	}
 
-	m.responser.SelectionResponse(c, m.repository, s)
+	m.responser.SelectionResponse(c, m.repository.MerchantAutopayout(), s)
 }
 
 func (m *ModMerchantAutoPayout) GetBalanceMerchantAutopayoutHandler(c *gin.Context) {

@@ -13,6 +13,7 @@ type AdminPanelRepository interface {
 	Exchanger() ExchangerRepository
 	MerchantAutopayout() MerchantAutopayoutRepository
 	ExchangeRequest() ExchangeRequestRepository
+	Directions() DirectionsRepository
 }
 
 type UserRepository interface {
@@ -84,4 +85,11 @@ type ExchangeRequestRepository interface {
 	Count(querys interface{}) (int, error)
 	Selection(querys interface{}) ([]*models.ExchangeRequest, error)
 	GetAllByStatus(s ...AppType.ExchangeRequestStatus) ([]*models.ExchangeRequest, error)
+}
+
+type DirectionsRepository interface {
+	Create(m *models.Direction) error
+	Update(m *models.Direction) error
+	Delete(m *models.Direction) error
+	Get(m *models.Direction) error
 }

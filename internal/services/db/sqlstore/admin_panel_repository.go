@@ -15,6 +15,7 @@ type AdminPanelRepository struct {
 	logsRepository               *LoggerRepository
 	merchantAutopayoutRepository *MerchantAutopayoutRepository
 	exchangeRequestRepository    *ExchangeRequestRepository
+	directionsRepository         *DirectionsRepository
 }
 
 /*
@@ -105,4 +106,16 @@ func (r *AdminPanelRepository) ExchangeRequest() db.ExchangeRequestRepository {
 	}
 
 	return r.exchangeRequestRepository
+}
+
+func (r *AdminPanelRepository) Directions() db.DirectionsRepository {
+	if r.directionsRepository != nil {
+		return r.directionsRepository
+	}
+
+	r.directionsRepository = &DirectionsRepository{
+		store: r.store,
+	}
+
+	return r.directionsRepository
 }

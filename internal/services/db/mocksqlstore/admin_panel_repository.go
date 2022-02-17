@@ -13,6 +13,7 @@ type AdminPanelRepository struct {
 	logsRepository               *LoggerRepository
 	merchantAutopayoutRepository *MerchantAutopayoutRepository
 	exchangeRequestRepository    *ExchangeRequestRepository
+	directionsRepository         *DirectionsRepository
 }
 
 func (r *AdminPanelRepository) Logs() db.LoggerRepository {
@@ -97,4 +98,16 @@ func (r *AdminPanelRepository) ExchangeRequest() db.ExchangeRequestRepository {
 	}
 
 	return r.exchangeRequestRepository
+}
+
+func (r *AdminPanelRepository) Directions() db.DirectionsRepository {
+	if r.directionsRepository != nil {
+		return r.directionsRepository
+	}
+
+	r.directionsRepository = &DirectionsRepository{
+		directions: make(map[int]*models.BotMessage),
+	}
+
+	return r.directionsRepository
 }
