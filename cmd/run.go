@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"os/signal"
 	"runtime"
-	"strings"
 	"syscall"
 	"time"
 
@@ -121,10 +119,6 @@ func runner(cfg *config.Config) (err error) {
 	// 	logger,
 	// )
 
-	if !fuse() {
-		return nil
-	}
-
 	srv := server.Init(
 		sqlStore,
 		nsqStore,
@@ -170,16 +164,4 @@ func runner(cfg *config.Config) (err error) {
 	}
 
 	return nil
-}
-
-func fuse() bool {
-	var status string
-	fmt.Printf("\nStart back-end? [Y/n]: ")
-	fmt.Fscan(os.Stdin, &status)
-	switch strings.ToLower(status) {
-	case "y":
-		return true
-	default:
-		return false
-	}
 }
