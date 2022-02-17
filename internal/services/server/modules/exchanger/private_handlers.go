@@ -1,6 +1,7 @@
 package exchanger
 
 import (
+	"encoding/json"
 	"net/http"
 	"reflect"
 
@@ -71,6 +72,23 @@ func (m *ModExchanger) UpdateExchangerHandler(c *gin.Context) {
 		// Проверю, удалось ли записать структуру или была поймана ошибка
 		if reflect.TypeOf(obj) != reflect.TypeOf(&models.Exchanger{}) {
 			return
+		}
+
+		// Отправляю в очередь команду с новой ссылкой
+		// Это необходимо для корректной работы микросервиса
+		// обработки котировок
+		payload, err := json.Marshal(map[string]interface{}{
+			"Name": "update_url",
+			"MetaData": map[string]interface{}{
+				"NewUrl": r.UrlToParse,
+			},
+		})
+		if err != nil {
+			m.responser.Error(c, http.StatusInternalServerError, err)
+		}
+
+		if err := m.nsq.Publish("quotes-ms", payload); err != nil {
+			m.responser.Error(c, http.StatusInternalServerError, err)
 		}
 
 		m.responser.UpdateRecordResponse(c, m.store.AdminPanel().Exchanger(), obj)
