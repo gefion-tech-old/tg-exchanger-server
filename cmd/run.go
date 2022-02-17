@@ -22,7 +22,6 @@ import (
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/nsqstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/redisstore"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/db/sqlstore"
-	"github.com/gefion-tech/tg-exchanger-server/internal/services/listener"
 	"github.com/gefion-tech/tg-exchanger-server/internal/services/server"
 	"github.com/gefion-tech/tg-exchanger-server/internal/utils"
 	"github.com/spf13/cobra"
@@ -115,12 +114,12 @@ func runner(cfg *config.Config) (err error) {
 	logger := utils.InitLogger(sqlStore.AdminPanel().Logs())
 	utils.SetSuccessStep(AppType.StartStepLoggerInit)
 
-	lsnr := listener.InitListener(
-		sqlStore,
-		nsqStore,
-		plugins,
-		logger,
-	)
+	// lsnr := listener.InitListener(
+	// 	sqlStore,
+	// 	nsqStore,
+	// 	plugins,
+	// 	logger,
+	// )
 
 	if !fuse() {
 		return nil
@@ -147,15 +146,15 @@ func runner(cfg *config.Config) (err error) {
 	}()
 
 	// Запуск слушателя транзакций
-	go func() {
-		if err := lsnr.Listen(ctx, &cfg.Listener); err != nil {
-			logger.NewRecord(&models.LogRecord{
-				Service: AppType.LogTypeServer,
-				Module:  AppType.LogModuleListener,
-				Info:    err.Error(),
-			})
-		}
-	}()
+	// go func() {
+	// 	if err := lsnr.Listen(ctx, &cfg.Listener); err != nil {
+	// 		logger.NewRecord(&models.LogRecord{
+	// 			Service: AppType.LogTypeServer,
+	// 			Module:  AppType.LogModuleListener,
+	// 			Info:    err.Error(),
+	// 		})
+	// 	}
+	// }()
 
 	<-ctx.Done()
 	stop()

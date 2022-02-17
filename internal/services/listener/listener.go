@@ -67,8 +67,9 @@ func (listener *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig
 				defer close(cExchangeRequestsArr)
 
 				arr, err := listener.store.AdminPanel().ExchangeRequest().GetAllByStatus(
-					AppType.ExchangeRequestNew,  // новые заявки
-					AppType.ExchangeRequestPaid, // заявки по которым должны отработать автовыплаты
+					AppType.ExchangeRequestNew,                  // новые заявки
+					AppType.ExchangeRequestPaid,                 // заявки по которым должны отработать автовыплаты
+					AppType.ExchangeRequestAwaitingConfirmation, // заявки по которым отработали автовыплаты, ожидают подтверждения от биржи
 				)
 				if err != nil {
 					return err
@@ -138,8 +139,10 @@ func (listener *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig
 								listener.handleWhitebitDepositAction(rHistory, rRequest)
 								continue
 							case 2: // Событие вывода средств
-								listener.handleWhitebitWithdrawAction(rHistory, rRequest)
-								continue
+								if rHistory.Status == 3 || rHistory.Status == 7 {
+									listener.handleWhitebitWithdrawAction(rHistory, rRequest)
+									continue
+								}
 							default:
 								continue
 							}
@@ -173,12 +176,12 @@ func (listener *Listener) Listen(ctx context.Context, cfg *config.ListenerConfig
 						if reflect.TypeOf(body) == reflect.TypeOf(map[string]interface{}{}) {
 							resp := body.(map[string]interface{})
 							utils.SetSuccessStep(AppType.SprintfStep("Payout done with status %v", resp["code"]))
-							// fmt.Println(resp["errors"])
+							fmt.Println(resp["errors"])
 							continue
 						}
 
 						// Если деньги ушли
-						rRequest.Status = AppType.ExchangeRequestPaid
+						rRequest.Status = AppType.ExchangeRequestAwaitingConfirmation
 						if err := listener.store.AdminPanel().ExchangeRequest().Update(rRequest); err != nil {
 							fmt.Println(err)
 						}

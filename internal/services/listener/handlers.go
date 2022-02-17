@@ -13,18 +13,22 @@ import (
 
 // Метод обработки события вывода средств
 func (listener *Listener) handleWhitebitWithdrawAction(rHistory models.WhitebitHistoryRecord, rRequest *models.ExchangeRequest) error {
-	if rHistory.Address == rRequest.ClientAddress && rHistory.UniqueId == rRequest.ID {
-		rRequest.Status = AppType.ExchangeRequestDone
-		if err := listener.store.AdminPanel().ExchangeRequest().Update(rRequest); err != nil {
-			fmt.Println(err)
-		}
+	if rRequest.TransactionHash != nil && rRequest.Status == AppType.ExchangeRequestAwaitingConfirmation {
 
-		if err := listener.moneyHasBeenSent(rHistory, rRequest.CreatedBy); err != nil {
-			fmt.Println(err)
-		}
+		if rHistory.Address == rRequest.ClientAddress {
+			rRequest.Status = AppType.ExchangeRequestDone
+			if err := listener.store.AdminPanel().ExchangeRequest().Update(rRequest); err != nil {
+				fmt.Println(err)
+			}
 
-		utils.SetSuccessStep("Request done!")
+			if err := listener.moneyHasBeenSent(rHistory, rRequest.CreatedBy); err != nil {
+				fmt.Println(err)
+			}
+
+			utils.SetSuccessStep("Request done!")
+		}
 	}
+
 	return nil
 }
 
@@ -44,11 +48,10 @@ func (l *Listener) handleWhitebitDepositAction(rHistory models.WhitebitHistoryRe
 				rRequest.TransferredAmount = amount
 				rRequest.TransactionHash = &rHistory.TransactionHash
 
-				fmt.Println(rRequest.TransferredAmount, rRequest.ExpectedAmount)
-
 				if rRequest.TransferredAmount == rRequest.ExpectedAmount {
 					// Если полученная сумма совпадает с ожидаемой суммой
 					rRequest.Status = AppType.ExchangeRequestPaid
+
 				} else if rRequest.TransferredAmount < rRequest.ExpectedAmount {
 					// Если полученная сумма меньше ожидаемой суммы
 					rRequest.Status = AppType.ExchangeRequestInvalidAmount
@@ -59,7 +62,7 @@ func (l *Listener) handleWhitebitDepositAction(rHistory models.WhitebitHistoryRe
 					}
 				} else {
 					// Если полученная сумма больше ожидаемой суммы
-					rRequest.Status = AppType.ExchangeRequestPaid
+					rRequest.Status = AppType.ExchangeRequestInvalidAmount
 
 					// Отправка уведомления
 					if err := l.amountMoreThanExpected(rRequest.CreatedBy); err != nil {
@@ -67,7 +70,7 @@ func (l *Listener) handleWhitebitDepositAction(rHistory models.WhitebitHistoryRe
 					}
 				}
 
-				// Если все ок, обновляю запись в БД, отмечаю что деньги были получены
+				// Oбновляю запись в БД, отмечаю что деньги были получены
 				if err := l.store.AdminPanel().ExchangeRequest().Update(rRequest); err != nil {
 					return err
 				}

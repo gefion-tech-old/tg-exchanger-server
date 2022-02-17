@@ -3,6 +3,7 @@ package ma
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
@@ -80,6 +81,12 @@ func (m *ModMerchantAutoPayout) CreateNewAdressHandler(c *gin.Context) {
 
 		if err := json.Unmarshal(b.([]byte), &resp); err != nil {
 			m.responser.Error(c, http.StatusInternalServerError, err)
+			return
+		}
+
+		if resp["message"] != nil {
+			fmt.Println(resp["errors"])
+			c.JSON(http.StatusInternalServerError, resp)
 			return
 		}
 
