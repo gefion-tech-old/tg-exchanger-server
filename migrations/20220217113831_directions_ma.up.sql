@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS directions_ma(
-    id BIGSERIAL ON DELETE CASCADE PRIMARY KEY,
-    direction_id BIGINT REFERENCES exchange_directions(id),
-    ma_id BIGINT REFERENCES merchant_autopayout(id),
+    id BIGSERIAL PRIMARY KEY,
+    direction_id BIGINT REFERENCES exchange_directions(id) ON DELETE CASCADE,
+    ma_id BIGINT REFERENCES merchant_autopayout(id) ON DELETE CASCADE,
     service_type INT NOT NULL,
     status BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT now(),

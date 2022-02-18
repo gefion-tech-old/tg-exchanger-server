@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS exchange_directions;
+DROP TABLE IF EXISTS exchange_directions CASCADE;
