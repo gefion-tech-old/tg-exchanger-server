@@ -92,4 +92,6 @@ type DirectionsRepository interface {
 	Update(m *models.Direction) error
 	Delete(m *models.Direction) error
 	Get(m *models.Direction) error
+	Count(querys interface{}) (int, error)
+	Selection(querys interface{}) ([]*models.Direction, error)
 }

@@ -360,6 +360,29 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 			g.IsAuth(),
 			m.directionMod.CreateDirectionHandler,
 		)
+		router.PUT(
+			"/admin/direction/:id",
+			g.AuthTokenValidation(),
+			g.IsAuth(),
+			m.directionMod.UpdateDirectionHandler,
+		)
+		router.GET(
+			"/admin/direction/:id",
+			m.directionMod.GetDirectionHandler,
+		)
+		router.DELETE(
+			"/admin/direction/:id",
+			g.AuthTokenValidation(),
+			g.IsAuth(),
+			m.directionMod.DeleteDirectionHandler,
+		)
+
+		router.GET(
+			"/admin/directions",
+			g.AuthTokenValidation(),
+			g.IsAuth(),
+			m.directionMod.DirectionSelectionHandler,
+		)
 	}
 
 	// log

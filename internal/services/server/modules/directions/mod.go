@@ -16,6 +16,10 @@ type ModDirections struct {
 
 type ModDirectionsI interface {
 	CreateDirectionHandler(c *gin.Context)
+	UpdateDirectionHandler(c *gin.Context)
+	DeleteDirectionHandler(c *gin.Context)
+	GetDirectionHandler(c *gin.Context)
+	DirectionSelectionHandler(c *gin.Context)
 }
 
 func InitModDirections(

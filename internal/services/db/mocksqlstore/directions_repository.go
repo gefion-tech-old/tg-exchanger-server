@@ -21,3 +21,11 @@ func (r *DirectionsRepository) Delete(er *models.Direction) error {
 func (r *DirectionsRepository) Get(er *models.Direction) error {
 	return nil
 }
+
+func (r *DirectionsRepository) Count(querys interface{}) (int, error) {
+	return len(r.directions), nil
+}
+
+func (r *DirectionsRepository) Selection(querys interface{}) ([]*models.Direction, error) {
+	return nil, nil
+}

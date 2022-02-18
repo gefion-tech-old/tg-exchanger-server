@@ -32,15 +32,15 @@ func (m *ModDirections) DirectionHandler(c *gin.Context) {
 		case http.MethodPost:
 			m.responser.CreateRecordResponse(c, m.repository.Directions(), obj)
 			return
-			// case http.MethodGet:
-			// 	m.responser.GetRecordResponse(c, m.repository.MerchantAutopayout(), obj)
-			// 	return
-			// case http.MethodPut:
-			// 	m.responser.UpdateRecordResponse(c, m.repository.MerchantAutopayout(), obj)
-			// 	return
-			// case http.MethodDelete:
-			// 	m.responser.DeleteRecordResponse(c, m.repository.MerchantAutopayout(), obj)
-			// 	return
+		case http.MethodGet:
+			m.responser.GetRecordResponse(c, m.repository.Directions(), obj)
+			return
+		case http.MethodPut:
+			m.responser.UpdateRecordResponse(c, m.repository.Directions(), obj)
+			return
+		case http.MethodDelete:
+			m.responser.DeleteRecordResponse(c, m.repository.Directions(), obj)
+			return
 		}
 	}
 
