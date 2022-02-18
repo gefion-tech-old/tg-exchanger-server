@@ -20,6 +20,12 @@ type ModDirectionsI interface {
 	DeleteDirectionHandler(c *gin.Context)
 	GetDirectionHandler(c *gin.Context)
 	DirectionSelectionHandler(c *gin.Context)
+
+	CreateDirectionMaHandler(c *gin.Context)
+	UpdateDirectionMaHandler(c *gin.Context)
+	DeleteDirectionMaHandler(c *gin.Context)
+	GetDirectionMaHandler(c *gin.Context)
+	DirectionMaSelectionHandler(c *gin.Context)
 }
 
 func InitModDirections(

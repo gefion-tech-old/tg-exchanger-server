@@ -41,6 +41,41 @@ type DirectionSelection struct {
 	Status *bool
 }
 
+type DirectionMASelection struct {
+	Page        *int
+	Limit       *int
+	DirectionID int
+}
+
+func (dmas *DirectionMASelection) Validation() error {
+	return validation.ValidateStruct(
+		dmas,
+		validation.Field(
+			&dmas.Page,
+			validation.When(
+				dmas.Page != nil,
+				validation.Required,
+				validation.Min(1)),
+		),
+
+		validation.Field(
+			&dmas.Limit,
+			validation.When(
+				dmas.Limit != nil,
+				validation.Required,
+				validation.Min(1),
+				validation.Max(30),
+			),
+		),
+
+		validation.Field(
+			&dmas.DirectionID,
+			validation.Required,
+			validation.Min(1),
+		),
+	)
+}
+
 func (ds *DirectionSelection) Validation() error {
 	return validation.ValidateStruct(
 		ds,

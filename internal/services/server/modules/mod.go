@@ -383,6 +383,40 @@ func (m *ServerModules) ModulesConfigure(router *gin.RouterGroup, g guard.GuardI
 			g.IsAuth(),
 			m.directionMod.DirectionSelectionHandler,
 		)
+
+		// Merchant and autopayout for direction
+		{
+			router.POST(
+				"/admin/direction/merchant-autopayout",
+				g.AuthTokenValidation(),
+				g.IsAuth(),
+				m.directionMod.DeleteDirectionMaHandler,
+			)
+			router.PUT(
+				"/admin/direction/merchant-autopayout/:id",
+				g.AuthTokenValidation(),
+				g.IsAuth(),
+				m.directionMod.UpdateDirectionMaHandler,
+			)
+			router.GET(
+				"/admin/direction/merchant-autopayout/:id",
+				g.AuthTokenValidation(),
+				g.IsAuth(),
+				m.directionMod.GetDirectionMaHandler,
+			)
+			router.DELETE(
+				"/admin/direction/merchant-autopayout/:id",
+				g.AuthTokenValidation(),
+				g.IsAuth(),
+				m.directionMod.DeleteDirectionMaHandler,
+			)
+			router.GET(
+				"/admin/direction/merchant-autopayout/all",
+				g.AuthTokenValidation(),
+				g.IsAuth(),
+				m.directionMod.DirectionMaSelectionHandler,
+			)
+		}
 	}
 
 	// log

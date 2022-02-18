@@ -94,4 +94,15 @@ type DirectionsRepository interface {
 	Get(m *models.Direction) error
 	Count(querys interface{}) (int, error)
 	Selection(querys interface{}) ([]*models.Direction, error)
+
+	Ma() DirectionsMaRepository
+}
+
+type DirectionsMaRepository interface {
+	Create(dma *models.DirectionMA) error
+	Update(dma *models.DirectionMA) error
+	Delete(dma *models.DirectionMA) error
+	Get(dma *models.DirectionMA) error
+	Count(querys interface{}) (int, error)
+	Selection(querys interface{}) ([]*models.DirectionMA, error)
 }

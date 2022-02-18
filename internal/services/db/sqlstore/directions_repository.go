@@ -10,12 +10,38 @@ import (
 	AppError "github.com/gefion-tech/tg-exchanger-server/internal/core/errors"
 	AppMath "github.com/gefion-tech/tg-exchanger-server/internal/core/math"
 	"github.com/gefion-tech/tg-exchanger-server/internal/models"
+	"github.com/gefion-tech/tg-exchanger-server/internal/services/db"
 )
 
 type DirectionsRepository struct {
 	store *sql.DB
+
+	directionsMaRepository *DirectionsMaRepository
 }
 
+/*
+	==========================================================================================
+	КОНСТРУКТОРЫ ВЛОЖЕННЫХ СТРУКТУР
+	==========================================================================================
+*/
+
+func (r *DirectionsRepository) Ma() db.DirectionsMaRepository {
+	if r.directionsMaRepository != nil {
+		return r.directionsMaRepository
+	}
+
+	r.directionsMaRepository = &DirectionsMaRepository{
+		store: r.store,
+	}
+
+	return r.directionsMaRepository
+}
+
+/*
+	==========================================================================================
+	КОНЕЧНЫЕ МЕТОДЫ
+	==========================================================================================
+*/
 func (r *DirectionsRepository) Create(d *models.Direction) error {
 	if err := r.store.QueryRow(
 		`
