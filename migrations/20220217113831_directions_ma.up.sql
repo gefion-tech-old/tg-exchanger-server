@@ -5,5 +5,7 @@ CREATE TABLE IF NOT EXISTS directions_ma(
     service_type INT NOT NULL,
     status BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT now(),
-    updated_at TIMESTAMP DEFAULT now()
+    updated_at TIMESTAMP DEFAULT now(),
+
+    UNIQUE (direction_id, ma_id, service_type)
 );
