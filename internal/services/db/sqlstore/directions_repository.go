@@ -232,6 +232,8 @@ func (r *DirectionsRepository) queryGeneration(q *models.DirectionSelection) []s
 		case true:
 			conditions = append(conditions, "status=TRUE")
 		}
+	} else {
+		conditions = append(conditions, "status=TRUE OR status=FALSE")
 	}
 
 	return conditions
